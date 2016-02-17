@@ -18,8 +18,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "angel.h"
 #include "game_manager.h"
+#include "init_shader.h"
 
 using namespace std;
 
@@ -45,19 +45,31 @@ GLuint loc_size_y;
 GLuint vao_IDs[3]; // One VAO for each object: the grid, the board, the current piece
 GLuint vbo_IDs[6]; // Two Vertex Buffer Objects for each VAO (specifying vertex positions and colours, respectively)
 
-// When the current tile is moved or rotated (or created), update the VBO containing its vertex position data
+//
+// Function: UpdateTilePosition
+// ---------------------------
+//
+//   When the current tile is moved or rotated (or created), update the VBO containing its vertex position data
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void UpdateTilePosition() {
     // Bind the VBO containing current tile vertex positions
     glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[4]);
 
     // For each of the 4 'cells' of the tile,
     for (int i = 0; i < libconsts::kCountCells; i++) {
+
         // Calculate the grid coordinates of the cell
         GLfloat x = manager.get_tile_current_position().x + libconsts::kShapeCategory[manager.get_tile_current_shape()][manager.get_tile_current_orient()][i].x;
         GLfloat y = manager.get_tile_current_position().y + libconsts::kShapeCategory[manager.get_tile_current_shape()][manager.get_tile_current_orient()][i].y;
 
         // Create the 4 corners of the square - these vertices are using location in pixels
-        // These vertices are later converted by the vertex shader
         glm::vec4 p1 = glm::vec4(33.0 + (x * 33.0), 33.0 + (y * 33.0), .4, 1);
         glm::vec4 p2 = glm::vec4(33.0 + (x * 33.0), 66.0 + (y * 33.0), .4, 1);
         glm::vec4 p3 = glm::vec4(66.0 + (x * 33.0), 33.0 + (y * 33.0), .4, 1);
@@ -68,10 +80,23 @@ void UpdateTilePosition() {
 
         // Put new data in the VBO
         glBufferSubData(GL_ARRAY_BUFFER, i * 6 * sizeof(glm::vec4), 6 * sizeof(glm::vec4), new_points);
+
     }
 }
 
-// When the current tile is moved or rotated (or created), update the VBO containing its vertex color data
+//
+// Function: UpdateTileColor
+// ---------------------------
+//
+//   When the current tile is moved or rotated (or created), update the VBO containing its vertex color data
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void UpdateTileColor() {
     // Get color from color category;
     glm::vec4 new_colors[24];
@@ -80,9 +105,22 @@ void UpdateTileColor() {
     }
 
     // Update the color VBO of current tile
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[5]); // Bind the VBO containing current tile vertex colours
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(new_colors), new_colors); // Put the colour data in the VBO
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[5]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(new_colors), new_colors);
 }
+
+//
+// Function: UpdateTileDisplay
+// ---------------------------
+//
+//   When the current tile is moved or rotated (or created), update all of its VBO
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
 
 void UpdateTileDisplay() {
     // Update the geometry VBO of current tile
@@ -95,8 +133,21 @@ void UpdateTileDisplay() {
     glutPostRedisplay();
 }
 
-// Update the VBO containing current board informations
+//
+// Function: UpdateBoard
+// ---------------------------
+//
+//   Update the VBO containing current board information
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void UpdateBoard() {
+    // Get current map color data
     std::vector<std::vector<int>> &map_data = manager.get_map_data();
 
     // Let the empty cells on the board be black
@@ -106,12 +157,24 @@ void UpdateBoard() {
         board_colors[i] = libconsts::kColorCategory[map_data[y][x]];
     }
 
-    // grid cell vertex colours
+    // Update grid cell vertex colours
     glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[3]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 1200 * sizeof(glm::vec4), board_colors);
 }
 
-// Called at the start of play and every time a tile is placed
+//
+// Function: NewTile
+// ---------------------------
+//
+//   Called at the start of play and every time a tile is placed
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void NewTile() {
     // Add a new tile
     manager.AddNewTile();
@@ -120,7 +183,19 @@ void NewTile() {
     UpdateTileDisplay();
 }
 
-// Init Grid
+//
+// Function: InitGrid
+// ---------------------------
+//
+//   Init grid line
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void InitGrid() {
     glm::vec4 grid_points[64]; // Array containing the 64 points of the 32 total lines to be later put in the VBO
     glm::vec4 grid_colors[64]; // One color per vertex
@@ -141,24 +216,36 @@ void InitGrid() {
     for (int i = 0; i < 64; i++)
         grid_colors[i] = libconsts::kColorCategory[libconsts::kColorWhite];
 
-    // Set up first VAO (representing grid lines)
-    glBindVertexArray(vao_IDs[0]); // Bind the first VAO
-    glGenBuffers(2, &vbo_IDs[0]); // Create two Vertex Buffer Objects for this VAO (positions, colours)
+    // Set up first VAO that represent grid lines
+    glBindVertexArray(vao_IDs[0]);      // Bind the first VAO
+    glGenBuffers(2, &vbo_IDs[0]);       // Create two Vertex Buffer Objects for this VAO (positions, colours)
 
     // Grid vertex positions
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[0]); // Bind the first grid VBO (vertex positions)
-    glBufferData(GL_ARRAY_BUFFER, 64 * sizeof(glm::vec4), grid_points, GL_STATIC_DRAW); // Put the grid points in the VBO
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[0]);      // Bind the first grid VBO (vertex positions)
+    glBufferData(GL_ARRAY_BUFFER, 64 * sizeof(glm::vec4), grid_points, GL_STATIC_DRAW);     // Put the grid points in the VBO
     glVertexAttribPointer(v_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(v_position); // Enable the attribute
+    glEnableVertexAttribArray(v_position);
 
     // Grid vertex colours
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[1]); // Bind the second grid VBO (vertex colours)
-    glBufferData(GL_ARRAY_BUFFER, 64 * sizeof(glm::vec4), grid_colors, GL_STATIC_DRAW); // Put the grid colours in the VBO
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[1]);      // Bind the second grid VBO (vertex colours)
+    glBufferData(GL_ARRAY_BUFFER, 64 * sizeof(glm::vec4), grid_colors, GL_STATIC_DRAW);     // Put the grid colours in the VBO
     glVertexAttribPointer(v_color, 4, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(v_color); // Enable the attribute
+    glEnableVertexAttribArray(v_color);
 }
 
-// Init Board
+//
+// Function: InitBoard
+// ---------------------------
+//
+//   Init board
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void InitBoard() {
     glm::vec4 board_points[1200];
 
@@ -197,8 +284,21 @@ void InitBoard() {
     glEnableVertexAttribArray(v_color);
 }
 
-// No geometry for current tile initially
+//
+// Function: InitCurrentTile
+// ---------------------------
+//
+//   No geometry for current tile initially
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void InitCurrentTile() {
+    // Bind to current tile buffer vertex array
     glBindVertexArray(vao_IDs[2]);
     glGenBuffers(2, &vbo_IDs[4]);
 
@@ -215,7 +315,19 @@ void InitCurrentTile() {
     glEnableVertexAttribArray(v_color);
 }
 
-// Init function
+//
+// Function: Init
+// ---------------------------
+//
+//   Init all things, including shader
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void Init() {
     // Initialize the time seed
     srand(time(0));
@@ -247,37 +359,74 @@ void Init() {
     NewTile(); // create new next tile
 }
 
-// Draws the game
+//
+// Function: Display
+// ---------------------------
+//
+//   Display callback function
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void Display() {
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUniform1i(loc_size_x, size_x); // x and y sizes are passed to the shader program to maintain shape of the vertices on screen
+    glUniform1i(loc_size_x, size_x);    // x and y sizes are passed to the shader program to maintain shape of the vertices on screen
     glUniform1i(loc_size_y, size_y);
 
-    glBindVertexArray(vao_IDs[1]); // Bind the VAO representing the grid cells (to be drawn first)
-    glDrawArrays(GL_TRIANGLES, 0, 1200); // Draw the board (10*20*2 = 400 triangles)
+    glBindVertexArray(vao_IDs[1]);      // Bind the VAO representing the grid cells (to be drawn first)
+    glDrawArrays(GL_TRIANGLES, 0, 1200);        // Draw the board (10 * 20 * 2 = 400 triangles)
 
     if (manager.get_game_state() != GameState::GameStateEnd) {
-        glBindVertexArray(vao_IDs[2]); // Bind the VAO representing the current tile (to be drawn on top of the board)
-        glDrawArrays(GL_TRIANGLES, 0, 24); // Draw the current tile (8 triangles)
+        glBindVertexArray(vao_IDs[2]);          // Bind the VAO representing the current tile (to be drawn on top of the board)
+        glDrawArrays(GL_TRIANGLES, 0, 24);      // Draw the current tile (8 triangles)
     }
 
-    glBindVertexArray(vao_IDs[0]); // Bind the VAO representing the grid lines (to be drawn on top of everything else)
-    glDrawArrays(GL_LINES, 0, 64); // Draw the grid lines (21+11 = 32 lines)
+    glBindVertexArray(vao_IDs[0]);      // Bind the VAO representing the grid lines (to be drawn on top of everything else)
+    glDrawArrays(GL_LINES, 0, 64);      // Draw the grid lines (21+11 = 32 lines)
 
     glutSwapBuffers();
 }
 
-// Reshape callback will simply change size_x and size_y variables, which are passed to the vertex shader
-// to keep the game the same from stretching if the window is stretched
+//
+// Function: Reshape
+// ---------------------------
+//
+//   Reshape callback function
+//
+//   Parameters:
+//       w: the width of the window
+//       h: the height of the window
+//
+//   Returns:
+//       void
+//
+
 void Reshape(GLsizei w, GLsizei h) {
     size_x = w;
     size_y = h;
     glViewport(0, 0, w, h);
 }
 
-// Timer
+//
+// Function: Tick
+// ---------------------------
+//
+//   Timer callback function
+//
+//   Parameters:
+//       w: the width of the window
+//       h: the height of the window
+//
+//   Returns:
+//       void
+//
+
 void Tick(int value) {
     manager.Tick();
     UpdateBoard();
@@ -285,7 +434,19 @@ void Tick(int value) {
     glutTimerFunc(manager.get_tick_interval(), Tick, 0);
 }
 
-// Handle arrow key keypresses
+//
+// Function: Special
+// ---------------------------
+//
+//   Special input callback function
+//
+//   Parameters:
+//       key: the key that user pressed
+//
+//   Returns:
+//       void
+//
+
 void Special(int key, int, int) {
     switch (key) {
         case GLUT_KEY_LEFT:         // Move left
@@ -309,31 +470,43 @@ void Special(int key, int, int) {
     }
 }
 
-// Handles standard keypresses
+//
+// Function: Keyboard
+// ---------------------------
+//
+//   Keyboard input callback function
+//
+//   Parameters:
+//       key: the key that user pressed
+//
+//   Returns:
+//       void
+//
+
 void Keyboard(unsigned char key, int, int) {
     switch (key) {
-        case 033: // Both escape key and 'q' cause the game to exit
+        case 033:   // Both escape key and 'q' cause the game to exit
             exit(EXIT_SUCCESS);
-        case 'q':
+        case 'q':   // Both escape key and 'q' cause the game to exit
             exit (EXIT_SUCCESS);
-        case '1': // '1' key enter easy mode
+        case '1':   // '1' key enter easy mode
             manager.Easy();
             break;
-        case '2': // '2' key enter normal mode
+        case '2':   // '2' key enter normal mode
             manager.Normal();
             break;
-        case '3': // '3' key enter hard mode
+        case '3':   // '3' key enter hard mode
             manager.Hard();
             break;
-        case '4': // '4' key enter insane mode
+        case '4':   // '4' key enter insane mode
             manager.Insane();
             break;
-        case 'r': // 'r' key restarts the game
+        case 'r':   // 'r' key restarts the game
             manager.Restart();
             UpdateBoard();
             UpdateTileDisplay();
             break;
-        case 'p': // 'p' key pause or resume the game
+        case 'p':   // 'p' key pause or resume the game
             if (manager.get_game_state() == GameState::GameStatePause)
                 manager.Resume();
             else
@@ -343,12 +516,38 @@ void Keyboard(unsigned char key, int, int) {
     glutPostRedisplay();
 }
 
+//
+// Function: Idle
+// ---------------------------
+//
+//   Idle callback function
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void Idle(void) {
     glutPostRedisplay();
 }
 
-int main(int argc, char **argv) {
+//
+// Function: Main
+// ---------------------------
+//
+//   The main function
+//
+//   Parameters:
+//       argc: the number of parameters in main function
+//       argv[]: the array of parameters in main function
+//
+//   Returns:
+//       void
+//
 
+int main(int argc, char **argv) {
     glutInit(&argc, argv);
 #ifdef __APPLE__
     glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_RGBA | GLUT_DOUBLE);
@@ -358,14 +557,16 @@ int main(int argc, char **argv) {
 
     // Init glut window
     glutInitWindowSize(size_x, size_y);
-    glutInitWindowPosition(680, 178); // Center the game window (well, on a 1920x1080 display)
+    glutInitWindowPosition(libconsts::kWindowPositionX, libconsts::kWindowPositionY);
     glutCreateWindow("Fruit Tetris");
+
+    // Init
 #ifndef __APPLE__
     glewInit();
 #endif
     Init();
 
-    // Callback functions
+    // Setup Callback functions
     glutDisplayFunc(Display);
     glutReshapeFunc(Reshape);
     glutSpecialFunc(Special);

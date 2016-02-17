@@ -18,7 +18,20 @@
 
 #include "game_manager.h"
 
-// Init game manager
+//
+// Function: Init
+// ---------------------------
+//
+//   Init game manager
+//
+//   Parameters:
+//       width: the width of the window
+//       height: the height of the window
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Init(int width, int height) {
     map_size_.x = width;
     map_size_.y = height;
@@ -30,7 +43,19 @@ void GameManager::Init(int width, int height) {
     tick_interval_ = libconsts::kTickNormalMode;
 }
 
-// Generate new tile
+//
+// Function: AddNewTile
+// ---------------------------
+//
+//   Generate new tile
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::AddNewTile() {
     tile_current_position_.x = rand() % (int)map_size_.x;
     tile_current_position_.y = map_size_.y - 1; // Put the tile at the top of the board
@@ -62,7 +87,19 @@ void GameManager::AddNewTile() {
         game_states_.push(GameState::GameStateEnd);
 }
 
-// Tick
+//
+// Function: Tick
+// ---------------------------
+//
+//   Tick function for timer callback
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Tick() {
     if (get_game_state() != GameState::GameStateEnd || get_game_state() != GameState::GameStatePause) {
         int drop_state = DropOneBlock();
@@ -74,7 +111,19 @@ void GameManager::Tick() {
     }
 }
 
-// Easy mode
+//
+// Function: Easy
+// ---------------------------
+//
+//   Change to easy mode
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Easy(){
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
         ChangeGameMode(GameState::GameStateEasy);
@@ -82,7 +131,19 @@ void GameManager::Easy(){
     }
 }
 
-// Normal mode
+//
+// Function: Normal
+// ---------------------------
+//
+//   Change to normal mode
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Normal() {
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
         ChangeGameMode(GameState::GameStateNormal);
@@ -90,7 +151,19 @@ void GameManager::Normal() {
     }
 }
 
-// Hard mode
+//
+// Function: Hard
+// ---------------------------
+//
+//   Change to hard mode
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Hard() {
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
         ChangeGameMode(GameState::GameStateHard);
@@ -98,7 +171,19 @@ void GameManager::Hard() {
     }
 }
 
-// Insane mode
+//
+// Function: Insane
+// ---------------------------
+//
+//   Change to insane mode
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Insane() {
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
         ChangeGameMode(GameState::GameStateInsane);
@@ -106,14 +191,38 @@ void GameManager::Insane() {
     }
 }
 
-// Pause game
+//
+// Function: Pause
+// ---------------------------
+//
+//   Pause the game
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Pause() {
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
         game_states_.push(GameState::GameStatePause);
     }
 }
 
-// Resume game
+//
+// Function: Resume
+// ---------------------------
+//
+//   Resume the game
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Resume() {
     if (get_game_state() != GameState::GameStateEnd && get_game_state() == GameState::GameStatePause) {
         game_states_.pop();
@@ -123,7 +232,19 @@ void GameManager::Resume() {
     }
 }
 
-// Change game mode to specific state
+//
+// Function: ChangeGameMode
+// ---------------------------
+//
+//   Change game mode to specific state
+//
+//   Parameters:
+//       state: the state that we want to change to
+//
+//   Returns:
+//       void
+//
+
 void GameManager::ChangeGameMode(GameState state){
     if (get_game_state() != GameState::GameStateEnd) {
         GameState last_state = GameState::GameStateEmpty;
@@ -141,7 +262,19 @@ void GameManager::ChangeGameMode(GameState state){
     }
 }
 
-// Move tile with direction
+//
+// Function: MoveTile
+// ---------------------------
+//
+//   Move tile with direction
+//
+//   Parameters:
+//       direction: the direction that we want to move the tile
+//
+//   Returns:
+//       void
+//
+
 int GameManager::MoveTile(glm::vec2 direction) {
     if (get_game_state() != GameState::GameStatePause) {
         tile_current_position_ += direction;
@@ -158,12 +291,24 @@ int GameManager::MoveTile(glm::vec2 direction) {
     return libconsts::kInBoundary;
 }
 
-// Rotate tile with direction
+//
+// Function: RotateTile
+// ---------------------------
+//
+//   Rotate tile with direction
+//
+//   Parameters:
+//       direction: the direction that we want to rotate the tile
+//
+//   Returns:
+//       void
+//
+
 int GameManager::RotateTile(int direction) {
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
         tile_current_orient_ += direction;
         tile_current_orient_ %= libconsts::kCountOrient;
-        if (CheckCollision()) {         // Check collision
+        if (CheckCollision()) {                     // Check collision
             tile_current_orient_ -= direction;
             if (tile_current_orient_ < 0)
                 tile_current_orient_ = libconsts::kCountOrient - 1;
@@ -182,7 +327,19 @@ int GameManager::RotateTile(int direction) {
     return libconsts::kInBoundary;
 }
 
-// Fill current tile color to map
+//
+// Function: FillTileToMap
+// ---------------------------
+//
+//   Fill current tile color to map
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::FillTileToMap(){
     for (int i = 0; i < libconsts::kCountCells; i++) {
         int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
@@ -193,7 +350,19 @@ void GameManager::FillTileToMap(){
     }
 }
 
-// Check elimination
+//
+// Function: CheckElimination
+// ---------------------------
+//
+//   Check if there needs elimination
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::CheckElimination() {
     int should_eliminate;
 
@@ -265,7 +434,19 @@ void GameManager::CheckElimination() {
     } while (should_eliminate);
 }
 
-// Eliminate one row
+//
+// Function: EliminateRow
+// ---------------------------
+//
+//   Eliminate one row
+//
+//   Parameters:
+//       row: the row number that we want to eliminate
+//
+//   Returns:
+//       void
+//
+
 void GameManager::EliminateRow(int row) {
     std::vector<int>::iterator it;
     for (int i = 0; i < map_size_.x; i++) {
@@ -275,7 +456,19 @@ void GameManager::EliminateRow(int row) {
     }
 }
 
-// Drop one block
+//
+// Function: DropOneBlock
+// ---------------------------
+//
+//   Drop current tile by one block
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 int GameManager::DropOneBlock() {
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
         return MoveTile(libconsts::kMoveDown);
@@ -283,7 +476,19 @@ int GameManager::DropOneBlock() {
     return libconsts::kInBoundary;
 }
 
-// Check boundary
+//
+// Function: CheckBoundary
+// ---------------------------
+//
+//   Check if current tile within the boundary
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 int GameManager::CheckBoundary() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
         int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
@@ -300,7 +505,19 @@ int GameManager::CheckBoundary() {
     return libconsts::kInBoundary;
 }
 
-// Check collision
+//
+// Function: CheckCollision
+// ---------------------------
+//
+//   Check if current tile collide with other tile
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 bool GameManager::CheckCollision() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
         int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
@@ -311,7 +528,19 @@ bool GameManager::CheckCollision() {
     return false;
 }
 
-// Restart game
+//
+// Function: Restart
+// ---------------------------
+//
+//   Restart the game
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
 void GameManager::Restart() {
     Init((int)map_size_.x, (int)map_size_.y);
     AddNewTile();

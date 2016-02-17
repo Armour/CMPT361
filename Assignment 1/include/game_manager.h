@@ -19,11 +19,12 @@
 #ifndef FRUITTETRIS_GAME_MANAGER_H_
 #define FRUITTETRIS_GAME_MANAGER_H_
 
-#include "angel.h"
 #include <vector>
 #include <stack>
+#include "lib_gl.h"
+#include "lib_consts.h"
 
-enum class GameState {
+enum class GameState {              // Game states
     GameStateEmpty,
     GameStateEasy,
     GameStateNormal,
@@ -35,11 +36,11 @@ enum class GameState {
 
 class GameManager {
 private:
-    int tick_interval_;
-    int tile_current_shape_;
-    int tile_current_orient_;
-    int tile_current_color_[libconsts::kCountCells];
-    glm::vec2 tile_current_position_;
+    int tick_interval_;             // Current tick interval
+    int tile_current_shape_;        // Current tile shape
+    int tile_current_orient_;       // Current tile orientation
+    int tile_current_color_[libconsts::kCountCells];        // Current tile color
+    glm::vec2 tile_current_position_;       // Current tile position
     glm::vec2 map_size_;
 
     std::stack<GameState> game_states_;     // Gamestate stack
@@ -60,16 +61,16 @@ public:
     void Init(int width, int height);
 
     void AddNewTile();      // Generate new tile
-    void Tick();        // Time tick function
+    void Tick();            // Time tick function
     int RotateTile(int direction);
     int MoveTile(glm::vec2 direction);
 
-    void Easy();        // Game mode
+    void Easy();            // Game mode
     void Normal();
     void Hard();
     void Insane();
 
-    void Pause();       // Game state
+    void Pause();           // Game state
     void Resume();
     void Restart();
 

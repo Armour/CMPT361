@@ -7,16 +7,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Set source files
 set(SOURCE_FILES
-        include/angel.h
         include/game_manager.h
         include/init_shader.h
-        include/check_error.h
         include/lib_consts.h
         include/lib_gl.h
         src/game_manager.cc
         src/fruit_tetris.cc
         src/init_shader.cc
-        src/check_error.cc
         fshader.glsl
         vshader.glsl)
 

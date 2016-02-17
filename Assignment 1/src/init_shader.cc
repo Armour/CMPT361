@@ -74,6 +74,7 @@ GLuint InitShader(const char *vertex_shader_file, const char *fragment_shader_fi
         { fragment_shader_file, GL_FRAGMENT_SHADER, NULL }
     };
 
+    // Create program
     GLuint program = glCreateProgram();
 
     // Compile and attach shaders
