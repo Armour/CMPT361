@@ -14,8 +14,10 @@ set(SOURCE_FILES
         src/game_manager.cc
         src/fruit_tetris.cc
         src/init_shader.cc
-        fshader.glsl
-        vshader.glsl)
+        fshader_unix.glsl
+        vshader_unix.glsl
+        fshader_mac.glsl
+        vshader_mac.glsl)
 
 # Add header include directories
 include_directories(include src cmake)

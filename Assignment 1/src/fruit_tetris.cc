@@ -336,7 +336,11 @@ void Init() {
     manager.Init(10, 20);
 
     // Load shaders and use the shader program
-    GLuint program = angel::InitShader("vshader.glsl", "fshader.glsl");
+#ifdef __APPLE__
+    GLuint program = angel::InitShader("vshader_mac.glsl", "fshader_mac.glsl");
+#else
+    GLuint program = angel::InitShader("vshader_unix.glsl", "fshader_unix.glsl");
+#endif
     glUseProgram(program);
 
     // Get the location of the attributes (for glVertexAttribPointer() calls)

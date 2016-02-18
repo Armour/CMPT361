@@ -27,7 +27,7 @@ namespace libconsts {
 const int kWindowPositionX = 680;
 const int kWindowPositionY = 178;
 
-    // Count
+// Count
 const int kCountShape  = 6;
 const int kCountColor  = 7;
 const int kCountOrient = 4;
@@ -56,10 +56,11 @@ const int kOutOfBoundaryLeft  = -3;
 const int kOutOfBoundaryRight = -4;
 const int kCollision          = -5;
 
-// Colors
+// Black and white
 const int kColorBlack  = 0;
 const int kColorWhite  = 1;
 
+// Color category
 const glm::vec4 kColorCategory[kCountColor] = {
 
     glm::vec4(0.0, 0.0, 0.0, 1.0),  // Black
@@ -72,6 +73,7 @@ const glm::vec4 kColorCategory[kCountColor] = {
 
 };
 
+// Shape category
 const glm::vec2 kShapeCategory[kCountShape][kCountOrient][kCountCells] = {
 
     // I Shape
