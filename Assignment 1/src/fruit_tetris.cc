@@ -20,6 +20,8 @@
 
 #include "game_manager.h"
 #include "init_shader.h"
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 

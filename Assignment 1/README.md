@@ -27,31 +27,29 @@
 ## How to use
 
 - Mac
-    - Use `Clion` 
-    - Manual compile
-        - `cmake .`
-        - `make`
-        - `./FruitTetris`
-        
-- Ubuntu (in school lab, can only use make but not cmake)
     - Use `Clion`
     - Manual compile
+        - `cmake .` (Optional)
         - `make`
-        - `./FruitTetris`
+        - `./FruitTetris` 
 
-- Ubuntu (normal computer)
+- Ubuntu
     - Use `Clion`
-    - `cmake .`
-    - `make`
-    - `./FruitTetris` 
+    - Manual compile
+        - `cmake .` (Optional)
+        - `make`
+        - `./FruitTetris` 
 
 - If `make` in ubuntu not well, you should remove depend and try to run `make` twice.
 
 ## Additional Features
 
-- Cross platform (Clion + Cmake)
-- Following Google C++ Style, well commented
-- Self-write almost all the skeleton code with comment
-- Put all constant values to one header file, elegant and easy to modify
-- Four different game mode by press key `1`, `2`, `3`, `4`
-- Press `p` to pause the game and again to resume 
+- Functions
+    - Four different game mode by press key `1`, `2`, `3`, `4`
+    - Press `p` to pause the game and again to resume 
+
+- Others
+    - Cross platform (Clion + Cmake)
+    - Following Google C++ Style, well commented
+    - Self-write almost all the skeleton code with comment
+    - Put all constant values to one header file, elegant and easy to modify
