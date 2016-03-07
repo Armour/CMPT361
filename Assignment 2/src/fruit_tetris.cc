@@ -51,15 +51,15 @@ GLuint v_mv;
 GLuint is_text;
 
 // VAO and VBO
-GLuint vao_IDs[4]; // One VAO for each object: the grid, the board, the current piece, the robot arm
-GLuint vbo_IDs[8]; // Vertex Buffer Objects for each VAO (contain vertex positions and colours)
+GLuint vao_IDs[4];  // One VAO for each object: the grid, the board, the current piece, the robot arm
+GLuint vbo_IDs[8];  // Vertex Buffer Objects for each VAO (contain vertex positions and colours)
 
 // The id of main window
 int main_win;
 
 // Variables in GLUI
-GLUI *gluiRight;            // The GLUI on right
-GLUI *gluiTop;              // The GLUI on top
+GLUI *gluiTop;	    // The GLUI on top
+GLUI_StaticText *count_down_text;    // The text for count down display
 
 // Camera rotation angle
 float camera_rotation = 0.0f;
@@ -520,7 +520,7 @@ void Init() {
     srand(time(0));
 
     // Init game manager
-    manager.Init(libconsts::kMapSizeWidth, libconsts::kMapSizeHeight, 9);
+    manager.Init(libconsts::kMapSizeWidth, libconsts::kMapSizeHeight, 3);
 
     // Enable Z-buffering
     glEnable(GL_DEPTH_TEST);
@@ -556,28 +556,6 @@ void Init() {
 }
 
 //
-// Function: RenderText
-// ---------------------------
-//
-//   Display count down text on screen
-//
-//   Parameters:
-//       void
-//
-//   Returns:
-//       void
-//
-
-void RenderText() {
-    std::string text = "23333323232323";
-    glUniform1i(is_text, 1);
-    for (auto c: text) {
-        glutStrokeCharacter(GLUT_STROKE_ROMAN, c);
-    }
-    glUniform1i(is_text, 0);
-}
-
-//
 // Function: Display
 // ---------------------------
 //
@@ -596,7 +574,7 @@ void Display() {
 
     UpdateMVP();    // Update MVP matrix
 
-    gluiRight->sync_live();       // Sync live variables in GLUI
+    gluiTop->sync_live();       // Sync live variables in GLUI
 
     glUniformMatrix4fv(v_mv, 1, GL_FALSE, glm::value_ptr(MV));          // Send MV matrix to uniform v_mv in shader
     glUniformMatrix4fv(v_mvp, 1, GL_FALSE, glm::value_ptr(MVP));        // Send MVP matrix to uniform v_mvp in shader
@@ -619,8 +597,6 @@ void Display() {
 
     glBindVertexArray(vao_IDs[3]);
     glDrawArrays(GL_TRIANGLES, 0, 108);      // Draw the robot arm
-
-    RenderText();
 
     glutSwapBuffers();
 }
@@ -662,6 +638,7 @@ void Tick(int value) {
     manager.Tick();
     UpdateBoard();
     UpdateTileDisplay();
+    count_down_text->set_text("Drop Count Down: x  ");
     GLUI_Master.set_glutTimerFunc(manager.get_tick_interval(), Tick, 0);
 }
 
@@ -826,17 +803,26 @@ void InitGLUI(void) {
     tmp->hide();
 #endif
 
-    // Setup right subwindow GUI
-    gluiRight = GLUI_Master.create_glui_subwindow(main_win, GLUI_SUBWINDOW_RIGHT);
+    // Setup top subwindow GUI
+    gluiTop = GLUI_Master.create_glui_subwindow(main_win, GLUI_SUBWINDOW_TOP);
 
-    // Add option panel
-    GLUI_Panel *mode_panel = gluiRight->add_panel("Game Mode");
+    // Add editable text
+    gluiTop->add_editabletext("Input Z:", &map_z);
+    
+    // Add start button
+    gluiTop->add_column(false);
+    gluiTop->add_button("Start", 0, (GLUI_Update_CB)StartGame);
+    
+    // Add static text
+    gluiTop->add_column(false);
+    count_down_text = gluiTop->add_statictext("Drop Count Down:    ");
 
     // Add quit button
-    gluiRight->add_button("Quit", 0, (GLUI_Update_CB)exit);
+    gluiTop->add_column(false);
+    gluiTop->add_button("Quit", 0, (GLUI_Update_CB)exit);
 
     // Set main gfx windows
-    gluiRight->set_main_gfx_window(main_win);
+    gluiTop->set_main_gfx_window(main_win);
 }
 
 //
