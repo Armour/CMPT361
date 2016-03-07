@@ -42,12 +42,12 @@ private:
     int tile_current_color_[libconsts::kCountCells];        // Current tile color
     int tile_current_state_;        // Current tile state
     int tile_count_down;            // The couont down for tile on robot arm
-    glm::vec2 tile_current_position_;       // Current tile position
-    glm::vec2 map_size_;
+    glm::vec3 tile_current_position_;       // Current tile position
+    glm::vec3 map_size_;
     glm::vec3 spawn_point_;           // The point that spawn tile
 
     std::stack<GameState> game_states_;     // Gamestate stack
-    std::vector<std::vector<int>> map_;     // Map color data
+    std::vector<std::vector<std::vector<int>>> map_;     // Map color data
 
 private:
     int DropOneBlock();             // Drop one block
@@ -61,7 +61,7 @@ private:
 public:
     GameManager() {};
 
-    void Init(int width, int height);
+    void Init(int x, int y, int z);
 
     void AddNewTile();                          // Generate new tile
     void Tick();                                // Time tick function
@@ -96,7 +96,7 @@ public:
         return tile_current_color_;
     }
 
-    inline glm::vec2 get_tile_current_position() const {
+    inline glm::vec3 get_tile_current_position() const {
         return tile_current_position_;
     }
 
@@ -111,11 +111,11 @@ public:
             return GameState::GameStateEmpty;
     }
 
-    inline glm::vec2 get_map_size() const {
+    inline glm::vec3 get_map_size() const {
         return map_size_;
     }
 
-    inline std::vector<std::vector<int>> &get_map_data() {
+    inline std::vector<std::vector<std::vector<int>>> &get_map_data() {
         return map_;
     }
 

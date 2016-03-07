@@ -32,10 +32,11 @@
 //       void
 //
 
-void GameManager::Init(int width, int height) {
-    map_size_.x = width;
-    map_size_.y = height;
-    map_ = std::vector<std::vector<int>>(width, std::vector<int>(height, 0));
+void GameManager::Init(int x, int y, int z) {
+    map_size_.x = x;
+    map_size_.y = y;
+    map_size_.z = z;
+    map_ = std::vector<std::vector<std::vector<int>>>(z, std::vector<std::vector<int>>(x, std::vector<int>(y, 0)));
     while (!game_states_.empty()) {
         game_states_.pop();
     }
@@ -59,6 +60,7 @@ void GameManager::Init(int width, int height) {
 void GameManager::AddNewTile() {
     tile_current_position_.x = (int)spawn_point_.x;         // Spawn tile in spawn point
     tile_current_position_.y = (int)spawn_point_.y;
+    tile_current_position_.z = (int)spawn_point_.z;
 
     tile_current_state_ = libconsts::kStateOnRobotArm;      // Set initial property
     tile_current_orient_ = rand() % libconsts::kCountOrient;
@@ -86,7 +88,7 @@ void GameManager::AddNewTile() {
 glm::vec3 GameManager::CalculateFitPosition(glm::vec4 end_point) {
     float x = end_point.x / libconsts::kMapCubeSize + libconsts::kMapSizeWidth / 2;
     float y = end_point.y / libconsts::kMapCubeSize;
-    float z = end_point.z / libconsts::kMapCubeSize;
+    float z = end_point.z / libconsts::kMapCubeSize + map_size_.z / 2;
     return (glm::vec3(floorf(x), floorf(y), floorf(z)));
 }
 
@@ -291,14 +293,14 @@ void GameManager::ChangeGameMode(GameState state){
 
 int GameManager::MoveTile(glm::vec2 direction) {
     if (get_game_state() != GameState::GameStatePause) {
-        tile_current_position_ += direction;
+        tile_current_position_ += glm::vec3(direction, 0.0);
         if (CheckCollision()) {         // Check collision
-            tile_current_position_ -= direction;
+            tile_current_position_ -= glm::vec3(direction, 0.0);
             return libconsts::kCollision;
         }
         int boundary_state = CheckBoundary();       // Check boundary
         if (boundary_state != libconsts::kInBoundary) {
-            tile_current_position_ -= direction;
+            tile_current_position_ -= glm::vec3(direction, 0.0);
             return boundary_state;
         }
     }
@@ -358,6 +360,7 @@ int GameManager::RotateTile(int direction) {
 void GameManager::UpdateTilePosition() {
     tile_current_position_.x = spawn_point_.x;
     tile_current_position_.y = spawn_point_.y;
+    tile_current_position_.z = spawn_point_.z;
 }
 
 //
@@ -377,8 +380,9 @@ void GameManager::FillTileToMap(){
     for (int i = 0; i < libconsts::kCountCells; i++) {
         int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
         int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].y;
-        if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y) {
-            map_[x][y] = tile_current_color_[i];
+        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].z;
+        if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y && z >= 0 && z < map_size_.z) {
+            map_[z][x][y] = tile_current_color_[i];
         }
     }
 }
@@ -402,11 +406,13 @@ void GameManager::CheckElimination() {
     do {
         should_eliminate = false;
 
+        int z = tile_current_position_.z;
+
         // Row elimination checking
         for (int i = 0; i < map_size_.y; i++) {
             bool row_flag = true;
             for (int j = 0; j < map_size_.x; j++) {
-                if (map_[j][i] == libconsts::kColorBlack)
+                if (map_[z][j][i] == libconsts::kColorBlack)
                     row_flag = false;
             }
             if (row_flag) {
@@ -421,29 +427,29 @@ void GameManager::CheckElimination() {
         bool same_fruits_flag = false;
         for (int i = 0; i < map_size_.x; i++) {
             for (int j = 0; j < map_size_.y; j++) {
-                if (i > 0 && i < map_size_.x - 1 && map_[i][j] != libconsts::kColorBlack &&
-                    map_[i][j] == map_[i + 1][j] && map_[i][j] == map_[i - 1][j]) {         // "一"
+                if (i > 0 && i < map_size_.x - 1 && map_[z][i][j] != libconsts::kColorBlack &&
+                    map_[z][i][j] == map_[z][i + 1][j] && map_[z][i][j] == map_[z][i - 1][j]) {         // "一"
                     same_fruits_flag = true;
                     eliminate_flag[i][j] = true;
                     eliminate_flag[i + 1][j] = true;
                     eliminate_flag[i - 1][j] = true;
                 }
-                if (j > 0 && j < map_size_.y - 1 && map_[i][j] != libconsts::kColorBlack &&
-                    map_[i][j] == map_[i][j + 1] && map_[i][j] == map_[i][j - 1]) {         // "|"
+                if (j > 0 && j < map_size_.y - 1 && map_[z][i][j] != libconsts::kColorBlack &&
+                    map_[z][i][j] == map_[z][i][j + 1] && map_[z][i][j] == map_[z][i][j - 1]) {         // "|"
                     same_fruits_flag = true;
                     eliminate_flag[i][j] = true;
                     eliminate_flag[i][j + 1] = true;
                     eliminate_flag[i][j - 1] = true;
                 }
-                if (i > 0 && i < map_size_.x - 1 && map_[i][j] != libconsts::kColorBlack &&         // "/"
-                    j > 0 && j < map_size_.y - 1 && map_[i][j] == map_[i + 1][j + 1] && map_[i][j] == map_[i - 1][j - 1]) {
+                if (i > 0 && i < map_size_.x - 1 && map_[z][i][j] != libconsts::kColorBlack &&         // "/"
+                    j > 0 && j < map_size_.y - 1 && map_[z][i][j] == map_[z][i + 1][j + 1] && map_[z][i][j] == map_[z][i - 1][j - 1]) {
                     same_fruits_flag = true;
                     eliminate_flag[i][j] = true;
                     eliminate_flag[i + 1][j + 1] = true;
                     eliminate_flag[i - 1][j - 1] = true;
                 }
-                if (i > 0 && i < map_size_.x - 1 && map_[i][j] != libconsts::kColorBlack &&         // "\"
-                    j > 0 && j < map_size_.y - 1 && map_[i][j] == map_[i - 1][j + 1] && map_[i][j] == map_[i + 1][j - 1]) {
+                if (i > 0 && i < map_size_.x - 1 && map_[z][i][j] != libconsts::kColorBlack &&         // "\"
+                    j > 0 && j < map_size_.y - 1 && map_[z][i][j] == map_[z][i - 1][j + 1] && map_[z][i][j] == map_[z][i + 1][j - 1]) {
                     same_fruits_flag = true;
                     eliminate_flag[i][j] = true;
                     eliminate_flag[i - 1][j + 1] = true;
@@ -456,9 +462,9 @@ void GameManager::CheckElimination() {
             for (int i = 0; i < map_size_.x; i++) {
                 for (int j = map_size_.y - 1; j >= 0; j--) {
                     if (eliminate_flag[i][j]) {
-                        std::vector<int>::iterator it = map_[i].begin();
-                        map_[i].erase(it + j, it + j + 1);
-                        map_[i].push_back(libconsts::kColorBlack);
+                        std::vector<int>::iterator it = map_[z][i].begin();
+                        map_[z][i].erase(it + j, it + j + 1);
+                        map_[z][i].push_back(libconsts::kColorBlack);
                     }
                 }
             }
@@ -483,9 +489,9 @@ void GameManager::CheckElimination() {
 void GameManager::EliminateRow(int row) {
     std::vector<int>::iterator it;
     for (int i = 0; i < map_size_.x; i++) {
-        it = map_[i].begin();
-        map_[i].erase(it + row, it + row + 1);
-        map_[i].push_back(libconsts::kColorBlack);
+        it = map_[tile_current_position_.z][i].begin();
+        map_[tile_current_position_.z][i].erase(it + row, it + row + 1);
+        map_[tile_current_position_.z][i].push_back(libconsts::kColorBlack);
     }
 }
 
@@ -526,6 +532,7 @@ int GameManager::CheckBoundary() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
         int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
         int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].y;
+        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].z;
         if (y < 0)
             return libconsts::kOutOfBoundaryDown;
         if (y >= map_size_.y)
@@ -534,6 +541,10 @@ int GameManager::CheckBoundary() {
             return libconsts::kOutOfBoundaryLeft;
         if (x >= map_size_.x)
             return libconsts::kOutOfBoundaryRight;
+        if (z < 0)
+            return libconsts::kOutOfBoundaryBack;
+        if (z >= map_size_.z)
+            return libconsts::kOutOfBoundaryFront;
     }
     return libconsts::kInBoundary;
 }
@@ -555,7 +566,8 @@ bool GameManager::CheckCollision() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
         int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
         int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].y;
-        if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y && map_[x][y])
+        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].z;
+        if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y && z >= 0 && z < map_size_.z && map_[z][x][y])
             return true;
     }
     return false;
@@ -575,6 +587,6 @@ bool GameManager::CheckCollision() {
 //
 
 void GameManager::Restart() {
-    Init((int)map_size_.x, (int)map_size_.y);
+    Init((int)map_size_.x, (int)map_size_.y, (int)map_size_.z);
     AddNewTile();
 }

@@ -125,12 +125,15 @@ void UpdateTilePosition() {
         // Calculate the grid coordinates of the cell
         GLfloat x = manager.get_tile_current_position().x + libconsts::kShapeCategory[manager.get_tile_current_shape()][manager.get_tile_current_orient()][i].x;
         GLfloat y = manager.get_tile_current_position().y + libconsts::kShapeCategory[manager.get_tile_current_shape()][manager.get_tile_current_orient()][i].y;
+        GLfloat z = manager.get_tile_current_position().z + libconsts::kShapeCategory[manager.get_tile_current_shape()][manager.get_tile_current_orient()][i].z;
 
         // Create the 8 vertex of the cube - these vertices are using location in pixels
         glm::vec4 p[8];
+        int map_size_z = (int)manager.get_map_size().z;
         for (int j = 0; j < 8; j++) {
-            p[j] = glm::vec4(x * libconsts::kMapCubeSize, y * libconsts::kMapCubeSize, 0 * libconsts::kMapCubeSize, 1)
-                   + glm::vec4(libconsts::kMapCubeOffset[j], 0);
+            p[j] = glm::vec4(x * libconsts::kMapCubeSize, y * libconsts::kMapCubeSize,
+                             (z - map_size_z / 2 + 0.5 * (1 - map_size_z % 2)) * libconsts::kMapCubeSize, 1)
+                             + libconsts::kMapCubeOffset[j];
         }
 
         // Create triangles for 6 faces of new cube
@@ -212,34 +215,38 @@ void UpdateTileDisplay() {
 
 void UpdateBoard() {
     // Get current map color data
-    std::vector<std::vector<int>> &map_data = manager.get_map_data();
+    std::vector<std::vector<std::vector<int>>> &map_data = manager.get_map_data();
     board_colors.clear();
     board_position.clear();
 
     // Update board content
     for (int i = 0; i < (int)manager.get_map_size().x; i++) {
         for (int j = 0; j < (int)manager.get_map_size().y; j++) {
-            // Create the 8 vertex of the cube - these vertices are using location in pixels
-            glm::vec4 p[8];
-            for (int k = 0; k < 8; k++) {
-                p[k] = glm::vec4(i * libconsts::kMapCubeSize, j * libconsts::kMapCubeSize, 0 * libconsts::kMapCubeSize, 1)
-                       + glm::vec4(libconsts::kMapCubeOffset[k], 0);
-            }
-
-            // Create triangles for 6 faces of new cube
-            glm::vec4 new_cube[36];
-            for (int j = 0; j < 36; j++) {
-                new_cube[j] = p[libconsts::kCubeFaceIndex[j]];
-            }
-
-            // Push position and color into board_position
-            for (int k = 0; k < 36; k++) {
-                if (map_data[i][j] != libconsts::kColorBlack) {
-                    board_colors.push_back(libconsts::kColorCategory[map_data[i][j]]);      // Tile color
-                } else {
-                    board_colors.push_back(glm::vec4(0.0, 0.0, 0.0, 0.0));      // Clear color
+            for (int k = 0; k < (int)manager.get_map_size().z; k++) {
+                // Create the 8 vertex of the cube - these vertices are using location in pixels
+                glm::vec4 p[8];
+                int map_size_z = (int)manager.get_map_size().z;
+                for (int l = 0; l < 8; l++) {
+                    p[l] = glm::vec4(i * libconsts::kMapCubeSize, j * libconsts::kMapCubeSize,
+                                     (k - map_size_z / 2 + 0.5 * (1 - map_size_z % 2)) * libconsts::kMapCubeSize, 1)
+                                    + libconsts::kMapCubeOffset[l];
                 }
-                board_position.push_back(new_cube[k]);
+
+                // Create triangles for 6 faces of new cube
+                glm::vec4 new_cube[36];
+                for (int l = 0; l < 36; l++) {
+                    new_cube[l] = p[libconsts::kCubeFaceIndex[l]];
+                }
+
+                // Push position and color into board_position
+                for (int l = 0; l < 36; l++) {
+                    if (map_data[k][i][j] != libconsts::kColorBlack) {
+                        board_colors.push_back(libconsts::kColorCategory[map_data[k][i][j]]);      // Tile color
+                    } else {
+                        board_colors.push_back(glm::vec4(0.0, 0.0, 0.0, 0.0));      // Clear color
+                    }
+                    board_position.push_back(new_cube[l]);
+                }
             }
         }
     }
@@ -304,17 +311,17 @@ void UpdateRobotArmPosition() {
 //
 
 void InitGrid() {
+    int z = (int)manager.get_map_size().z;
+
     // Horizontal lines X
     for (int i = 0; i < libconsts::kMapSizeHeight + 1; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < z + 1; j++) {
             grid_position.push_back(glm::vec4(-libconsts::kMapCubeSize * libconsts::kMapSizeWidth / 2.0,
-                                            libconsts::kMapCubeSize * i,
-                                            -libconsts::kMapCubeSize / 2 + libconsts::kMapCubeSize * j,
-                                            1));
+                                               libconsts::kMapCubeSize * i,
+                                              -libconsts::kMapCubeSize * z / 2.0 + libconsts::kMapCubeSize * j, 1));
             grid_position.push_back(glm::vec4(libconsts::kMapCubeSize * libconsts::kMapSizeWidth / 2.0,
-                                            libconsts::kMapCubeSize * i,
-                                            -libconsts::kMapCubeSize / 2 + libconsts::kMapCubeSize * j,
-                                            1));
+                                              libconsts::kMapCubeSize * i,
+                                              -libconsts::kMapCubeSize * z / 2.0 + libconsts::kMapCubeSize * j, 1));
             grid_colors.push_back(libconsts::kColorCategory[libconsts::kColorWhite]);
             grid_colors.push_back(libconsts::kColorCategory[libconsts::kColorWhite]);
         }
@@ -322,15 +329,13 @@ void InitGrid() {
 
     // Vertical lines Y
     for (int i = 0; i < libconsts::kMapSizeWidth + 1; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < z + 1; j++) {
             grid_position.push_back(glm::vec4(-libconsts::kMapCubeSize * libconsts::kMapSizeWidth / 2.0 + libconsts::kMapCubeSize * i,
-                                            0,
-                                            -libconsts::kMapCubeSize / 2 + libconsts::kMapCubeSize * j,
-                                            1));
+                                               libconsts::kMapCubeSize * 0,
+                                              -libconsts::kMapCubeSize * z / 2.0 + libconsts::kMapCubeSize * j, 1));
             grid_position.push_back(glm::vec4(-libconsts::kMapCubeSize * libconsts::kMapSizeWidth / 2.0 + libconsts::kMapCubeSize * i,
-                                            libconsts::kMapCubeSize * libconsts::kMapSizeHeight,
-                                            -libconsts::kMapCubeSize / 2 + libconsts::kMapCubeSize * j,
-                                            1));
+                                               libconsts::kMapCubeSize * libconsts::kMapSizeHeight,
+                                              -libconsts::kMapCubeSize * z / 2.0 + libconsts::kMapCubeSize * j, 1));
             grid_colors.push_back(libconsts::kColorCategory[libconsts::kColorWhite]);
             grid_colors.push_back(libconsts::kColorCategory[libconsts::kColorWhite]);
         }
@@ -340,13 +345,11 @@ void InitGrid() {
     for (int i = 0; i < libconsts::kMapSizeWidth + 1; i++) {
         for (int j = 0; j < libconsts::kMapSizeHeight + 1; j++) {
             grid_position.push_back(glm::vec4(-libconsts::kMapCubeSize * libconsts::kMapSizeWidth / 2.0 + libconsts::kMapCubeSize * i,
-                                              libconsts::kMapCubeSize * j,
-                                              -libconsts::kMapCubeSize / 2,
-                                              1));
+                                               libconsts::kMapCubeSize * j,
+                                              -libconsts::kMapCubeSize * z / 2.0, 1));
             grid_position.push_back(glm::vec4(-libconsts::kMapCubeSize * libconsts::kMapSizeWidth / 2.0 + libconsts::kMapCubeSize * i,
-                                              libconsts::kMapCubeSize * j,
-                                              libconsts::kMapCubeSize / 2,
-                                              1));
+                                               libconsts::kMapCubeSize * j,
+                                               libconsts::kMapCubeSize * z / 2.0, 1));
             grid_colors.push_back(libconsts::kColorCategory[libconsts::kColorWhite]);
             grid_colors.push_back(libconsts::kColorCategory[libconsts::kColorWhite]);
         }
@@ -389,13 +392,13 @@ void InitBoard() {
 
     // Board vertex positions
     glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[2]);
-    glBufferData(GL_ARRAY_BUFFER, 7200 * sizeof(glm::vec4), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, manager.get_map_size().z * 7200 * sizeof(glm::vec4), NULL, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(v_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(v_position);
 
     // Board vertex color
     glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[3]);
-    glBufferData(GL_ARRAY_BUFFER, 7200 * sizeof(glm::vec4), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, manager.get_map_size().z * 7200 * sizeof(glm::vec4), NULL, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(v_color, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(v_color);
 }
@@ -516,7 +519,7 @@ void Init() {
     srand(time(0));
 
     // Init game manager
-    manager.Init(libconsts::kMapSizeWidth, libconsts::kMapSizeHeight);
+    manager.Init(libconsts::kMapSizeWidth, libconsts::kMapSizeHeight, 9);
 
     // Enable Z-buffering
     glEnable(GL_DEPTH_TEST);

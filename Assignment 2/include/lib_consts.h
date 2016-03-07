@@ -38,15 +38,15 @@ const int kMapSizeHeight = 20;
 const float kMapCubeSize = 33.0f;
 
 // Map block offset
-const glm::vec3 kMapCubeOffset[8] = {
-    glm::vec3( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, 0.0,                      libconsts::kMapCubeSize / 2),
-    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, 0.0,                      libconsts::kMapCubeSize / 2),
-    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, libconsts::kMapCubeSize,  libconsts::kMapCubeSize / 2),
-    glm::vec3( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, libconsts::kMapCubeSize,  libconsts::kMapCubeSize / 2),
-    glm::vec3( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, 0.0,                     -libconsts::kMapCubeSize / 2),
-    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, 0.0,                     -libconsts::kMapCubeSize / 2),
-    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, libconsts::kMapCubeSize, -libconsts::kMapCubeSize / 2),
-    glm::vec3( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, libconsts::kMapCubeSize, -libconsts::kMapCubeSize / 2)
+const glm::vec4 kMapCubeOffset[8] = {
+    glm::vec4( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, 0.0,                      libconsts::kMapCubeSize / 2, 0.0),
+    glm::vec4((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, 0.0,                      libconsts::kMapCubeSize / 2, 0.0),
+    glm::vec4((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, libconsts::kMapCubeSize,  libconsts::kMapCubeSize / 2, 0.0),
+    glm::vec4( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, libconsts::kMapCubeSize,  libconsts::kMapCubeSize / 2, 0.0),
+    glm::vec4( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, 0.0,                     -libconsts::kMapCubeSize / 2, 0.0),
+    glm::vec4((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, 0.0,                     -libconsts::kMapCubeSize / 2, 0.0),
+    glm::vec4((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, libconsts::kMapCubeSize, -libconsts::kMapCubeSize / 2, 0.0),
+    glm::vec4( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, libconsts::kMapCubeSize, -libconsts::kMapCubeSize / 2, 0.0)
 };
 
 // Cube face
@@ -88,7 +88,9 @@ const int kOutOfBoundaryUp    = -1;
 const int kOutOfBoundaryDown  = -2;
 const int kOutOfBoundaryLeft  = -3;
 const int kOutOfBoundaryRight = -4;
-const int kCollision          = -5;
+const int kOutOfBoundaryFront = -5;
+const int kOutOfBoundaryBack  = -6;
+const int kCollision          = -7;
 
 // Black and white index
 const int kColorBlack  = 0;
@@ -111,54 +113,54 @@ const glm::vec4 kColorCategory[kCountColor] = {
 const glm::vec4 kColorGray = glm::vec4(0.5, 0.5, 0.5, 1.0);     // Used indicate tile can not be placed
 
 // Shape category
-const glm::vec2 kShapeCategory[kCountShape][kCountOrient][kCountCells] = {
+const glm::vec3 kShapeCategory[kCountShape][kCountOrient][kCountCells] = {
 
     // I Shape
     {
-        {glm::vec2(-2,  0), glm::vec2(-1,  0), glm::vec2( 0,  0), glm::vec2( 1,  0)},
-        {glm::vec2( 0, -2), glm::vec2( 0, -1), glm::vec2( 0,  0), glm::vec2( 0,  1)},
-        {glm::vec2( 1,  0), glm::vec2( 0,  0), glm::vec2(-1,  0), glm::vec2(-2,  0)},
-        {glm::vec2( 0,  1), glm::vec2( 0,  0), glm::vec2( 0, -1), glm::vec2( 0, -2)}
+        {glm::vec3(-2,  0, 0), glm::vec3(-1,  0, 0), glm::vec3( 0,  0, 0), glm::vec3( 1,  0, 0)},
+        {glm::vec3( 0, -2, 0), glm::vec3( 0, -1, 0), glm::vec3( 0,  0, 0), glm::vec3( 0,  1, 0)},
+        {glm::vec3( 1,  0, 0), glm::vec3( 0,  0, 0), glm::vec3(-1,  0, 0), glm::vec3(-2,  0, 0)},
+        {glm::vec3( 0,  1, 0), glm::vec3( 0,  0, 0), glm::vec3( 0, -1, 0), glm::vec3( 0, -2, 0)}
     },
 
     // Left S Shape
     {
-        {glm::vec2(-1, -1), glm::vec2(0, -1), glm::vec2(0,  0), glm::vec2( 1,  0)},
-        {glm::vec2( 1, -1), glm::vec2(1,  0), glm::vec2(0,  0), glm::vec2( 0,  1)},
-        {glm::vec2( 1,  0), glm::vec2(0,  0), glm::vec2(0, -1), glm::vec2(-1, -1)},
-        {glm::vec2( 0,  1), glm::vec2(0,  0), glm::vec2(1,  0), glm::vec2( 1, -1)}
+        {glm::vec3(-1, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0,  0, 0), glm::vec3( 1,  0, 0)},
+        {glm::vec3( 1, -1, 0), glm::vec3(1,  0, 0), glm::vec3(0,  0, 0), glm::vec3( 0,  1, 0)},
+        {glm::vec3( 1,  0, 0), glm::vec3(0,  0, 0), glm::vec3(0, -1, 0), glm::vec3(-1, -1, 0)},
+        {glm::vec3( 0,  1, 0), glm::vec3(0,  0, 0), glm::vec3(1,  0, 0), glm::vec3( 1, -1, 0)}
     },
 
     // Right S Shape
     {
-        {glm::vec2( 1, -1), glm::vec2(0, -1), glm::vec2(0,  0), glm::vec2(-1,  0)},
-        {glm::vec2( 1,  1), glm::vec2(1,  0), glm::vec2(0,  0), glm::vec2( 0, -1)},
-        {glm::vec2(-1,  0), glm::vec2(0,  0), glm::vec2(0, -1), glm::vec2( 1, -1)},
-        {glm::vec2( 0, -1), glm::vec2(0,  0), glm::vec2(1,  0), glm::vec2( 1,  1)}
+        {glm::vec3( 1, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0,  0, 0), glm::vec3(-1,  0, 0)},
+        {glm::vec3( 1,  1, 0), glm::vec3(1,  0, 0), glm::vec3(0,  0, 0), glm::vec3( 0, -1, 0)},
+        {glm::vec3(-1,  0, 0), glm::vec3(0,  0, 0), glm::vec3(0, -1, 0), glm::vec3( 1, -1, 0)},
+        {glm::vec3( 0, -1, 0), glm::vec3(0,  0, 0), glm::vec3(1,  0, 0), glm::vec3( 1,  1, 0)}
     },
 
     // Left L Shape
     {
-        {glm::vec2(-1, -1), glm::vec2(-1,  0), glm::vec2(0, 0), glm::vec2( 1,  0)},
-        {glm::vec2( 1, -1), glm::vec2( 0, -1), glm::vec2(0, 0), glm::vec2( 0,  1)},
-        {glm::vec2( 1,  1), glm::vec2( 1,  0), glm::vec2(0, 0), glm::vec2(-1,  0)},
-        {glm::vec2(-1,  1), glm::vec2( 0,  1), glm::vec2(0, 0), glm::vec2( 0, -1)}
+        {glm::vec3(-1, -1, 0), glm::vec3(-1,  0, 0), glm::vec3(0, 0, 0), glm::vec3( 1,  0, 0)},
+        {glm::vec3( 1, -1, 0), glm::vec3( 0, -1, 0), glm::vec3(0, 0, 0), glm::vec3( 0,  1, 0)},
+        {glm::vec3( 1,  1, 0), glm::vec3( 1,  0, 0), glm::vec3(0, 0, 0), glm::vec3(-1,  0, 0)},
+        {glm::vec3(-1,  1, 0), glm::vec3( 0,  1, 0), glm::vec3(0, 0, 0), glm::vec3( 0, -1, 0)}
     },
 
     // Right L Shape
     {
-        {glm::vec2(-1,  1), glm::vec2(-1,  0), glm::vec2(0, 0), glm::vec2( 1,  0)},
-        {glm::vec2(-1, -1), glm::vec2( 0, -1), glm::vec2(0, 0), glm::vec2( 0,  1)},
-        {glm::vec2( 1, -1), glm::vec2( 1,  0), glm::vec2(0, 0), glm::vec2(-1,  0)},
-        {glm::vec2( 1,  1), glm::vec2( 0,  1), glm::vec2(0, 0), glm::vec2( 0, -1)}
+        {glm::vec3(-1,  1, 0), glm::vec3(-1,  0, 0), glm::vec3(0, 0, 0), glm::vec3( 1,  0, 0)},
+        {glm::vec3(-1, -1, 0), glm::vec3( 0, -1, 0), glm::vec3(0, 0, 0), glm::vec3( 0,  1, 0)},
+        {glm::vec3( 1, -1, 0), glm::vec3( 1,  0, 0), glm::vec3(0, 0, 0), glm::vec3(-1,  0, 0)},
+        {glm::vec3( 1,  1, 0), glm::vec3( 0,  1, 0), glm::vec3(0, 0, 0), glm::vec3( 0, -1, 0)}
     },
 
     // T Shape
     {
-        {glm::vec2( 0, -1), glm::vec2(-1,  0), glm::vec2(0, 0), glm::vec2( 1,  0)},
-        {glm::vec2( 1,  0), glm::vec2( 0, -1), glm::vec2(0, 0), glm::vec2( 0,  1)},
-        {glm::vec2( 0,  1), glm::vec2( 1,  0), glm::vec2(0, 0), glm::vec2(-1,  0)},
-        {glm::vec2(-1,  0), glm::vec2( 0,  1), glm::vec2(0, 0), glm::vec2( 0, -1)}
+        {glm::vec3( 0, -1, 0), glm::vec3(-1,  0, 0), glm::vec3(0, 0, 0), glm::vec3( 1,  0, 0)},
+        {glm::vec3( 1,  0, 0), glm::vec3( 0, -1, 0), glm::vec3(0, 0, 0), glm::vec3( 0,  1, 0)},
+        {glm::vec3( 0,  1, 0), glm::vec3( 1,  0, 0), glm::vec3(0, 0, 0), glm::vec3(-1,  0, 0)},
+        {glm::vec3(-1,  0, 0), glm::vec3( 0,  1, 0), glm::vec3(0, 0, 0), glm::vec3( 0, -1, 0)}
     }
 
 };
