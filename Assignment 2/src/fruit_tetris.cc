@@ -48,7 +48,6 @@ GLuint v_position;
 GLuint v_color;
 GLuint v_mvp;
 GLuint v_mv;
-GLuint is_text;
 
 // VAO and VBO
 GLuint vao_IDs[4];  // One VAO for each object: the grid, the board, the current piece, the robot arm
@@ -56,6 +55,15 @@ GLuint vbo_IDs[8];  // Vertex Buffer Objects for each VAO (contain vertex positi
 
 // The id of main window
 int main_win;
+
+// The size of map in z axis
+int map_z = 1;
+
+// Game start flag
+int start_flag = 0;
+
+// Game mode level
+int level = 2;
 
 // Variables in GLUI
 GLUI *gluiTop;	    // The GLUI on top
@@ -503,6 +511,55 @@ void NewTile() {
 }
 
 //
+// Function: Restart
+// ---------------------------
+//
+//   Restart game
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+void Restart(void) {
+    if (start_flag) {
+        manager.Restart();
+        robot_arm->ResetAngle();
+        UpdateBoard();
+        UpdateTileDisplay();
+        UpdateRobotArmPosition();
+    }
+}
+
+//
+// Function: ChangeMode
+// ---------------------------
+//
+//   Change game mode according to level varible
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+void ChangeMode(void) {
+    switch (level) {
+        case 1: manager.Easy();
+            break;
+        case 2: manager.Normal();
+            break;
+        case 3: manager.Hard();
+            break;
+        case 4: manager.Insane();
+            break;
+    }
+}
+
+//
 // Function: Init
 // ---------------------------
 //
@@ -520,7 +577,7 @@ void Init() {
     srand(time(0));
 
     // Init game manager
-    manager.Init(libconsts::kMapSizeWidth, libconsts::kMapSizeHeight, 3);
+    manager.Init(libconsts::kMapSizeWidth, libconsts::kMapSizeHeight, map_z);
 
     // Enable Z-buffering
     glEnable(GL_DEPTH_TEST);
@@ -539,7 +596,6 @@ void Init() {
     v_color = glGetAttribLocation(program, "v_color");
     v_mvp = glGetUniformLocation(program, "v_mvp");
     v_mv = glGetUniformLocation(program, "v_mv");
-    is_text = glGetUniformLocation(program, "is_text");
 
     // Create 3 Vertex Array Objects, each representing one 'object'. Store the names in array vao_IDs
     glGenVertexArrays(4, vao_IDs);
@@ -553,6 +609,9 @@ void Init() {
 
     // Game initialization
     NewTile(); // create new next tile
+
+    // Update start flag
+    start_flag = 1;
 }
 
 //
@@ -636,9 +695,13 @@ void Reshape(GLsizei w, GLsizei h) {
 
 void Tick(int value) {
     manager.Tick();
+    int count_down = manager.get_tile_count_down();
+
     UpdateBoard();
     UpdateTileDisplay();
-    count_down_text->set_text("Drop Count Down: x  ");
+    string s = "Drop Count Down:    " + std::to_string(count_down);
+    count_down_text->set_text(s.c_str());
+
     GLUI_Master.set_glutTimerFunc(manager.get_tick_interval(), Tick, 0);
 }
 
@@ -749,11 +812,7 @@ void Keyboard(unsigned char key, int, int) {
             }
             break;
         case 'r':   // 'r' key restarts the game
-            manager.Restart();
-            robot_arm->ResetAngle();
-            UpdateBoard();
-            UpdateTileDisplay();
-            UpdateRobotArmPosition();
+            Restart();
             break;
         case 'p':   // 'p' key pause or resume the game
             if (manager.get_game_state() == GameState::GameStatePause)
@@ -806,20 +865,31 @@ void InitGLUI(void) {
     // Setup top subwindow GUI
     gluiTop = GLUI_Master.create_glui_subwindow(main_win, GLUI_SUBWINDOW_TOP);
 
-    // Add editable text
-    gluiTop->add_editabletext("Input Z:", &map_z);
-    
-    // Add start button
-    gluiTop->add_column(false);
-    gluiTop->add_button("Start", 0, (GLUI_Update_CB)StartGame);
+    // Add start panel
+    GLUI_Panel *start_panel = gluiTop->add_panel("Start Option");
+    GLUI_Spinner *spinner = gluiTop->add_spinner_to_panel(start_panel, "Input Z:", GLUI_SPINNER_INT, &map_z);
+    spinner->set_int_limits(1, 10, GLUI_LIMIT_CLAMP);
+    gluiTop->add_button_to_panel(start_panel, "Start", 0, (GLUI_Update_CB)Init);
     
     // Add static text
     gluiTop->add_column(false);
-    count_down_text = gluiTop->add_statictext("Drop Count Down:    ");
+    GLUI_Panel *text_panel = gluiTop->add_panel("Timer");
+    count_down_text = gluiTop->add_statictext_to_panel(text_panel, "Drop Count Down:    0");
+    gluiTop->add_statictext_to_panel(text_panel, "");
+    gluiTop->add_statictext_to_panel(text_panel, "Rotate robot base:  '<'  '>'");
 
-    // Add quit button
+    // Add game mode panel
     gluiTop->add_column(false);
-    gluiTop->add_button("Quit", 0, (GLUI_Update_CB)exit);
+    GLUI_Panel *mod_panel = gluiTop->add_panel("Game Mode");
+    GLUI_Spinner *level_spinner = gluiTop->add_spinner_to_panel(mod_panel, "Level:", GLUI_SPINNER_INT, &level);
+    level_spinner->set_int_limits(1, 4, GLUI_LIMIT_CLAMP);
+    gluiTop->add_button_to_panel(mod_panel, "Change", 0, (GLUI_Update_CB)ChangeMode);
+
+    // Add control panel
+    gluiTop->add_column(false);
+    GLUI_Panel *quit_panel = gluiTop->add_panel("Quit Game");
+    gluiTop->add_button_to_panel(quit_panel, "Restart", 0, (GLUI_Update_CB)Restart);
+    gluiTop->add_button_to_panel(quit_panel, "Quit", 0, (GLUI_Update_CB)exit);
 
     // Set main gfx windows
     gluiTop->set_main_gfx_window(main_win);
@@ -864,7 +934,6 @@ int main(int argc, char **argv) {
 #ifndef __APPLE__
     glewInit();
 #endif
-    Init();
     InitGLUI();
 
     // Start main loop

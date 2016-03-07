@@ -65,7 +65,7 @@ void GameManager::AddNewTile() {
     tile_current_state_ = libconsts::kStateOnRobotArm;      // Set initial property
     tile_current_orient_ = rand() % libconsts::kCountOrient;
     tile_current_shape_ = rand() % libconsts::kCountShape;
-    tile_count_down = 10;
+    tile_count_down = 9;
 
     for (int i = 0; i < libconsts::kCountCells; i++) {
         tile_current_color_[i] = rand() % (libconsts::kCountColor - 2) + 2;    // Except black and white

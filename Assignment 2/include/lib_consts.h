@@ -29,7 +29,7 @@ const float kDegreeToRadians = M_PI / 180.0;
 // Window size
 const int kWindowPositionX = 400;
 const int kWindowPositionY = 85;
-const int kWindowSizeWidth = 600;
+const int kWindowSizeWidth = 650;
 const int kWindowSizeHeight = 800;
 
 // Map size
