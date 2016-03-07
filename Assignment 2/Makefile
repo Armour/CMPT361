@@ -17,7 +17,7 @@ INCLUDEDIR=/usr/include/
 LIBDIR=/usr/lib
 
 # If you have more source files add them here
-SOURCE= include/init_shader.h include/lib_consts.h include/lib_gl.h include/game_manager.h src/init_shader.cc src/fruit_tetris.cc src/game_manager.cc
+SOURCE= include/init_shader.h include/lib_consts.h include/lib_gl.h include/game_manager.h include/robot_arm.h src/init_shader.cc src/fruit_tetris.cc src/game_manager.cc src/robot_arm.cc
 
 # The compiler we are using
 CC= g++

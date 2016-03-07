@@ -122,7 +122,9 @@ void GameManager::Tick() {
                 game_states_.push(GameState::GameStateEnd);
             }
         } else {
-            tile_count_down--;
+            if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
+                tile_count_down--;
+            }
         }
     }
 }

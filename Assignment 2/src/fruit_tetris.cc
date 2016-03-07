@@ -59,6 +59,7 @@ int main_win;
 
 // Variables in GLUI
 GLUI *gluiRight;            // The GLUI on right
+GLUI *gluiTop;              // The GLUI on top
 
 // Camera rotation angle
 float camera_rotation = 0.0f;
