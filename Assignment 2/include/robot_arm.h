@@ -53,9 +53,9 @@ public:
         base_height_ = 30.0;
         base_width_ = 100.0;
         lower_arm_height_ = 380.0;
-        lower_arm_width_ = 12.0;
+        lower_arm_width_ = 10.0;
         upper_arm_height_ = 380.0;
-        upper_arm_width_ = 8.0;
+        upper_arm_width_ = 6.0;
         base_angle_ = 45.0;
         upper_arm_angle_ = -40.0;
         lower_arm_angle_ = 2.0;

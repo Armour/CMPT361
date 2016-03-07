@@ -162,7 +162,10 @@ void UpdateTileColor() {
     // Get color from color category;
     glm::vec4 cube_colors[36 * 4];
     for (int i = 0; i < 36 * 4; i++) {
-        cube_colors[i] = libconsts::kColorCategory[manager.get_tile_current_color()[i / 36]];
+        if (manager.IsDroppable())
+            cube_colors[i] = libconsts::kColorCategory[manager.get_tile_current_color()[i / 36]];
+        else
+            cube_colors[i] = libconsts::kColorGray;
     }
 
     // Update the color VBO of current tile
@@ -281,7 +284,7 @@ void UpdateRobotArmPosition() {
     glm::vec4 end_point = robot_arm->get_upper_arm_end_point();
     glm::vec3 spawn_point = manager.CalculateFitPosition(end_point);
     manager.set_spawn_point(spawn_point);
-    UpdateTilePosition();
+    UpdateTileDisplay();
 
     // Post redisplay
     glutPostRedisplay();
@@ -573,13 +576,13 @@ void Display() {
     glEnable(GL_POLYGON_OFFSET_FILL);   // Draw all the block with offset, so that it seems to be in the grid
     glPolygonOffset(1.0f, 1.0f);
 
-    glBindVertexArray(vao_IDs[1]);      // Bind the VAO representing the grid cells (to be drawn first)
-    glDrawArrays(GL_TRIANGLES, 0, board_position.size() * sizeof(glm::vec4));        // Draw the board (10 * 20 * 2 = 400 triangles)
-
     if (manager.get_game_state() != GameState::GameStateEnd) {
         glBindVertexArray(vao_IDs[2]);          // Bind the VAO representing the current tile (to be drawn on top of the board)
         glDrawArrays(GL_TRIANGLES, 0, 144);      // Draw the current tile (8 triangles)
     }
+
+    glBindVertexArray(vao_IDs[1]);      // Bind the VAO representing the grid cells (to be drawn first)
+    glDrawArrays(GL_TRIANGLES, 0, board_position.size() * sizeof(glm::vec4));        // Draw the board (10 * 20 * 2 = 400 triangles)
 
     glDisable(GL_POLYGON_OFFSET_FILL);  // Disable the offset and begin to draw grid lines
 

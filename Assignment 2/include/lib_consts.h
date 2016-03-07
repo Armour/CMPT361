@@ -90,7 +90,7 @@ const int kOutOfBoundaryLeft  = -3;
 const int kOutOfBoundaryRight = -4;
 const int kCollision          = -5;
 
-// Black and white
+// Black and white index
 const int kColorBlack  = 0;
 const int kColorWhite  = 1;
 
@@ -106,6 +106,9 @@ const glm::vec4 kColorCategory[kCountColor] = {
     glm::vec4(0.5, 0.0, 0.5, 1.0)   // Purple
 
 };
+
+// Special color : gray
+const glm::vec4 kColorGray = glm::vec4(0.5, 0.5, 0.5, 1.0);     // Used indicate tile can not be placed
 
 // Shape category
 const glm::vec2 kShapeCategory[kCountShape][kCountOrient][kCountCells] = {
