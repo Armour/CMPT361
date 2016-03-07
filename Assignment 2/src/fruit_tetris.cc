@@ -111,6 +111,11 @@ void UpdateMVP() {
 //
 
 void UpdateTilePosition() {
+    // Update tile position if in the robot arm
+    if (manager.get_tile_current_state() == libconsts::kStateOnRobotArm) {
+        manager.UpdateTilePosition();
+    }
+
     // Bind the VBO containing current tile vertex positions
     glBindBuffer(GL_ARRAY_BUFFER, vbo_IDs[4]);
 
@@ -259,7 +264,6 @@ void UpdateBoard() {
 //
 
 void UpdateRobotArmPosition() {
-    //TODO: update robot position
     std::vector<glm::vec4> robot_base_position = robot_arm->get_base_render_data();
     std::vector<glm::vec4> robot_lower_arm_position = robot_arm->get_lower_arm_render_data();
     std::vector<glm::vec4> robot_upper_arm_position = robot_arm->get_upper_arm_render_data();
@@ -272,6 +276,12 @@ void UpdateRobotArmPosition() {
                     robot_lower_arm_position.size() * sizeof(glm::vec4), &robot_lower_arm_position.front());
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * (robot_base_position.size() + robot_lower_arm_position.size()),
                     robot_upper_arm_position.size() * sizeof(glm::vec4), &robot_upper_arm_position.front());
+
+    // Update spawn point in game manager
+    glm::vec4 end_point = robot_arm->get_upper_arm_end_point();
+    glm::vec3 spawn_point = manager.CalculateFitPosition(end_point);
+    manager.set_spawn_point(spawn_point);
+    UpdateTilePosition();
 
     // Post redisplay
     glutPostRedisplay();
@@ -473,6 +483,11 @@ void InitRobotArm() {
 //
 
 void NewTile() {
+    // Update spawn point in game manager
+    glm::vec4 end_point = robot_arm->get_upper_arm_end_point();
+    glm::vec3 spawn_point = manager.CalculateFitPosition(end_point);
+    manager.set_spawn_point(spawn_point);
+
     // Add a new tile
     manager.AddNewTile();
 
@@ -717,6 +732,11 @@ void Keyboard(unsigned char key, int, int) {
         case '>':
             robot_arm->RotateBase(libconsts::kClockWise);
             UpdateRobotArmPosition();
+            break;
+        case ' ':
+            if (manager.IsDroppable()) {
+                manager.set_tile_state_on_air();
+            }
             break;
         case 'r':   // 'r' key restarts the game
             manager.Restart();

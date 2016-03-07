@@ -40,9 +40,10 @@ private:
     int tile_current_shape_;        // Current tile shape
     int tile_current_orient_;       // Current tile orientation
     int tile_current_color_[libconsts::kCountCells];        // Current tile color
-    int tile_current_state;         // Current tile state
+    int tile_current_state_;        // Current tile state
     glm::vec2 tile_current_position_;       // Current tile position
     glm::vec2 map_size_;
+    glm::vec3 spawn_point_;           // The point that spawn tile
 
     std::stack<GameState> game_states_;     // Gamestate stack
     std::vector<std::vector<int>> map_;     // Map color data
@@ -61,10 +62,13 @@ public:
 
     void Init(int width, int height);
 
-    void AddNewTile();      // Generate new tile
-    void Tick();            // Time tick function
-    int RotateTile(int direction);
+    void AddNewTile();                          // Generate new tile
+    void Tick();                                // Time tick function
     int MoveTile(glm::vec2 direction);
+    int RotateTile(int direction);
+    void UpdateTilePosition();                  // Update tile position if in robot arm
+
+    glm::vec3 CalculateFitPosition(glm::vec4 end_point);    // Get the block that fits the end point best
 
     void Easy();            // Game mode
     void Normal();
@@ -95,6 +99,10 @@ public:
         return tile_current_position_;
     }
 
+    inline int get_tile_current_state() const {
+        return tile_current_state_;
+    }
+
     inline GameState get_game_state() const {
         if (!game_states_.empty())
             return game_states_.top();
@@ -108,6 +116,18 @@ public:
 
     inline std::vector<std::vector<int>> &get_map_data() {
         return map_;
+    }
+
+    inline void set_spawn_point(glm::vec3 point) {
+        spawn_point_ = point;
+    }
+
+    inline void set_tile_state_on_air() {
+        tile_current_state_ = libconsts::kStateOnAir;
+    }
+
+    inline bool IsDroppable() {
+        return (CheckBoundary() == libconsts::kInBoundary && !CheckCollision());
     }
 };
 

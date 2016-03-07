@@ -57,11 +57,10 @@ void GameManager::Init(int width, int height) {
 //
 
 void GameManager::AddNewTile() {
-    // TODO: change spawn place
-    tile_current_position_.x = rand() % (int)map_size_.x;
-    tile_current_position_.y = map_size_.y - 1; // Put the tile at the top of the board
+    tile_current_position_.x = (int)spawn_point_.x;         // Spawn tile in spawn point
+    tile_current_position_.y = (int)spawn_point_.y;
 
-    tile_current_state = libconsts::kStateOnRobotArm;
+    tile_current_state_ = libconsts::kStateOnRobotArm;      // Set initial property
     tile_current_orient_ = rand() % libconsts::kCountOrient;
     tile_current_shape_ = rand() % libconsts::kCountShape;
 
@@ -69,7 +68,7 @@ void GameManager::AddNewTile() {
         tile_current_color_[i] = rand() % (libconsts::kCountColor - 2) + 2;    // Except black and white
     }
 
-    int boundary_state = CheckBoundary();
+    /*int boundary_state = CheckBoundary();
     while (boundary_state != libconsts::kInBoundary) {      // Adjust tile according to boundary state
         switch (boundary_state) {
             case libconsts::kOutOfBoundaryUp:
@@ -86,7 +85,28 @@ void GameManager::AddNewTile() {
     }
 
     if (CheckCollision())
-        game_states_.push(GameState::GameStateEnd);
+        game_states_.push(GameState::GameStateEnd);*/
+}
+
+//
+// Function: CalculateFitPosition
+// ---------------------------
+//
+//   Get the block that fits the end point best
+//
+//   Parameters:
+//       end_point: the point in global axis
+//
+//   Returns:
+//       the block position in map axis
+//
+
+glm::vec3 GameManager::CalculateFitPosition(glm::vec4 end_point) {
+    int x = end_point.x / libconsts::kMapCubeSize + libconsts::kMapSizeWidth / 2;
+    int y = end_point.y / libconsts::kMapCubeSize;
+    int z = end_point.z / libconsts::kMapCubeSize;
+    if (end_point.y < 0) y--;
+    return (glm::vec3(x, y, z));
 }
 
 //
@@ -103,7 +123,9 @@ void GameManager::AddNewTile() {
 //
 
 void GameManager::Tick() {
-    if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
+    if (tile_current_state_ == libconsts::kStateOnAir &&
+            get_game_state() != GameState::GameStateEnd &&
+            get_game_state() != GameState::GameStatePause) {
         int drop_state = DropOneBlock();
         if (drop_state == libconsts::kOutOfBoundaryDown || drop_state == libconsts::kCollision) {       // Check if can not drop
             FillTileToMap();
@@ -327,6 +349,24 @@ int GameManager::RotateTile(int direction) {
         }
     }
     return libconsts::kInBoundary;
+}
+
+//
+// Function: UpdateTilePosition
+// ---------------------------
+//
+//   Update current tile position if in robot arm
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+void GameManager::UpdateTilePosition() {
+    tile_current_position_.x = spawn_point_.x;
+    tile_current_position_.y = spawn_point_.y;
 }
 
 //
