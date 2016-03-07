@@ -57,9 +57,11 @@ void GameManager::Init(int width, int height) {
 //
 
 void GameManager::AddNewTile() {
+    // TODO: change spawn place
     tile_current_position_.x = rand() % (int)map_size_.x;
     tile_current_position_.y = map_size_.y - 1; // Put the tile at the top of the board
 
+    tile_current_state = libconsts::kStateOnRobotArm;
     tile_current_orient_ = rand() % libconsts::kCountOrient;
     tile_current_shape_ = rand() % libconsts::kCountShape;
 
@@ -101,9 +103,9 @@ void GameManager::AddNewTile() {
 //
 
 void GameManager::Tick() {
-    if (get_game_state() != GameState::GameStateEnd || get_game_state() != GameState::GameStatePause) {
+    if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
         int drop_state = DropOneBlock();
-        if (drop_state == libconsts::kOutOfBoundaryDown || drop_state == libconsts::kCollision) {       // Check if it can drop
+        if (drop_state == libconsts::kOutOfBoundaryDown || drop_state == libconsts::kCollision) {       // Check if can not drop
             FillTileToMap();
             CheckElimination();
             AddNewTile();
@@ -345,7 +347,7 @@ void GameManager::FillTileToMap(){
         int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
         int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].y;
         if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y) {
-           map_[x][y] = tile_current_color_[i];
+            map_[x][y] = tile_current_color_[i];
         }
     }
 }

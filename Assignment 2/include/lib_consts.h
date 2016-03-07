@@ -23,6 +23,9 @@
 
 namespace libconsts {
 
+// Math
+const float kDegreeToRadians = M_PI / 180.0;
+
 // Window size
 const int kWindowPositionX = 400;
 const int kWindowPositionY = 85;
@@ -32,24 +35,31 @@ const int kWindowSizeHeight = 720;
 // Map size
 const int kMapSizeWidth = 10;
 const int kMapSizeHeight = 20;
-
-// Map Block
 const float kMapCubeSize = 33.0f;
-const glm::vec3 kMapCubePoints[8] = {
-    glm::vec3(-libconsts::kMapSizeWidth / 2 * libconsts::kMapCubeSize, 0.0, libconsts::kMapCubeSize / 2),
-    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, 0.0, libconsts::kMapCubeSize / 2),
-    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, libconsts::kMapCubeSize, libconsts::kMapCubeSize / 2),
-    glm::vec3(-libconsts::kMapSizeWidth / 2 * libconsts::kMapCubeSize, libconsts::kMapCubeSize, libconsts::kMapCubeSize / 2),
-    glm::vec3(-libconsts::kMapSizeWidth / 2 * libconsts::kMapCubeSize, 0.0, -libconsts::kMapCubeSize / 2),
-    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, 0.0, -libconsts::kMapCubeSize / 2),
+
+// Map block offset
+const glm::vec3 kMapCubeOffset[8] = {
+    glm::vec3( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, 0.0,                      libconsts::kMapCubeSize / 2),
+    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, 0.0,                      libconsts::kMapCubeSize / 2),
+    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, libconsts::kMapCubeSize,  libconsts::kMapCubeSize / 2),
+    glm::vec3( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, libconsts::kMapCubeSize,  libconsts::kMapCubeSize / 2),
+    glm::vec3( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, 0.0,                     -libconsts::kMapCubeSize / 2),
+    glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, 0.0,                     -libconsts::kMapCubeSize / 2),
     glm::vec3((-libconsts::kMapSizeWidth / 2 + 1) * libconsts::kMapCubeSize, libconsts::kMapCubeSize, -libconsts::kMapCubeSize / 2),
-    glm::vec3(-libconsts::kMapSizeWidth / 2 * libconsts::kMapCubeSize, libconsts::kMapCubeSize, -libconsts::kMapCubeSize / 2)
+    glm::vec3( -libconsts::kMapSizeWidth / 2      * libconsts::kMapCubeSize, libconsts::kMapCubeSize, -libconsts::kMapCubeSize / 2)
 };
 
-// Bind buffer element vector length
-const int kElementVecLenPosition = 3;
-const int kElementVecLenColor = 4;
-const int kElementVecLenTotal = 7;
+// Cube face
+const int kCubeFaceIndex[36] = {1, 0, 3, 1, 3, 2,
+                                2, 3, 7, 2, 7, 6,
+                                3, 0, 4, 3, 4, 7,
+                                6, 5, 1, 6, 1, 2,
+                                4, 5, 6, 4, 6, 7,
+                                5, 4, 0, 5, 0, 1};
+
+// State
+const int kStateOnRobotArm = 0;
+const int kStateOnAir      = 1;
 
 // Count
 const int kCountShape  = 6;

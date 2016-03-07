@@ -40,6 +40,7 @@ private:
     int tile_current_shape_;        // Current tile shape
     int tile_current_orient_;       // Current tile orientation
     int tile_current_color_[libconsts::kCountCells];        // Current tile color
+    int tile_current_state;         // Current tile state
     glm::vec2 tile_current_position_;       // Current tile position
     glm::vec2 map_size_;
 
