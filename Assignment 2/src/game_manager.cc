@@ -63,31 +63,11 @@ void GameManager::AddNewTile() {
     tile_current_state_ = libconsts::kStateOnRobotArm;      // Set initial property
     tile_current_orient_ = rand() % libconsts::kCountOrient;
     tile_current_shape_ = rand() % libconsts::kCountShape;
+    tile_count_down = 10;
 
     for (int i = 0; i < libconsts::kCountCells; i++) {
         tile_current_color_[i] = rand() % (libconsts::kCountColor - 2) + 2;    // Except black and white
     }
-
-    /* Assignment 1 part
-    int boundary_state = CheckBoundary();
-    while (boundary_state != libconsts::kInBoundary) {      // Adjust tile according to boundary state
-        switch (boundary_state) {
-            case libconsts::kOutOfBoundaryUp:
-                tile_current_position_ += libconsts::kMoveDown;
-                break;
-            case libconsts::kOutOfBoundaryLeft:
-                tile_current_position_ += libconsts::kMoveRight;
-                break;
-            case libconsts::kOutOfBoundaryRight:
-                tile_current_position_ += libconsts::kMoveLeft;
-                break;
-        }
-        boundary_state = CheckBoundary();
-    }
-
-    if (CheckCollision())
-        game_states_.push(GameState::GameStateEnd);
-    */
 }
 
 //
@@ -124,14 +104,23 @@ glm::vec3 GameManager::CalculateFitPosition(glm::vec4 end_point) {
 //
 
 void GameManager::Tick() {
-    if (tile_current_state_ == libconsts::kStateOnAir &&
-            get_game_state() != GameState::GameStateEnd &&
-            get_game_state() != GameState::GameStatePause) {
-        int drop_state = DropOneBlock();
-        if (drop_state == libconsts::kOutOfBoundaryDown || drop_state == libconsts::kCollision) {       // Check if can not drop
-            FillTileToMap();
-            CheckElimination();
-            AddNewTile();
+    if (tile_current_state_ == libconsts::kStateOnAir) {
+        if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
+            int drop_state = DropOneBlock();
+            if (drop_state == libconsts::kOutOfBoundaryDown || drop_state == libconsts::kCollision) {       // Check if can not drop
+                FillTileToMap();
+                CheckElimination();
+                AddNewTile();
+            }
+        }
+    } else {
+        if (tile_count_down == 0) {
+            tile_current_state_ = libconsts::kStateOnAir;
+            if (CheckBoundary() != libconsts::kInBoundary || CheckCollision()) {
+                game_states_.push(GameState::GameStateEnd);
+            }
+        } else {
+            tile_count_down--;
         }
     }
 }

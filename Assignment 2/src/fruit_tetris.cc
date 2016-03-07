@@ -22,7 +22,6 @@
 #include "robot_arm.h"
 #include "init_shader.h"
 #include <ctime>
-#include <iostream>
 
 using namespace std;
 
@@ -49,6 +48,7 @@ GLuint v_position;
 GLuint v_color;
 GLuint v_mvp;
 GLuint v_mv;
+GLuint is_text;
 
 // VAO and VBO
 GLuint vao_IDs[4]; // One VAO for each object: the grid, the board, the current piece, the robot arm
@@ -520,6 +520,7 @@ void Init() {
 
     // Enable Z-buffering
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     // Load shaders and use the shader program
 #ifdef __APPLE__
@@ -534,6 +535,7 @@ void Init() {
     v_color = glGetAttribLocation(program, "v_color");
     v_mvp = glGetUniformLocation(program, "v_mvp");
     v_mv = glGetUniformLocation(program, "v_mv");
+    is_text = glGetUniformLocation(program, "is_text");
 
     // Create 3 Vertex Array Objects, each representing one 'object'. Store the names in array vao_IDs
     glGenVertexArrays(4, vao_IDs);
@@ -547,6 +549,28 @@ void Init() {
 
     // Game initialization
     NewTile(); // create new next tile
+}
+
+//
+// Function: RenderText
+// ---------------------------
+//
+//   Display count down text on screen
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+void RenderText() {
+    std::string text = "23333323232323";
+    glUniform1i(is_text, 1);
+    for (auto c: text) {
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, c);
+    }
+    glUniform1i(is_text, 0);
 }
 
 //
@@ -591,6 +615,8 @@ void Display() {
 
     glBindVertexArray(vao_IDs[3]);
     glDrawArrays(GL_TRIANGLES, 0, 108);      // Draw the robot arm
+
+    RenderText();
 
     glutSwapBuffers();
 }

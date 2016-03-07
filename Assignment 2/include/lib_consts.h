@@ -50,12 +50,12 @@ const glm::vec3 kMapCubeOffset[8] = {
 };
 
 // Cube face
-const int kCubeFaceIndex[36] = {1, 0, 3, 1, 3, 2,
-                                2, 3, 7, 2, 7, 6,
-                                3, 0, 4, 3, 4, 7,
-                                6, 5, 1, 6, 1, 2,
-                                4, 5, 6, 4, 6, 7,
-                                5, 4, 0, 5, 0, 1};
+const int kCubeFaceIndex[36] = {1, 3, 0, 1, 2, 3,
+                                2, 7, 3, 2, 6, 7,
+                                3, 4, 0, 3, 7, 4,
+                                6, 1, 5, 6, 2, 1,
+                                4, 6, 5, 4, 7, 6,
+                                5, 0, 4, 5, 1, 0};
 
 // State
 const int kStateOnRobotArm = 0;

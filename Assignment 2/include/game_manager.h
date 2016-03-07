@@ -41,6 +41,7 @@ private:
     int tile_current_orient_;       // Current tile orientation
     int tile_current_color_[libconsts::kCountCells];        // Current tile color
     int tile_current_state_;        // Current tile state
+    int tile_count_down;            // The couont down for tile on robot arm
     glm::vec2 tile_current_position_;       // Current tile position
     glm::vec2 map_size_;
     glm::vec3 spawn_point_;           // The point that spawn tile
@@ -66,7 +67,7 @@ public:
     void Tick();                                // Time tick function
     int MoveTile(glm::vec2 direction);
     int RotateTile(int direction);
-    void UpdateTilePosition();                  // Update tile position if in robot arm
+    void UpdateTilePosition();                  // Update tile position if on robot arm
 
     glm::vec3 CalculateFitPosition(glm::vec4 end_point);    // Get the block that fits the end point best
 
@@ -124,6 +125,10 @@ public:
 
     inline void set_tile_state_on_air() {
         tile_current_state_ = libconsts::kStateOnAir;
+    }
+
+    inline int get_tile_count_down() {
+        return tile_count_down;
     }
 
     inline bool IsDroppable() {
