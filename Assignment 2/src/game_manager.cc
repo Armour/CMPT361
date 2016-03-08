@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "game_manager.h"
+#include <iostream>
 
 //
 // Function: Init
@@ -63,7 +64,8 @@ void GameManager::AddNewTile() {
     tile_current_position_.z = (int)spawn_point_.z;
 
     tile_current_state_ = libconsts::kStateOnRobotArm;      // Set initial property
-    tile_current_orient_ = rand() % libconsts::kCountOrient;
+    tile_current_orient_Y = rand() % libconsts::kCountOrient;
+    tile_current_orient_Z = rand() % libconsts::kCountOrient;
     tile_current_shape_ = rand() % libconsts::kCountShape;
     tile_count_down = 9;
 
@@ -322,24 +324,31 @@ int GameManager::MoveTile(glm::vec2 direction) {
 //       void
 //
 
-int GameManager::RotateTile(int direction) {
+int GameManager::RotateTile(int rotation_axis, int direction) {
+    int *tile_current_orient;
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
-        tile_current_orient_ += direction;
-        tile_current_orient_ %= libconsts::kCountOrient;
-        if (tile_current_state_ == libconsts::kStateOnRobotArm) return  libconsts::kInBoundary;
+        if (rotation_axis == libconsts::kRotationAxisY) {
+            tile_current_orient = &tile_current_orient_Y;
+        } else {
+            tile_current_orient = &tile_current_orient_Z;
+        }
+        *tile_current_orient += direction;
+        *tile_current_orient %= libconsts::kCountOrient;
+        if (tile_current_state_ == libconsts::kStateOnRobotArm)
+            return libconsts::kInBoundary;
         if (CheckCollision()) {                     // Check collision
-            tile_current_orient_ -= direction;
-            if (tile_current_orient_ < 0)
-                tile_current_orient_ = libconsts::kCountOrient - 1;
-            tile_current_orient_ %= libconsts::kCountOrient;
+            *tile_current_orient -= direction;
+            if (*tile_current_orient < 0)
+                *tile_current_orient = libconsts::kCountOrient - 1;
+            *tile_current_orient %= libconsts::kCountOrient;
             return libconsts::kCollision;
         }
         int boundary_state = CheckBoundary();       // Check boundary
         if (boundary_state != libconsts::kInBoundary) {
-            tile_current_orient_ -= direction;
-            if (tile_current_orient_ < 0)
-                tile_current_orient_ = libconsts::kCountOrient - 1;
-            tile_current_orient_ %= libconsts::kCountOrient;
+            *tile_current_orient -= direction;
+            if (*tile_current_orient < 0)
+                *tile_current_orient = libconsts::kCountOrient - 1;
+            *tile_current_orient %= libconsts::kCountOrient;
             return boundary_state;
         }
     }
@@ -380,9 +389,9 @@ void GameManager::UpdateTilePosition() {
 
 void GameManager::FillTileToMap(){
     for (int i = 0; i < libconsts::kCountCells; i++) {
-        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
-        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].y;
-        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].z;
+        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].x;
+        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].y;
+        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].z;
         if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y && z >= 0 && z < map_size_.z) {
             map_[z][x][y] = tile_current_color_[i];
         }
@@ -532,9 +541,9 @@ int GameManager::DropOneBlock() {
 
 int GameManager::CheckBoundary() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
-        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
-        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].y;
-        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].z;
+        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].x;
+        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].y;
+        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].z;
         if (y < 0)
             return libconsts::kOutOfBoundaryDown;
         if (y >= map_size_.y)
@@ -566,9 +575,9 @@ int GameManager::CheckBoundary() {
 
 bool GameManager::CheckCollision() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
-        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].x;
-        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].y;
-        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_][i].z;
+        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].x;
+        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].y;
+        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].z;
         if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y && z >= 0 && z < map_size_.z && map_[z][x][y])
             return true;
     }

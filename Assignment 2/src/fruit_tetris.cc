@@ -66,8 +66,8 @@ int start_flag = 0;
 int level = 2;
 
 // Variables in GLUI
-GLUI *gluiTop;	    // The GLUI on top
-GLUI_StaticText *count_down_text;    // The text for count down display
+GLUI *gluiTop;      // The GLUI on top
+GLUI_StaticText *count_down_text;       // The text for count down display
 
 // Camera rotation angle
 float camera_rotation = 0.0f;
@@ -132,9 +132,13 @@ void UpdateTilePosition() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
 
         // Calculate the grid coordinates of the cell
-        GLfloat x = manager.get_tile_current_position().x + libconsts::kShapeCategory[manager.get_tile_current_shape()][manager.get_tile_current_orient()][i].x;
-        GLfloat y = manager.get_tile_current_position().y + libconsts::kShapeCategory[manager.get_tile_current_shape()][manager.get_tile_current_orient()][i].y;
-        GLfloat z = manager.get_tile_current_position().z + libconsts::kShapeCategory[manager.get_tile_current_shape()][manager.get_tile_current_orient()][i].z;
+        int shape = manager.get_tile_current_shape();
+        int orient_Y = manager.get_tile_current_orient_Y();
+        int orient_Z = manager.get_tile_current_orient_Z();
+
+        GLfloat x = manager.get_tile_current_position().x + libconsts::kShapeCategory[shape][orient_Y][orient_Z][i].x;
+        GLfloat y = manager.get_tile_current_position().y + libconsts::kShapeCategory[shape][orient_Y][orient_Z][i].y;
+        GLfloat z = manager.get_tile_current_position().z + libconsts::kShapeCategory[shape][orient_Y][orient_Z][i].z;
 
         // Create the 8 vertex of the cube - these vertices are using location in pixels
         glm::vec4 p[8];
@@ -320,7 +324,10 @@ void UpdateRobotArmPosition() {
 //
 
 void InitGrid() {
+    // Init grid buffer data
     int z = (int)manager.get_map_size().z;
+    grid_colors.clear();
+    grid_position.clear();
 
     // Horizontal lines X
     for (int i = 0; i < libconsts::kMapSizeHeight + 1; i++) {
@@ -695,12 +702,13 @@ void Reshape(GLsizei w, GLsizei h) {
 
 void Tick(int value) {
     manager.Tick();
+
     int count_down = manager.get_tile_count_down();
+    string s = "Drop Count Down:    " + std::to_string(count_down);
+    count_down_text->set_text(s.c_str());
 
     UpdateBoard();
     UpdateTileDisplay();
-    string s = "Drop Count Down:    " + std::to_string(count_down);
-    count_down_text->set_text(s.c_str());
 
     GLUI_Master.set_glutTimerFunc(manager.get_tick_interval(), Tick, 0);
 }
@@ -738,7 +746,11 @@ void Special(int key, int, int) {
             }
             break;
         case GLUT_KEY_UP:           // Rotate
-            manager.RotateTile(libconsts::kClockWise);
+            if (modifiers & GLUT_ACTIVE_SHIFT) {
+                manager.RotateTile(libconsts::kRotationAxisY, libconsts::kClockWise);
+            } else {
+                manager.RotateTile(libconsts::kRotationAxisZ, libconsts::kClockWise);
+            }
             UpdateTileDisplay();
             break;
         case GLUT_KEY_DOWN:         // Drop down
@@ -866,11 +878,11 @@ void InitGLUI(void) {
     gluiTop = GLUI_Master.create_glui_subwindow(main_win, GLUI_SUBWINDOW_TOP);
 
     // Add start panel
-    GLUI_Panel *start_panel = gluiTop->add_panel("Start Option");
+    GLUI_Panel *start_panel = gluiTop->add_panel("Game Option");
     GLUI_Spinner *spinner = gluiTop->add_spinner_to_panel(start_panel, "Input Z:", GLUI_SPINNER_INT, &map_z);
     spinner->set_int_limits(1, 10, GLUI_LIMIT_CLAMP);
     gluiTop->add_button_to_panel(start_panel, "Start", 0, (GLUI_Update_CB)Init);
-    
+
     // Add static text
     gluiTop->add_column(false);
     GLUI_Panel *text_panel = gluiTop->add_panel("Timer");
@@ -880,14 +892,14 @@ void InitGLUI(void) {
 
     // Add game mode panel
     gluiTop->add_column(false);
-    GLUI_Panel *mod_panel = gluiTop->add_panel("Game Mode");
+    GLUI_Panel *mod_panel = gluiTop->add_panel("Game Level");
     GLUI_Spinner *level_spinner = gluiTop->add_spinner_to_panel(mod_panel, "Level:", GLUI_SPINNER_INT, &level);
     level_spinner->set_int_limits(1, 4, GLUI_LIMIT_CLAMP);
     gluiTop->add_button_to_panel(mod_panel, "Change", 0, (GLUI_Update_CB)ChangeMode);
 
     // Add control panel
     gluiTop->add_column(false);
-    GLUI_Panel *quit_panel = gluiTop->add_panel("Quit Game");
+    GLUI_Panel *quit_panel = gluiTop->add_panel("Game State");
     gluiTop->add_button_to_panel(quit_panel, "Restart", 0, (GLUI_Update_CB)Restart);
     gluiTop->add_button_to_panel(quit_panel, "Quit", 0, (GLUI_Update_CB)exit);
 

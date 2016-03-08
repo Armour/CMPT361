@@ -38,7 +38,8 @@ class GameManager {
 private:
     int tick_interval_;             // Current tick interval
     int tile_current_shape_;        // Current tile shape
-    int tile_current_orient_;       // Current tile orientation
+    int tile_current_orient_Y;      // Current tile orientation in Y rotation
+    int tile_current_orient_Z;      // Current tile orientation in Z rotation
     int tile_current_color_[libconsts::kCountCells];        // Current tile color
     int tile_current_state_;        // Current tile state
     int tile_count_down;            // The couont down for tile on robot arm
@@ -66,7 +67,7 @@ public:
     void AddNewTile();                          // Generate new tile
     void Tick();                                // Time tick function
     int MoveTile(glm::vec2 direction);
-    int RotateTile(int direction);
+    int RotateTile(int rotation_axis, int direction);
     void UpdateTilePosition();                  // Update tile position if on robot arm
 
     glm::vec3 CalculateFitPosition(glm::vec4 end_point);    // Get the block that fits the end point best
@@ -88,8 +89,12 @@ public:
         return tile_current_shape_;
     }
 
-    inline int get_tile_current_orient() const {
-        return tile_current_orient_;
+    inline int get_tile_current_orient_Y() const {
+        return tile_current_orient_Y;
+    }
+
+    inline int get_tile_current_orient_Z() const {
+        return tile_current_orient_Z;
     }
 
     inline int *get_tile_current_color() {
@@ -115,23 +120,23 @@ public:
         return map_size_;
     }
 
-    inline std::vector<std::vector<std::vector<int>>> &get_map_data() {
-        return map_;
-    }
-
-    inline void set_spawn_point(glm::vec3 point) {
-        spawn_point_ = point;
-    }
-
-    inline void set_tile_state_on_air() {
-        tile_current_state_ = libconsts::kStateOnAir;
-    }
-
     inline int get_tile_count_down() {
         return tile_count_down;
     }
 
-    inline bool IsDroppable() {
+    inline std::vector<std::vector<std::vector<int>>> &get_map_data() {     // Get map data
+        return map_;
+    }
+
+    inline void set_spawn_point(glm::vec3 point) {      // Set spawn point for tile
+        spawn_point_ = point;
+    }
+
+    inline void set_tile_state_on_air() {               // Set tile on air (from robot arm)
+        tile_current_state_ = libconsts::kStateOnAir;
+    }
+
+    inline bool IsDroppable() {                     // Change if current tile can be dropped from robot arm
         return (CheckBoundary() == libconsts::kInBoundary && !CheckCollision());
     }
 };
