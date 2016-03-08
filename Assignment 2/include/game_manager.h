@@ -111,7 +111,7 @@ public:
         return map_size_;
     }
 
-    inline int get_tile_count_down() {
+    inline int get_tile_count_down() const {
         return tile_count_down;
     }
 

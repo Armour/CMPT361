@@ -1,9 +1,10 @@
-# ASSIGNMENT 1
+# ASSIGNMENT 2
 #### Chong Guo armourg@sfu.ca
 
 ## Not Finished Features
 
 - None
+- Bonus Added
 
 ## File Structure
 
@@ -11,17 +12,20 @@
 
     - fruit_tetris -- Main function, OpenGL related function
     - game_manager.cc -- Elegant game manager with game states
+    - robot_arm.cc -- Elegant robot arm controller
     - init_shader.cc -- Used to read shader
 
 - include -- the header file folder
 
+    - game_manager.h -- Elegant game manager with game states
+    - robot_arm.h -- Elegant robot arm controller
+    - init_shader.h -- Used to read shader
     - lib_consts.h -- Constant variables header
     - lib_gl.h -- Include GL related header
-    - init_shader.h -- Used to read shader
-    - game_manager.h -- Elegant game manager with game states
     - glm -- OpenGL math library
 
 - cmake -- the cmake findmodule file folder
+    - FindGLUI.cmake -- Used to find GLUI in different platform
  
     
 ## How to use
@@ -31,20 +35,21 @@
     - Manual compile
         - `cmake .` (Optional)
         - `make`
-        - `./FruitTetris` 
+        - `./FruitTetris3D` 
 
 - Ubuntu
     - Use `Clion`
     - Manual compile
         - `cmake .` (Optional)
         - `make`
-        - `./FruitTetris` 
+        - `./FruitTetris3D` 
 
-- If `make` in ubuntu not well, you should remove depend and try to run `make` twice.
+- If `make` in ubuntu failed, you should remove depend and try to run `make` twice.
 
 ## Additional Features
 
 - Functions
+    - Have a GUI to controll the game 
     - Four different game mode by press key `1`, `2`, `3`, `4`
     - Press `p` to pause the game and again to resume 
 
