@@ -62,7 +62,7 @@ const int kStateOnRobotArm = 0;
 const int kStateOnAir      = 1;
 
 // Count
-const int kCountShape  = 6;
+const int kCountShape  = 9;
 const int kCountColor  = 7;
 const int kCountOrient = 4;
 const int kCountCells  = 4;
@@ -187,9 +187,31 @@ const glm::vec3 kShapeCategory[kCountShape][kCountOrient][kCountCells] = {
         {glm::vec3( 1,  0,  0), glm::vec3( 0, -1,  0), glm::vec3( 0,  0,  0), glm::vec3( 0,  1,  0)},
         {glm::vec3( 0,  1,  0), glm::vec3( 1,  0,  0), glm::vec3( 0,  0,  0), glm::vec3(-1,  0,  0)},
         {glm::vec3(-1,  0,  0), glm::vec3( 0,  1,  0), glm::vec3( 0,  0,  0), glm::vec3( 0, -1,  0)}
-    }
+    },
 
-    //
+    // New Shape I
+    {
+        {glm::vec3( 0,  0,  0), glm::vec3( 1,  0,  0), glm::vec3( 0,  1,  0), glm::vec3( 0,  0,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 0,  1,  0), glm::vec3(-1,  0,  0), glm::vec3( 0,  0,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 0, -1,  0), glm::vec3(-1,  0,  0), glm::vec3( 0,  0,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 1,  0,  0), glm::vec3( 0, -1,  0), glm::vec3( 0,  0,  1)}
+    },
+
+    // New Shape II
+    {
+        {glm::vec3( 0,  0,  0), glm::vec3( 1,  0,  0), glm::vec3( 0,  1,  0), glm::vec3( 0,  1,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 0,  1,  0), glm::vec3(-1,  0,  0), glm::vec3(-1,  0,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 0, -1,  0), glm::vec3(-1,  0,  0), glm::vec3(-1,  0,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 1,  0,  0), glm::vec3( 0, -1,  0), glm::vec3( 0, -1,  1)}
+    },
+
+    // New Shape III
+    {
+        {glm::vec3( 0,  0,  0), glm::vec3( 1,  0,  0), glm::vec3( 0,  1,  0), glm::vec3( 1,  0,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 0,  1,  0), glm::vec3(-1,  0,  0), glm::vec3( 0,  1,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 0, -1,  0), glm::vec3(-1,  0,  0), glm::vec3( 0, -1,  1)},
+        {glm::vec3( 0,  0,  0), glm::vec3( 1,  0,  0), glm::vec3( 0, -1,  0), glm::vec3( 1,  0,  1)}
+    }
 };
 
 } // namespace libconsts

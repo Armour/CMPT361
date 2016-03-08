@@ -21,8 +21,8 @@
 
 void RobotArm::ResetAngle() {
     base_angle_ = 45.0;
-    upper_arm_angle_ = -40.0;
-    lower_arm_angle_ = 2.0;
+    upper_arm_angle_ = -35.0;
+    lower_arm_angle_ = 0.0;
 }
 
 void RobotArm::RotateBase(int direction) {
