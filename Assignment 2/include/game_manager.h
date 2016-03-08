@@ -37,12 +37,10 @@ enum class GameState {              // Game states
 class GameManager {
 private:
     int tick_interval_;             // Current tick interval
-    int tile_current_shape_;        // Current tile shape
-    int tile_current_orient_Y;      // Current tile orientation in Y rotation
-    int tile_current_orient_Z;      // Current tile orientation in Z rotation
-    int tile_current_color_[libconsts::kCountCells];        // Current tile color
-    int tile_current_state_;        // Current tile state
     int tile_count_down;            // The couont down for tile on robot arm
+    int tile_current_state_;        // Current tile state
+    int tile_current_color_[libconsts::kCountCells];        // Current tile color
+    glm::vec3 tile_current_cells_[libconsts::kCountCells];
     glm::vec3 tile_current_position_;       // Current tile position
     glm::vec3 map_size_;
     glm::vec3 spawn_point_;           // The point that spawn tile
@@ -58,6 +56,7 @@ private:
     void EliminateRow(int row);     // Eliminate one row
     void FillTileToMap();           // Fill current tile to map
     void ChangeGameMode(GameState state);
+    void MakeTileCellsInteger();    // Make the tile cells vec3 be integer
 
 public:
     GameManager() {};
@@ -67,7 +66,7 @@ public:
     void AddNewTile();                          // Generate new tile
     void Tick();                                // Time tick function
     int MoveTile(glm::vec2 direction);
-    int RotateTile(int rotation_axis, int direction);
+    int RotateTile(int rotation_axis);
     void UpdateTilePosition();                  // Update tile position if on robot arm
 
     glm::vec3 CalculateFitPosition(glm::vec4 end_point);    // Get the block that fits the end point best
@@ -85,16 +84,8 @@ public:
         return tick_interval_;
     }
 
-    inline int get_tile_current_shape() const {
-        return tile_current_shape_;
-    }
-
-    inline int get_tile_current_orient_Y() const {
-        return tile_current_orient_Y;
-    }
-
-    inline int get_tile_current_orient_Z() const {
-        return tile_current_orient_Z;
+    inline glm::vec3 *get_tile_current_cells() {
+        return tile_current_cells_;
     }
 
     inline int *get_tile_current_color() {
@@ -126,6 +117,10 @@ public:
 
     inline std::vector<std::vector<std::vector<int>>> &get_map_data() {     // Get map data
         return map_;
+    }
+
+    inline void set_tile_count_down(int cd) {
+        tile_count_down = cd;
     }
 
     inline void set_spawn_point(glm::vec3 point) {      // Set spawn point for tile

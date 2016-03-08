@@ -63,11 +63,12 @@ int map_z = 1;
 int start_flag = 0;
 
 // Game mode level
-int level = 2;
+int level = 1;
 
 // Variables in GLUI
 GLUI *gluiTop;      // The GLUI on top
 GLUI_StaticText *count_down_text;       // The text for count down display
+GLUI_Button *pause_button;      // The button for pause and resume
 
 // Camera rotation angle
 float camera_rotation = 0.0f;
@@ -132,13 +133,9 @@ void UpdateTilePosition() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
 
         // Calculate the grid coordinates of the cell
-        int shape = manager.get_tile_current_shape();
-        int orient_Y = manager.get_tile_current_orient_Y();
-        int orient_Z = manager.get_tile_current_orient_Z();
-
-        GLfloat x = manager.get_tile_current_position().x + libconsts::kShapeCategory[shape][orient_Y][orient_Z][i].x;
-        GLfloat y = manager.get_tile_current_position().y + libconsts::kShapeCategory[shape][orient_Y][orient_Z][i].y;
-        GLfloat z = manager.get_tile_current_position().z + libconsts::kShapeCategory[shape][orient_Y][orient_Z][i].z;
+        GLfloat x = manager.get_tile_current_position().x + manager.get_tile_current_cells()[i].x;
+        GLfloat y = manager.get_tile_current_position().y + manager.get_tile_current_cells()[i].y;
+        GLfloat z = manager.get_tile_current_position().z + manager.get_tile_current_cells()[i].z;
 
         // Create the 8 vertex of the cube - these vertices are using location in pixels
         glm::vec4 p[8];
@@ -504,7 +501,7 @@ void InitRobotArm() {
 //       void
 //
 
-void NewTile() {
+void NewTile(void) {
     // Update spawn point in game manager
     glm::vec4 end_point = robot_arm->get_upper_arm_end_point();
     glm::vec3 spawn_point = manager.CalculateFitPosition(end_point);
@@ -515,6 +512,31 @@ void NewTile() {
 
     // Update tile display
     UpdateTileDisplay();
+}
+
+//
+// Function: PauseOrResume
+// ---------------------------
+//
+//   Pause or resume the game
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+void PauseOrResume(void) {
+    if (!start_flag) return;
+    if (manager.get_game_state() == GameState::GameStatePause) {
+        manager.Resume();
+        pause_button->set_name("Pause");
+    } else {
+        manager.Pause();
+        pause_button->set_name("Resume");
+    }
+    gluiTop->sync_live();
 }
 
 //
@@ -531,13 +553,13 @@ void NewTile() {
 //
 
 void Restart(void) {
-    if (start_flag) {
-        manager.Restart();
-        robot_arm->ResetAngle();
-        UpdateBoard();
-        UpdateTileDisplay();
-        UpdateRobotArmPosition();
-    }
+    if (!start_flag) return;
+    manager.Restart();
+    robot_arm->ResetAngle();
+    UpdateBoard();
+    UpdateTileDisplay();
+    UpdateRobotArmPosition();
+    gluiTop->sync_live();
 }
 
 //
@@ -554,6 +576,7 @@ void Restart(void) {
 //
 
 void ChangeMode(void) {
+    if (!start_flag) return;
     switch (level) {
         case 1: manager.Easy();
             break;
@@ -747,9 +770,9 @@ void Special(int key, int, int) {
             break;
         case GLUT_KEY_UP:           // Rotate
             if (modifiers & GLUT_ACTIVE_SHIFT) {
-                manager.RotateTile(libconsts::kRotationAxisY, libconsts::kClockWise);
+                manager.RotateTile(libconsts::kRotationAxisY);
             } else {
-                manager.RotateTile(libconsts::kRotationAxisZ, libconsts::kClockWise);
+                manager.RotateTile(libconsts::kRotationAxisZ);
             }
             UpdateTileDisplay();
             break;
@@ -784,15 +807,23 @@ void Keyboard(unsigned char key, int, int) {
             exit (EXIT_SUCCESS);
         case '1':   // '1' key enter easy mode
             manager.Easy();
+            level = 1;
+            gluiTop->sync_live();
             break;
         case '2':   // '2' key enter normal mode
             manager.Normal();
+            level = 2;
+            gluiTop->sync_live();
             break;
         case '3':   // '3' key enter hard mode
             manager.Hard();
+            level = 3;
+            gluiTop->sync_live();
             break;
         case '4':   // '4' key enter insane mode
             manager.Insane();
+            level = 4;
+            gluiTop->sync_live();
             break;
         case 'a':
             robot_arm->RotateLowerArm(libconsts::kAntiClockWise);
@@ -821,16 +852,14 @@ void Keyboard(unsigned char key, int, int) {
         case ' ':
             if (manager.IsDroppable()) {
                 manager.set_tile_state_on_air();
+                manager.set_tile_count_down(0);
             }
             break;
         case 'r':   // 'r' key restarts the game
             Restart();
             break;
         case 'p':   // 'p' key pause or resume the game
-            if (manager.get_game_state() == GameState::GameStatePause)
-                manager.Resume();
-            else
-                manager.Pause();
+            PauseOrResume();
             break;
     }
     glutPostRedisplay();
@@ -881,7 +910,7 @@ void InitGLUI(void) {
     GLUI_Panel *start_panel = gluiTop->add_panel("Game Option");
     GLUI_Spinner *spinner = gluiTop->add_spinner_to_panel(start_panel, "Input Z:", GLUI_SPINNER_INT, &map_z);
     spinner->set_int_limits(1, 10, GLUI_LIMIT_CLAMP);
-    gluiTop->add_button_to_panel(start_panel, "Start", 0, (GLUI_Update_CB)Init);
+    gluiTop->add_button_to_panel(start_panel, "(Re)Start", 0, (GLUI_Update_CB)Init);
 
     // Add static text
     gluiTop->add_column(false);
@@ -900,7 +929,7 @@ void InitGLUI(void) {
     // Add control panel
     gluiTop->add_column(false);
     GLUI_Panel *quit_panel = gluiTop->add_panel("Game State");
-    gluiTop->add_button_to_panel(quit_panel, "Restart", 0, (GLUI_Update_CB)Restart);
+    pause_button = gluiTop->add_button_to_panel(quit_panel, "Pause", 0, (GLUI_Update_CB)PauseOrResume);
     gluiTop->add_button_to_panel(quit_panel, "Quit", 0, (GLUI_Update_CB)exit);
 
     // Set main gfx windows

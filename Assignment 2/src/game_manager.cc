@@ -41,7 +41,7 @@ void GameManager::Init(int x, int y, int z) {
     while (!game_states_.empty()) {
         game_states_.pop();
     }
-    game_states_.push(GameState::GameStateNormal);
+    game_states_.push(GameState::GameStateEasy);
     tick_interval_ = libconsts::kTickNormalMode;
 }
 
@@ -63,10 +63,12 @@ void GameManager::AddNewTile() {
     tile_current_position_.y = (int)spawn_point_.y;
     tile_current_position_.z = (int)spawn_point_.z;
 
+    int tile_orient = rand() % libconsts::kCountOrient;
+    int tile_shape_ = rand() % libconsts::kCountShape;
+    for (int i = 0; i <libconsts::kCountCells; i++) {
+        tile_current_cells_[i] = libconsts::kShapeCategory[tile_shape_][tile_orient][i];
+    }
     tile_current_state_ = libconsts::kStateOnRobotArm;      // Set initial property
-    tile_current_orient_Y = rand() % libconsts::kCountOrient;
-    tile_current_orient_Z = rand() % libconsts::kCountOrient;
-    tile_current_shape_ = rand() % libconsts::kCountShape;
     tile_count_down = 9;
 
     for (int i = 0; i < libconsts::kCountCells; i++) {
@@ -92,6 +94,27 @@ glm::vec3 GameManager::CalculateFitPosition(glm::vec4 end_point) {
     float y = end_point.y / libconsts::kMapCubeSize;
     float z = end_point.z / libconsts::kMapCubeSize + map_size_.z / 2;
     return (glm::vec3(floorf(x), floorf(y), floorf(z)));
+}
+
+//
+// Function: MakeTileCellsInteger
+// ---------------------------
+//
+//   Make the current tile cells vec3 value become integer
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+void GameManager::MakeTileCellsInteger() {
+    for (int i = 0; i < libconsts::kCountCells; i++) {
+        tile_current_cells_[i].x = roundf(tile_current_cells_[i].x);
+        tile_current_cells_[i].y = roundf(tile_current_cells_[i].y);
+        tile_current_cells_[i].z = roundf(tile_current_cells_[i].z);
+    }
 }
 
 //
@@ -324,31 +347,36 @@ int GameManager::MoveTile(glm::vec2 direction) {
 //       void
 //
 
-int GameManager::RotateTile(int rotation_axis, int direction) {
-    int *tile_current_orient;
+int GameManager::RotateTile(int rotation_axis) {
     if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
-        if (rotation_axis == libconsts::kRotationAxisY) {
-            tile_current_orient = &tile_current_orient_Y;
-        } else {
-            tile_current_orient = &tile_current_orient_Z;
+        for (int i = 0; i < libconsts::kCountCells; i++) {
+            if (rotation_axis == libconsts::kRotationAxisY)
+                tile_current_cells_[i] = libconsts::kCWRotationMatY * tile_current_cells_[i];
+            else
+                tile_current_cells_[i] = libconsts::kCWRotationMatZ * tile_current_cells_[i];
+            MakeTileCellsInteger();
         }
-        *tile_current_orient += direction;
-        *tile_current_orient %= libconsts::kCountOrient;
         if (tile_current_state_ == libconsts::kStateOnRobotArm)
             return libconsts::kInBoundary;
         if (CheckCollision()) {                     // Check collision
-            *tile_current_orient -= direction;
-            if (*tile_current_orient < 0)
-                *tile_current_orient = libconsts::kCountOrient - 1;
-            *tile_current_orient %= libconsts::kCountOrient;
+            for (int i = 0; i < libconsts::kCountCells; i++) {
+                if (rotation_axis == libconsts::kRotationAxisY)
+                    tile_current_cells_[i] = libconsts::kCCWRotationMatY * tile_current_cells_[i];
+                else
+                    tile_current_cells_[i] = libconsts::kCCWRotationMatZ * tile_current_cells_[i];
+            }
+            MakeTileCellsInteger();
             return libconsts::kCollision;
         }
         int boundary_state = CheckBoundary();       // Check boundary
         if (boundary_state != libconsts::kInBoundary) {
-            *tile_current_orient -= direction;
-            if (*tile_current_orient < 0)
-                *tile_current_orient = libconsts::kCountOrient - 1;
-            *tile_current_orient %= libconsts::kCountOrient;
+            for (int i = 0; i < libconsts::kCountCells; i++) {
+                if (rotation_axis == libconsts::kRotationAxisY)
+                    tile_current_cells_[i] = libconsts::kCCWRotationMatY * tile_current_cells_[i];
+                else
+                    tile_current_cells_[i] = libconsts::kCCWRotationMatZ * tile_current_cells_[i];
+            }
+            MakeTileCellsInteger();
             return boundary_state;
         }
     }
@@ -388,10 +416,11 @@ void GameManager::UpdateTilePosition() {
 //
 
 void GameManager::FillTileToMap(){
+    MakeTileCellsInteger();
     for (int i = 0; i < libconsts::kCountCells; i++) {
-        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].x;
-        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].y;
-        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].z;
+        int x = tile_current_position_.x + tile_current_cells_[i].x;
+        int y = tile_current_position_.y + tile_current_cells_[i].y;
+        int z = tile_current_position_.z + tile_current_cells_[i].z;
         if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y && z >= 0 && z < map_size_.z) {
             map_[z][x][y] = tile_current_color_[i];
         }
@@ -541,9 +570,9 @@ int GameManager::DropOneBlock() {
 
 int GameManager::CheckBoundary() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
-        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].x;
-        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].y;
-        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].z;
+        int x = tile_current_position_.x + tile_current_cells_[i].x;
+        int y = tile_current_position_.y + tile_current_cells_[i].y;
+        int z = tile_current_position_.z + tile_current_cells_[i].z;
         if (y < 0)
             return libconsts::kOutOfBoundaryDown;
         if (y >= map_size_.y)
@@ -575,9 +604,9 @@ int GameManager::CheckBoundary() {
 
 bool GameManager::CheckCollision() {
     for (int i = 0; i < libconsts::kCountCells; i++) {
-        int x = tile_current_position_.x + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].x;
-        int y = tile_current_position_.y + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].y;
-        int z = tile_current_position_.z + libconsts::kShapeCategory[tile_current_shape_][tile_current_orient_Y][tile_current_orient_Z][i].z;
+        int x = tile_current_position_.x + tile_current_cells_[i].x;
+        int y = tile_current_position_.y + tile_current_cells_[i].y;
+        int z = tile_current_position_.z + tile_current_cells_[i].z;
         if (x >= 0 && x < map_size_.x && y >= 0 && y < map_size_.y && z >= 0 && z < map_size_.z && map_[z][x][y])
             return true;
     }
