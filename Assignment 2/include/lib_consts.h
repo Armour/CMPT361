@@ -27,13 +27,13 @@ namespace libconsts {
 const float kDegreeToRadians = M_PI / 180.0;
 
 // Window size
-const int kWindowPositionX = 400;
-const int kWindowPositionY = 85;
-const int kWindowSizeWidth = 650;
+const int kWindowPositionX  = 400;
+const int kWindowPositionY  =  85;
+const int kWindowSizeWidth  = 650;
 const int kWindowSizeHeight = 800;
 
 // Map size
-const int kMapSizeWidth = 10;
+const int kMapSizeWidth  = 10;
 const int kMapSizeHeight = 20;
 const float kMapCubeSize = 33.0f;
 
@@ -62,10 +62,11 @@ const int kStateOnRobotArm = 0;
 const int kStateOnAir      = 1;
 
 // Count
-const int kCountShape  = 9;
-const int kCountColor  = 7;
-const int kCountOrient = 4;
-const int kCountCells  = 4;
+const int kCountShape   = 9;
+const int kCountShape2D = 6;
+const int kCountColor   = 7;
+const int kCountOrient  = 4;
+const int kCountCells   = 4;
 
 // Tick
 const int kTickEasyMode   = 2000;
@@ -90,23 +91,19 @@ const int kRotationAxisZ  = 1;
 const glm::mat3x3 kCCWRotationMatY = {
         cos(90 * kDegreeToRadians), 0.0, sin(90 * kDegreeToRadians),
                    0.0            , 1.0,            0.0            ,
-       -sin(90 * kDegreeToRadians), 0.0, cos(90 * kDegreeToRadians)
-    };
+       -sin(90 * kDegreeToRadians), 0.0, cos(90 * kDegreeToRadians)};
 const glm::mat3x3 kCCWRotationMatZ = {
         cos(90 * kDegreeToRadians), sin(90 * kDegreeToRadians), 0.0,
        -sin(90 * kDegreeToRadians), cos(90 * kDegreeToRadians), 0.0,
-                   0.0            ,            0.0            , 1.0
-    };
+                   0.0            ,            0.0            , 1.0};
 const glm::mat3x3 kCWRotationMatY = {
         cos(-90 * kDegreeToRadians), 0.0, sin(-90 * kDegreeToRadians),
                     0.0            , 1.0,             0.0            ,
-       -sin(-90 * kDegreeToRadians), 0.0, cos(-90 * kDegreeToRadians)
-    };
+       -sin(-90 * kDegreeToRadians), 0.0, cos(-90 * kDegreeToRadians)};
 const glm::mat3x3 kCWRotationMatZ = {
         cos(-90 * kDegreeToRadians), sin(-90 * kDegreeToRadians), 0.0,
        -sin(-90 * kDegreeToRadians), cos(-90 * kDegreeToRadians), 0.0,
-                    0.0            ,             0.0            , 1.0
-    };
+                    0.0            ,             0.0            , 1.0};
 
 // Boundary & Collision
 const int kInBoundary         =  0;

@@ -41,9 +41,9 @@ private:
     int tile_current_state_;        // Current tile state
     int tile_current_color_[libconsts::kCountCells];        // Current tile color
     glm::vec3 tile_current_cells_[libconsts::kCountCells];
-    glm::vec3 tile_current_position_;       // Current tile position
-    glm::vec3 map_size_;
-    glm::vec3 spawn_point_;           // The point that spawn tile
+    glm::vec3 tile_current_position_;   // Current tile position
+    glm::vec3 map_size_;                // The map size
+    glm::vec3 spawn_point_;             // The point that spawn tile
 
     std::stack<GameState> game_states_;     // Gamestate stack
     std::vector<std::vector<std::vector<int>>> map_;     // Map color data
@@ -55,7 +55,7 @@ private:
     void CheckElimination();        // Check elimination
     void EliminateRow(int row);     // Eliminate one row
     void FillTileToMap();           // Fill current tile to map
-    void ChangeGameMode(GameState state);
+    void ChangeGameMode(GameState state);       // Change game mode to a specific state
     void MakeTileCellsInteger();    // Make the tile cells vec3 be integer
 
 public:

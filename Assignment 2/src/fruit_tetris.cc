@@ -66,9 +66,9 @@ int start_flag = 0;
 int level = 1;
 
 // Variables in GLUI
-GLUI *gluiTop;      // The GLUI on top
+GLUI *gluiTop;                          // The GLUI on top
 GLUI_StaticText *count_down_text;       // The text for count down display
-GLUI_Button *pause_button;      // The button for pause and resume
+GLUI_Button *pause_button;              // The button for pause and resume
 
 // Camera rotation angle
 float camera_rotation = 0.0f;
@@ -233,6 +233,7 @@ void UpdateBoard() {
     for (int i = 0; i < (int)manager.get_map_size().x; i++) {
         for (int j = 0; j < (int)manager.get_map_size().y; j++) {
             for (int k = 0; k < (int)manager.get_map_size().z; k++) {
+
                 // Create the 8 vertex of the cube - these vertices are using location in pixels
                 glm::vec4 p[8];
                 int map_size_z = (int)manager.get_map_size().z;
@@ -257,6 +258,7 @@ void UpdateBoard() {
                     }
                     board_position.push_back(new_cube[l]);
                 }
+
             }
         }
     }
@@ -554,8 +556,13 @@ void PauseOrResume(void) {
 
 void Restart(void) {
     if (!start_flag) return;
+
+    // Reset all parameters
     manager.Restart();
     robot_arm->ResetAngle();
+    level = 1;
+
+    // Update display
     UpdateBoard();
     UpdateTileDisplay();
     UpdateRobotArmPosition();
@@ -661,7 +668,7 @@ void Display() {
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    UpdateMVP();    // Update MVP matrix
+    UpdateMVP();                // Update MVP matrix
 
     gluiTop->sync_live();       // Sync live variables in GLUI
 
@@ -726,7 +733,7 @@ void Reshape(GLsizei w, GLsizei h) {
 void Tick(int value) {
     manager.Tick();
 
-    int count_down = manager.get_tile_count_down();
+    int count_down = manager.get_tile_count_down();         // Update timer display
     string s = "Drop Count Down:    " + std::to_string(count_down);
     count_down_text->set_text(s.c_str());
 
@@ -825,31 +832,31 @@ void Keyboard(unsigned char key, int, int) {
             level = 4;
             gluiTop->sync_live();
             break;
-        case 'a':
+        case 'a':   // 'a' key for rotate lower part of robot in anticlockwise
             robot_arm->RotateLowerArm(libconsts::kAntiClockWise);
             UpdateRobotArmPosition();
             break;
-        case 'd':
+        case 'd':   // 'd' key for rotate lower part of robot in clockwise
             robot_arm->RotateLowerArm(libconsts::kClockWise);
             UpdateRobotArmPosition();
             break;
-        case 'w':
+        case 'w':   // 'w' key for rotate upper part of robot in anticlockwise
             robot_arm->RotateUpperArm(libconsts::kAntiClockWise);
             UpdateRobotArmPosition();
             break;
-        case 's':
+        case 's':   // 's' key for rotate upper part of robot in clockwise
             robot_arm->RotateUpperArm(libconsts::kClockWise);
             UpdateRobotArmPosition();
             break;
-        case '<':
+        case '<':   // '<' key for rotate base part of robot in anticlockwise
             robot_arm->RotateBase(libconsts::kAntiClockWise);
             UpdateRobotArmPosition();
             break;
-        case '>':
+        case '>':   // '>' key for rotate base part of robot in clockwise
             robot_arm->RotateBase(libconsts::kClockWise);
             UpdateRobotArmPosition();
             break;
-        case ' ':
+        case ' ':   // ' ' key for drop the tile from robot arm
             if (manager.IsDroppable()) {
                 manager.set_tile_state_on_air();
                 manager.set_tile_count_down(0);

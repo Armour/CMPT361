@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "game_manager.h"
-#include <iostream>
 
 //
 // Function: Init
@@ -64,7 +63,7 @@ void GameManager::AddNewTile() {
     tile_current_position_.z = (int)spawn_point_.z;
 
     int tile_orient = rand() % libconsts::kCountOrient;
-    int tile_shape_ = rand() % libconsts::kCountShape;
+    int tile_shape_ = rand() % (map_size_.z > 1? libconsts::kCountShape: libconsts::kCountShape2D);
     for (int i = 0; i <libconsts::kCountCells; i++) {
         tile_current_cells_[i] = libconsts::kShapeCategory[tile_shape_][tile_orient][i];
     }
@@ -131,7 +130,7 @@ void GameManager::MakeTileCellsInteger() {
 //
 
 void GameManager::Tick() {
-    if (tile_current_state_ == libconsts::kStateOnAir) {
+    if (tile_current_state_ == libconsts::kStateOnAir) {        // If the tile is on the air
         if (get_game_state() != GameState::GameStateEnd && get_game_state() != GameState::GameStatePause) {
             int drop_state = DropOneBlock();
             if (drop_state == libconsts::kOutOfBoundaryDown || drop_state == libconsts::kCollision) {       // Check if can not drop
@@ -140,7 +139,7 @@ void GameManager::Tick() {
                 AddNewTile();
             }
         }
-    } else {
+    } else {            // If the tile is on the robot arm
         if (tile_count_down == 0) {
             tile_current_state_ = libconsts::kStateOnAir;
             if (CheckBoundary() != libconsts::kInBoundary || CheckCollision()) {
@@ -321,7 +320,7 @@ void GameManager::ChangeGameMode(GameState state){
 int GameManager::MoveTile(glm::vec2 direction) {
     if (get_game_state() != GameState::GameStatePause) {
         tile_current_position_ += glm::vec3(direction, 0.0);
-        if (CheckCollision()) {         // Check collision
+        if (CheckCollision()) {                     // Check collision
             tile_current_position_ -= glm::vec3(direction, 0.0);
             return libconsts::kCollision;
         }

@@ -24,21 +24,21 @@
 
 class RobotArm{
 private:
-    glm::vec4 base_center_;
+    glm::vec4 base_center_;         // The center of the base of the robot arm
 
     GLfloat base_width_;
     GLfloat base_height_;
-    GLfloat lower_arm_width_;
-    GLfloat lower_arm_height_;
-    GLfloat upper_arm_width_;
-    GLfloat upper_arm_height_;
+    GLfloat lower_arm_width_;       // The width of the lower arm
+    GLfloat lower_arm_height_;      // The height of the lower arm
+    GLfloat upper_arm_width_;       // The width of the upper arm
+    GLfloat upper_arm_height_;      // The height of the upper arm
 
     GLfloat base_angle_;            // Let's call it delta
     GLfloat lower_arm_angle_;       // Let's call it theta
     GLfloat upper_arm_angle_;       // Let's call it phi
 
 private:
-    GLfloat ClampBaseAngle(GLfloat angle) const;
+    GLfloat ClampBaseAngle(GLfloat angle) const;            // Clamp the angle of three part
     GLfloat ClampLowerArmAngle(GLfloat angle) const;
     GLfloat ClampUpperArmAngle(GLfloat angle) const;
     void CalculateBasePosition(std::vector<glm::vec4> & base_position, glm::vec4 center_points,
@@ -49,7 +49,7 @@ private:
                                    GLfloat width, GLfloat height, GLfloat angle) const;
 
 public:
-    RobotArm(glm::vec4 center): base_center_(center) {
+    RobotArm(glm::vec4 center): base_center_(center) {      // Constructor
         base_height_ = 30.0;
         base_width_ = 100.0;
         lower_arm_height_ = 380.0;
@@ -62,7 +62,7 @@ public:
     };
 
     void ResetAngle();
-    void RotateBase(int direction);
+    void RotateBase(int direction);             // Rotate three part of robot arm
     void RotateLowerArm(int direction);
     void RotateUpperArm(int direction);
 

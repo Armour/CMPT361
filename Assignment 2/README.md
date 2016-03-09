@@ -26,7 +26,6 @@
 
 - cmake -- the cmake findmodule file folder
     - FindGLUI.cmake -- Used to find GLUI in different platform
- 
     
 ## How to use
 
@@ -49,7 +48,7 @@
 ## Additional Features
 
 - Functions
-    - Have a GUI to controll the game 
+    - Have a GUI (use glui) to control the game 
     - Four different game mode by press key `1`, `2`, `3`, `4`
     - Press `p` to pause the game and again to resume 
 
