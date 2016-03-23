@@ -28,9 +28,6 @@
 // The array for the final image
 GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 
-// The eye position
-glm::vec3 eye_pos = {0.0, 0.0, 0.0};  // eye position
-
 // Background color
 glm::vec3 background_color;
 
@@ -72,12 +69,12 @@ void init() {
     // Vertices of a square
     double ext = 1.0;
     glm::vec4 points[6] = {
-        glm::vec4(-ext, -ext,  0, 1.0), //v1
-        glm::vec4( ext, -ext,  0, 1.0), //v2
-        glm::vec4(-ext,  ext,  0, 1.0), //v3
-        glm::vec4(-ext,  ext,  0, 1.0), //v3
-        glm::vec4( ext, -ext,  0, 1.0), //v2
-        glm::vec4( ext,  ext,  0, 1.0)  //v4
+        glm::vec4(-ext, -ext,  0, 1.0), // V1
+        glm::vec4( ext, -ext,  0, 1.0), // V2
+        glm::vec4(-ext,  ext,  0, 1.0), // V3
+        glm::vec4(-ext,  ext,  0, 1.0), // V3
+        glm::vec4( ext, -ext,  0, 1.0), // V2
+        glm::vec4( ext,  ext,  0, 1.0)  // V4
     };
 
     // Texture coordinates
@@ -204,13 +201,12 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    // Check scene option
+    // Check scene specification and max steps
     if (strcmp(argv[1], "-u") == 0) {   // user defined scene
         raychess::SetUpUserScene();
     } else {                            // default scene
         raychess::SetUpDefaultScene();
     }
-
     step_max = atoi(argv[2]);           // maximum level of recursions
 
     // Optional arguments

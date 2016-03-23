@@ -31,20 +31,20 @@ typedef struct sphere {
     float mat_ambient[3];       // Material property used in Phong model
     float mat_diffuse[3];
     float mat_specular[3];
-    float mat_shineness;
+    float mat_shininess;
     float reflectance;          // Determines how much reflected light contributes to the color of a pixel
     struct sphere *next;        // A list of spheres
 } Sphere;
 
 // Intersect ray with sphere
-float IntersectSphere(glm::vec3 o, glm::vec3 u, raychess::Sphere *sph, glm::vec3 *hit);
+float IntersectSphere(glm::vec3 o, glm::vec3 u, raychess::Sphere *sphere, glm::vec3 *hit);
 
 // Intersect ray with scene
-raychess::Sphere *IntersectScene(glm::vec3, glm::vec3, Sphere *, glm::vec3 *, int);
+raychess::Sphere *IntersectScene(glm::vec3, glm::vec3, Sphere *sphere, glm::vec3 *, int);
 
 // Add a sphere to the sphere list
 raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float radius, float ambient[],
-                            float diffuse[], float specular[], float shineness, float reflectance, int index);
+                            float diffuse[], float specular[], float shininess, float reflectance, int index);
 
 // Return the unit normal at a point on sphere
 glm::vec3 SphereNormal(glm::vec3 surf_point, raychess::Sphere *sphere);

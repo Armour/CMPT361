@@ -39,7 +39,7 @@ namespace raychess {
 //       void
 //
 
-float IntersectSphere(glm::vec3 o, glm::vec3 u, raychess::Sphere *sph, glm::vec3 *hit) {
+float IntersectSphere(glm::vec3 o, glm::vec3 u, raychess::Sphere *sphere, glm::vec3 *hit) {
     // TODO: finish intersect function
     return 0.0;
 }
@@ -60,7 +60,7 @@ float IntersectSphere(glm::vec3 o, glm::vec3 u, raychess::Sphere *sph, glm::vec3
 //       void
 //
 
-raychess::Sphere *IntersectScene(glm::vec3, glm::vec3, Sphere *, glm::vec3 *, int) {
+raychess::Sphere *IntersectScene(glm::vec3, glm::vec3, Sphere *sphere, glm::vec3 *, int) {
     // TODO: finish intersect function
     return NULL;
 }
@@ -81,7 +81,6 @@ raychess::Sphere *IntersectScene(glm::vec3, glm::vec3, Sphere *, glm::vec3 *, in
 raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float radius, float ambient[],
                             float diffuse[], float specular[], float shineness, float reflectance, int index) {
     raychess::Sphere *new_sphere;
-
     new_sphere = (raychess::Sphere *)malloc(sizeof(raychess::Sphere));
     new_sphere->index = index;
     new_sphere->center = center;
@@ -95,13 +94,13 @@ raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float r
     (new_sphere->mat_specular)[0] = specular[0];
     (new_sphere->mat_specular)[1] = specular[1];
     (new_sphere->mat_specular)[2] = specular[2];
-    new_sphere->mat_shineness = shineness;
+    new_sphere->mat_shininess = shineness;
     new_sphere->reflectance = reflectance;
     new_sphere->next = NULL;
 
-    if (spheres == NULL) {        // First object
+    if (spheres == NULL) {          // First object
         spheres = new_sphere;
-    } else {                    // Insert at the beginning
+    } else {                        // Insert at the beginning
         new_sphere->next = spheres;
         spheres = new_sphere;
     }

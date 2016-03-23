@@ -39,7 +39,7 @@ void SaveImage(void) {
     int w = libconsts::kWindowSizeWidth;
     int h = libconsts::kWindowSizeHeight;
 
-    unsigned char *bImg = new unsigned char[w * h * 3];
+    unsigned char *bmp_image = new unsigned char[w * h * 3];
 
     int index = 0;
     for (int y = 0; y < h; y++){
@@ -49,50 +49,50 @@ void SaveImage(void) {
             float g = frame[y][x][1];
             float b = frame[y][x][2];
 
-            bImg[index] = (b > 1.f)? (unsigned char)255: (unsigned char)(b * 255); index++;
-            bImg[index] = (g > 1.f)? (unsigned char)255: (unsigned char)(g * 255); index++;
-            bImg[index] = (r > 1.f)? (unsigned char)255: (unsigned char)(r * 255); index++;
+            bmp_image[index] = (b > 1.f)? (unsigned char)255: (unsigned char)(b * 255); index++;
+            bmp_image[index] = (g > 1.f)? (unsigned char)255: (unsigned char)(g * 255); index++;
+            bmp_image[index] = (r > 1.f)? (unsigned char)255: (unsigned char)(r * 255); index++;
         }
     }
 
-    unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0,0,0, 54,0,0,0};
-    unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,24,0};
-    unsigned char bmppad[3] = {0,0,0};
+    unsigned char bmp_file_header[14] = {'B','M', 0,0,0,0, 0,0,0,0, 54,0,0,0};
+    unsigned char bmp_info_header[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,24,0};
+    unsigned char bmp_pad[3] = {0,0,0};
 
-    int filesize = 54 + 3 * w * h;
+    int file_size = 54 + 3 * w * h;
 
-    bmpfileheader[ 2] = (unsigned char)(filesize      );
-    bmpfileheader[ 3] = (unsigned char)(filesize >>  8);
-    bmpfileheader[ 4] = (unsigned char)(filesize >> 16);
-    bmpfileheader[ 5] = (unsigned char)(filesize >> 24);
+    bmp_file_header[ 2] = (unsigned char)(file_size      );
+    bmp_file_header[ 3] = (unsigned char)(file_size >>  8);
+    bmp_file_header[ 4] = (unsigned char)(file_size >> 16);
+    bmp_file_header[ 5] = (unsigned char)(file_size >> 24);
 
-    bmpinfoheader[ 4] = (unsigned char)(       w      );
-    bmpinfoheader[ 5] = (unsigned char)(       w >>  8);
-    bmpinfoheader[ 6] = (unsigned char)(       w >> 16);
-    bmpinfoheader[ 7] = (unsigned char)(       w >> 24);
-    bmpinfoheader[ 8] = (unsigned char)(       h      );
-    bmpinfoheader[ 9] = (unsigned char)(       h >>  8);
-    bmpinfoheader[10] = (unsigned char)(       h >> 16);
-    bmpinfoheader[11] = (unsigned char)(       h >> 24);
+    bmp_info_header[ 4] = (unsigned char)(        w      );
+    bmp_info_header[ 5] = (unsigned char)(        w >>  8);
+    bmp_info_header[ 6] = (unsigned char)(        w >> 16);
+    bmp_info_header[ 7] = (unsigned char)(        w >> 24);
+    bmp_info_header[ 8] = (unsigned char)(        h      );
+    bmp_info_header[ 9] = (unsigned char)(        h >>  8);
+    bmp_info_header[10] = (unsigned char)(        h >> 16);
+    bmp_info_header[11] = (unsigned char)(        h >> 24);
 
     FILE *fp;
-    char fname[32];
+    char file_name[32];
 
-    strcpy(fname, "scene.bmp");
-    printf("Saving image %s: %d x %d\n", fname, w, h);
-    fp = fopen(fname, "wb");
+    strcpy(file_name, "scene.bmp");
+    printf("Saving image %s: %d x %d\n", file_name, w, h);
+    fp = fopen(file_name, "wb");
     if (!fp) {
-        printf("Unable to open file '%s'\n",fname);
+        printf("Unable to open file '%s'\n",file_name);
         return;
     }
 
-    fwrite(bmpfileheader, 1, 14, fp);
-    fwrite(bmpinfoheader, 1, 40, fp);
+    fwrite(bmp_file_header, 1, 14, fp);
+    fwrite(bmp_info_header, 1, 40, fp);
 
     for (int y = h - 1; y >= 0; y--) {
         int offset = w * (h - 1 - y) * 3;
-        fwrite(bImg + offset, 3, (size_t)w, fp);
-        fwrite(bmppad, 1, (size_t)(4 - (w * 3) % 4) % 4, fp);
+        fwrite(bmp_image + offset, 3, (size_t)w, fp);
+        fwrite(bmp_pad, 1, (size_t)(4 - (w * 3) % 4) % 4, fp);
     }
 
     fclose(fp);

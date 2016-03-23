@@ -20,7 +20,6 @@
 
 extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 extern raychess::Sphere *scene;
-extern glm::vec3 eye_pos;
 extern glm::vec3 background_color;
 extern glm::vec3 light;
 extern float light_intensity[3];
@@ -46,7 +45,7 @@ namespace raychess {
 //       void
 //
 
-glm::vec3 PhongIllumination(glm::vec3 q, glm::vec3 v, glm::vec3 surf_norm, raychess::Sphere *sph) {
+glm::vec3 PhongIllumination(glm::vec3 q, glm::vec3 v, glm::vec3 surf_norm, raychess::Sphere *sphere) {
     // TODO: add phong illumination
     glm::vec3 color;
     return color;
@@ -90,18 +89,18 @@ void RayTrace() {
     float y_grid_size = libconsts::kImageHeight / float(libconsts::kWindowSizeHeight);
     float x_start = -0.5f * libconsts::kImageWidth;
     float y_start = -0.5f * libconsts::kImageHeight;
+    glm::vec3 ray;
     glm::vec3 ret_color;
     glm::vec3 cur_pixel_pos;
-    glm::vec3 ray;
 
-    // ray is cast through center of pixel
+    // Ray is cast through center of pixel
     cur_pixel_pos.x = x_start + 0.5f * x_grid_size;
     cur_pixel_pos.y = y_start + 0.5f * y_grid_size;
     cur_pixel_pos.z = libconsts::kImagePlanePosZ;
 
     for (i = 0; i < libconsts::kWindowSizeHeight; i++) {
         for (j = 0; j < libconsts::kWindowSizeWidth; j++) {
-            ray = cur_pixel_pos - eye_pos;
+            ray = cur_pixel_pos - libconsts::kEyePosition;
 
             // TODO: finish recursive function
             // ret_color = RecursiveRayTrace();
@@ -109,11 +108,11 @@ void RayTrace() {
 
             // Parallel rays can be cast instead using below
             //
-            // ray.x = ray.y = 0;
-            // ray.z = -1.0;
-            // ret_color = recursive_ray_trace(cur_pixel_pos, ray, 1);
+            // ray.x = 0.0f;
+            // ray.y = 0.0f;
+            // ray.z = -1.0f;
+            // ret_color = RecursiveRayTrace(cur_pixel_pos, ray, 1);
 
-            // Checkboard for testing
             glm::vec3 color = {float(i / 32), 0, float(j / 32)};
             ret_color = color;
 

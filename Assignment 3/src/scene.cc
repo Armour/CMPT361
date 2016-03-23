@@ -45,9 +45,9 @@ namespace raychess {
 void SetUpDefaultScene(void) {
 
     // Set background color
-    background_color.r = 0.5f;
+    background_color.r = 0.50f;
     background_color.g = 0.05f;
-    background_color.b = 0.8f;
+    background_color.b = 0.80f;
 
     // Set up global ambient color
     global_ambient[0] = 0.2f;
@@ -73,10 +73,10 @@ void SetUpDefaultScene(void) {
     float sphere1_ambient[] = {0.7f, 0.7f, 0.7f};
     float sphere1_diffuse[] = {0.1f, 0.5f, 0.8f};
     float sphere1_specular[] = {1.0f, 1.0f, 1.0f};
-    float sphere1_shineness = 10;
+    float sphere1_shininess = 10;
     float sphere1_reflectance = 0.4f;
     scene = AddSphere(scene, sphere1_ctr, sphere1_radius, sphere1_ambient,
-                      sphere1_diffuse, sphere1_specular, sphere1_shineness,
+                      sphere1_diffuse, sphere1_specular, sphere1_shininess,
                       sphere1_reflectance, 1);
 
     // Sphere 2
@@ -85,10 +85,10 @@ void SetUpDefaultScene(void) {
     float sphere2_ambient[] = {0.6f, 0.6f, 0.6f};
     float sphere2_diffuse[] = {1.0f, 0.0f, 0.25f};
     float sphere2_specular[] = {1.0f, 1.0f, 1.0f};
-    float sphere2_shineness = 6;
+    float sphere2_shininess = 6;
     float sphere2_reflectance = 0.3f;
     scene = AddSphere(scene, sphere2_ctr, sphere2_radius, sphere2_ambient,
-                      sphere2_diffuse, sphere2_specular, sphere2_shineness,
+                      sphere2_diffuse, sphere2_specular, sphere2_shininess,
                       sphere2_reflectance, 2);
 
     // Sphere 3
@@ -97,10 +97,10 @@ void SetUpDefaultScene(void) {
     float sphere3_ambient[] = {0.2f, 0.2f, 0.2f};
     float sphere3_diffuse[] = {0.0f, 1.0f, 0.25f};
     float sphere3_specular[] = {0.0f, 1.0f, 0.0f};
-    float sphere3_shineness = 30;
+    float sphere3_shininess = 30;
     float sphere3_reflectance = 0.3f;
     scene = AddSphere(scene, sphere3_ctr, sphere3_radius, sphere3_ambient,
-                      sphere3_diffuse, sphere3_specular, sphere3_shineness,
+                      sphere3_diffuse, sphere3_specular, sphere3_shininess,
                       sphere3_reflectance, 3);
 }
 

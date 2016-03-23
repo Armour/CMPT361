@@ -17,7 +17,7 @@ INCLUDEDIR=/usr/include/
 LIBDIR=/usr/lib
 
 # If you have more source files add them here
-SOURCE= src/scene.cc src/image_util.cc src/sphere.cc src/trace.cc src/raycast.cc isrc/init_shader.cc
+SOURCE= src/scene.cc src/image_util.cc src/sphere.cc src/trace.cc src/raycast.cc src/init_shader.cc
 
 # The compiler we are using
 CC= g++
@@ -51,7 +51,7 @@ depend:
 	$(CC) -M $(SOURCE) > depend
 
 $(OBJECT):
-	$(CC) $(CFLAGS) $(INCLUDEFLAG) -c -o $@ $(@:.o=.cpp)
+	$(CC) $(CFLAGS) $(INCLUDEFLAG) -c -o $@ $(@:.o=.cc)
 
 clean_object:
 	rm -f $(OBJECT)

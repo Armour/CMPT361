@@ -59,21 +59,21 @@ char *ReadShaderSource(const char *shader_file) {
 //   Create a GLSL program object from vertex and fragment shader files
 //
 //   Parameters:
-//       vertex_shader_file: the name of the vertex shader file that need to read
-//       fragment_shader_file: the name of the fragment shader file that need to read
+//       v_shader_file: the name of the vertex shader file that need to read
+//       f_shader_file: the name of the fragment shader file that need to read
 //
 //   Returns:
 //       the binded id of GLSL program object
 //
 
-GLuint InitShader(const char *vertex_shader_file, const char *fragment_shader_file) {
+GLuint InitShader(const char *v_shader_file, const char *f_shader_file) {
     struct Shader {
         const char *filename_;
         GLenum type_;
         GLchar *source_;
     } shaders[2] = {
-        { vertex_shader_file, GL_VERTEX_SHADER, NULL },
-        { fragment_shader_file, GL_FRAGMENT_SHADER, NULL }
+        { v_shader_file, GL_VERTEX_SHADER, NULL },
+        { f_shader_file, GL_FRAGMENT_SHADER, NULL }
     };
 
     // Create program
