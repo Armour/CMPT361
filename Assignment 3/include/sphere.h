@@ -28,23 +28,24 @@ typedef struct sphere {
     int index;                  // Identifies a sphere; must be greater than 0
     float radius;               // The radius of this sphere
     glm::vec3 center;           // The center point of this sphere
-    float mat_ambient[3];       // Material property used in Phong model
-    float mat_diffuse[3];
-    float mat_specular[3];
+    glm::vec3 mat_ambient;      // Material property used in Phong model
+    glm::vec3 mat_diffuse;
+    glm::vec3 mat_specular;
     float mat_shininess;
     float reflectance;          // Determines how much reflected light contributes to the color of a pixel
     struct sphere *next;        // A list of spheres
 } Sphere;
 
 // Intersect ray with sphere
-float IntersectSphere(glm::vec3 o, glm::vec3 u, raychess::Sphere *sphere, glm::vec3 *hit);
+float IntersectSphere(glm::vec3 origin, glm::vec3 direction, raychess::Sphere *sphere, glm::vec3 *hit);
 
 // Intersect ray with scene
-raychess::Sphere *IntersectScene(glm::vec3, glm::vec3, Sphere *sphere, glm::vec3 *, int);
+raychess::Sphere *IntersectScene(glm::vec3 origin, glm::vec3 direction, Sphere *spheres,
+                                 float max_distance, glm::vec3 *hit, int sphere_ignore);
 
 // Add a sphere to the sphere list
-raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float radius, float ambient[],
-                            float diffuse[], float specular[], float shininess, float reflectance, int index);
+raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float radius, glm::vec3 ambient,
+                            glm::vec3 diffuse, glm::vec3 specular, float shininess, float reflectance, int index);
 
 // Return the unit normal at a point on sphere
 glm::vec3 SphereNormal(glm::vec3 surf_point, raychess::Sphere *sphere);

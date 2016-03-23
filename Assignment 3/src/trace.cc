@@ -22,8 +22,10 @@ extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][
 extern raychess::Sphere *scene;
 extern glm::vec3 background_color;
 extern glm::vec3 light;
-extern float light_intensity[3];
-extern float global_ambient[3];
+extern glm::vec3 light_ambient;
+extern glm::vec3 light_diffuse;
+extern glm::vec3 light_specular;
+extern glm::vec3 global_ambient;
 extern float decay_a;
 extern float decay_b;
 extern float decay_c;
@@ -45,10 +47,20 @@ namespace raychess {
 //       void
 //
 
-glm::vec3 PhongIllumination(glm::vec3 q, glm::vec3 v, glm::vec3 surf_norm, raychess::Sphere *sphere) {
-    // TODO: add phong illumination
-    glm::vec3 color;
-    return color;
+glm::vec3 PhongIllumination(raychess::Sphere *sphere, glm::vec3 hit, glm::vec3 surf_norm) {
+    glm::vec3 intensity;
+    glm::vec3 l = glm::normalize(light - hit);
+    glm::vec3 v = glm::normalize(libconsts::kEyePosition - hit);
+    glm::vec3 r = glm::cross(glm::cross(surf_norm, l), surf_norm) * 2.0f - l;
+    float diffuse = fmaxf(glm::dot(surf_norm, l), 0.0f);
+    float specular = powf(fmaxf(glm::dot(v, r), 0.0f), sphere->mat_shininess);
+    float delta = glm::length(light - hit);
+    intensity = (light_ambient * sphere->mat_ambient +
+                 light_diffuse * sphere->mat_diffuse * diffuse +
+                 light_specular * sphere->mat_specular * specular) /
+                (decay_a + decay_b * delta + decay_c * delta * delta);
+    intensity += glm::matrixCompMult(global_ambient, sphere->mat_ambient);
+    return intensity;
 }
 
 //
@@ -64,10 +76,18 @@ glm::vec3 PhongIllumination(glm::vec3 q, glm::vec3 v, glm::vec3 surf_norm, raych
 //       void
 //
 
-glm::vec3 RecursiveRayTrace() {
-    // TODO: recursive here
-    glm::vec3 color;
-    return color;
+glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int max_distance, int sphere_ignore) {
+    if (iteration == 0) {
+        return background_color;
+    }
+    glm::vec3 *hit = new glm::vec3();
+    raychess::Sphere *sphere = IntersectScene(origin, direction, scene, max_distance, hit, sphere_ignore);
+    if (sphere != nullptr) {
+        glm::vec3 surf_norm = SphereNormal(*hit, sphere);
+        glm::vec3 color = PhongIllumination(sphere, *hit, surf_norm);
+        return color;
+    }
+    return background_color;
 }
 
 //
@@ -102,19 +122,7 @@ void RayTrace() {
         for (j = 0; j < libconsts::kWindowSizeWidth; j++) {
             ray = cur_pixel_pos - libconsts::kEyePosition;
 
-            // TODO: finish recursive function
-            // ret_color = RecursiveRayTrace();
-            ret_color = background_color; // just background for now
-
-            // Parallel rays can be cast instead using below
-            //
-            // ray.x = 0.0f;
-            // ray.y = 0.0f;
-            // ray.z = -1.0f;
-            // ret_color = RecursiveRayTrace(cur_pixel_pos, ray, 1);
-
-            glm::vec3 color = {float(i / 32), 0, float(j / 32)};
-            ret_color = color;
+            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, 1, 10000000, 0);
 
             frame[i][j][0] = ret_color.r;
             frame[i][j][1] = ret_color.g;
@@ -122,7 +130,6 @@ void RayTrace() {
 
             cur_pixel_pos.x += x_grid_size;
         }
-
         cur_pixel_pos.y += y_grid_size;
         cur_pixel_pos.x = x_start;
     }

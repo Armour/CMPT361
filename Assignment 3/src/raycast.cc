@@ -36,10 +36,12 @@ raychess::Sphere *scene = NULL;
 
 // Light position and color
 glm::vec3 light;
-float light_intensity[3];
+glm::vec3 light_ambient;
+glm::vec3 light_diffuse;
+glm::vec3 light_specular;
 
 // Global ambient term
-float global_ambient[3];
+glm::vec3 global_ambient;
 
 // Light decay parameters
 float decay_a;
@@ -49,8 +51,13 @@ float decay_c;
 // Maximum level of recursions of reflection
 int step_max = 1;
 
-// The flag to indicate whether you want to have shadows
+// The option flags
 int shadow_on = 0;
+int reflection_on = 0;
+int chess_board_on = 0;
+int refraction_on = 0;
+int diffuse_on = 0;
+int antialiasing_on = 0;
 
 //
 // Function: Init
@@ -218,6 +225,7 @@ int main(int argc, char **argv) {
     // Ray trace the scene now
     printf("Rendering scene using my fantastic ray tracer ...\n");
     raychess::RayTrace();
+    printf("Done!\n");
 
     // Make sure that intensity values are normalized
     image::HistogramNormalization();

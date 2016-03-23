@@ -25,18 +25,15 @@
 #  include <GLUT/glut.h>
 #  include <OpenGL/glu.h>
 #  include <OpenGL/gl3.h>
-#  include "glm/glm.hpp"
-#  include "glm/gtc/matrix_transform.hpp"
-#  include "glm/gtc/type_ptr.hpp"
+#  include <glm/glm.hpp>
+#  include <glm/gtx/component_wise.hpp>
 #else   // End of Mac OSX header include
 #  include <GL/glew.h>
 #  include <GL/glui.h>
 #  include <GL/freeglut.h>
 #  include <GL/freeglut_ext.h>
-#  include "glm/glm.hpp"
-#  include "glm/glm.hpp"
-#  include "glm/gtc/matrix_transform.hpp"
-#  include "glm/gtc/type_ptr.hpp"
+#  include <glm/glm.hpp>
+#  include <glm/gtx/component_wise.hpp>
 #endif  // End of Linux header include
 
 #endif  //RAYCHESS_LIB_GL_H_
