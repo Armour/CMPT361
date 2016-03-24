@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "sphere.h"
-#include <iostream>
 
 namespace raychess {
 
@@ -82,15 +81,14 @@ float IntersectSphere(glm::vec3 origin, glm::vec3 direction, raychess::Sphere *s
 //       A pointer to the sphere object that the ray intersects first, nullptr if no intersection.
 //
 
-raychess::Sphere *IntersectScene(glm::vec3 origin, glm::vec3 direction, Sphere *spheres,
-                                 float max_distance, glm::vec3 *hit, int sphere_ignore) {
+raychess::Sphere *IntersectScene(glm::vec3 origin, glm::vec3 direction, Sphere *spheres, glm::vec3 *hit, int sphere_ignore) {
     Sphere *result = nullptr;
     Sphere *current_sphere = spheres;
     glm::vec3 *current_hit = new glm::vec3();
     while (current_sphere != nullptr) {
         if (current_sphere->index != sphere_ignore) {
             float distance = IntersectSphere(origin, direction, current_sphere, current_hit);
-            if (distance != -1 && distance < max_distance) {
+            if (distance != -1 && distance < libconsts::kMaxDistance) {
                 if (result == nullptr || (*hit - origin).length() > (*current_hit - origin).length()) {
                     *hit = *current_hit;
                     result = current_sphere;

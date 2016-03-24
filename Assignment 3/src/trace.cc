@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "trace.h"
+#include <iostream>
 
 extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 extern raychess::Sphere *scene;
@@ -48,18 +49,22 @@ namespace raychess {
 //
 
 glm::vec3 PhongIllumination(raychess::Sphere *sphere, glm::vec3 hit, glm::vec3 surf_norm) {
-    glm::vec3 intensity;
-    glm::vec3 l = glm::normalize(light - hit);
-    glm::vec3 v = glm::normalize(libconsts::kEyePosition - hit);
-    glm::vec3 r = glm::cross(glm::cross(surf_norm, l), surf_norm) * 2.0f - l;
-    float diffuse = fmaxf(glm::dot(surf_norm, l), 0.0f);
-    float specular = powf(fmaxf(glm::dot(v, r), 0.0f), sphere->mat_shininess);
-    float delta = glm::length(light - hit);
-    intensity = (light_ambient * sphere->mat_ambient +
-                 light_diffuse * sphere->mat_diffuse * diffuse +
-                 light_specular * sphere->mat_specular * specular) /
-                (decay_a + decay_b * delta + decay_c * delta * delta);
-    intensity += glm::matrixCompMult(global_ambient, sphere->mat_ambient);
+    glm::vec3 intensity(0.0f);
+    glm::vec3 *dummy = new glm::vec3();
+    if (!shadow_on || IntersectScene(hit, light - hit, scene, dummy, sphere->index) == nullptr) {
+        glm::vec3 l = glm::normalize(light - hit);
+        glm::vec3 v = glm::normalize(libconsts::kEyePosition - hit);
+        glm::vec3 r = 2.0f * surf_norm * (glm::dot(surf_norm, l)) - l;
+        float diffuse = fmaxf(glm::dot(surf_norm, l), 0.0f);
+        float specular = powf(fmaxf(glm::dot(v, r), 0.0f), sphere->mat_shininess);
+        float delta = glm::length(light - hit);
+        intensity = (light_ambient * sphere->mat_ambient +
+                     light_diffuse * sphere->mat_diffuse * diffuse +
+                     light_specular * sphere->mat_specular * specular) /
+                    (decay_a + decay_b * delta + decay_c * delta * delta);
+    }
+    intensity += global_ambient * sphere->mat_ambient;
+    delete dummy;
     return intensity;
 }
 
@@ -76,12 +81,12 @@ glm::vec3 PhongIllumination(raychess::Sphere *sphere, glm::vec3 hit, glm::vec3 s
 //       void
 //
 
-glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int max_distance, int sphere_ignore) {
+glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int sphere_ignore) {
     if (iteration == 0) {
         return background_color;
     }
     glm::vec3 *hit = new glm::vec3();
-    raychess::Sphere *sphere = IntersectScene(origin, direction, scene, max_distance, hit, sphere_ignore);
+    raychess::Sphere *sphere = IntersectScene(origin, direction, scene, hit, sphere_ignore);
     if (sphere != nullptr) {
         glm::vec3 surf_norm = SphereNormal(*hit, sphere);
         glm::vec3 color = PhongIllumination(sphere, *hit, surf_norm);
@@ -122,7 +127,7 @@ void RayTrace() {
         for (j = 0; j < libconsts::kWindowSizeWidth; j++) {
             ray = cur_pixel_pos - libconsts::kEyePosition;
 
-            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, 1, 10000000, 0);
+            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, 1, 0);
 
             frame[i][j][0] = ret_color.r;
             frame[i][j][1] = ret_color.g;

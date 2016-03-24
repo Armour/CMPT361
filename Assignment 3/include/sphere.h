@@ -21,6 +21,7 @@
 
 #include "sphere.h"
 #include "lib_gl.h"
+#include "lib_consts.h"
 
 namespace raychess {
 
@@ -40,8 +41,7 @@ typedef struct sphere {
 float IntersectSphere(glm::vec3 origin, glm::vec3 direction, raychess::Sphere *sphere, glm::vec3 *hit);
 
 // Intersect ray with scene
-raychess::Sphere *IntersectScene(glm::vec3 origin, glm::vec3 direction, Sphere *spheres,
-                                 float max_distance, glm::vec3 *hit, int sphere_ignore);
+raychess::Sphere *IntersectScene(glm::vec3 origin, glm::vec3 direction, Sphere *spheres, glm::vec3 *hit, int sphere_ignore);
 
 // Add a sphere to the sphere list
 raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float radius, glm::vec3 ambient,

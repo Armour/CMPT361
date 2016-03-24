@@ -39,6 +39,9 @@ const int kImageHeight = kWindowSizeHeight / kWindowSizeWidth * kImageWidth;
 // Image plane position
 const float kImagePlanePosZ = -1.5f;
 
+// Max distance
+const int kMaxDistance = 10000000;
+
 // The eye position
 const glm::vec3 kEyePosition = {0.0, 0.0, 0.0};
 
