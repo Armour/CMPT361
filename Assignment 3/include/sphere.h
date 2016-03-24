@@ -19,36 +19,35 @@
 #ifndef RAYCHESS_SPHERE_H_
 #define RAYCHESS_SPHERE_H_
 
-#include "sphere.h"
+#include "object.h"
 #include "lib_gl.h"
 #include "lib_consts.h"
 
 namespace raychess {
 
-typedef struct sphere {
-    int index;                  // Identifies a sphere; must be greater than 0
-    float radius;               // The radius of this sphere
-    glm::vec3 center;           // The center point of this sphere
-    glm::vec3 mat_ambient;      // Material property used in Phong model
-    glm::vec3 mat_diffuse;
-    glm::vec3 mat_specular;
-    float mat_shininess;
-    float reflectance;          // Determines how much reflected light contributes to the color of a pixel
-    struct sphere *next;        // A list of spheres
-} Sphere;
+class Sphere : public Object {
+private:
+    float radius_;               // The radius of this sphere
+    glm::vec3 center_;           // The center point of this sphere
+public:
+    inline float get_radius(void) const { return radius_; };
+    inline glm::vec3 get_center(void) const { return center_; };
+    inline void set_radius(float radius) { this->radius_ = radius; };
+    inline void set_center(glm::vec3 center) { this->center_ = center; };
+};
 
 // Intersect ray with sphere
-float IntersectSphere(glm::vec3 origin, glm::vec3 direction, raychess::Sphere *sphere, glm::vec3 *hit);
+float IntersectSphere(glm::vec3 origin, glm::vec3 direction, Sphere *sphere, glm::vec3 *hit);
 
 // Intersect ray with scene
-raychess::Sphere *IntersectScene(glm::vec3 origin, glm::vec3 direction, Sphere *spheres, glm::vec3 *hit, int sphere_ignore);
+Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int sphere_ignore);
 
-// Add a sphere to the sphere list
-raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float radius, glm::vec3 ambient,
-                            glm::vec3 diffuse, glm::vec3 specular, float shininess, float reflectance, int index);
+// Add a sphere to the object list
+Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 ambient, glm::vec3 diffuse,
+                  glm::vec3 specular, float shininess, float reflectance, int index);
 
 // Return the unit normal at a point on sphere
-glm::vec3 SphereNormal(glm::vec3 surf_point, raychess::Sphere *sphere);
+glm::vec3 SphereNormal(glm::vec3 surf_point, Sphere *sphere);
 
 }  // namespace raychess
 

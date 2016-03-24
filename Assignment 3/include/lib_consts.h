@@ -39,6 +39,10 @@ const int kImageHeight = kWindowSizeHeight / kWindowSizeWidth * kImageWidth;
 // Image plane position
 const float kImagePlanePosZ = -1.5f;
 
+// Object type
+const int kTypeSphere = 1;
+const int kTypePlaner = 2;
+
 // Max distance
 const int kMaxDistance = 10000000;
 
@@ -47,10 +51,6 @@ const float kErrorEpsilon = 0.001f;
 
 // The eye position
 const glm::vec3 kEyePosition = {0.0, 0.0, 0.0};
-
-// Color
-const glm::vec3 kColorBlack = {0.0f, 0.0f, 0.0f};
-const glm::vec3 kColorWhite = {1.0f, 1.0f, 1.0f};
 
 }  // namespace libconsts
 

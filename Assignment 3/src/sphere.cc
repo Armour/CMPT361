@@ -39,10 +39,10 @@ namespace raychess {
 //       void
 //
 
-float IntersectSphere(glm::vec3 origin, glm::vec3 direction, raychess::Sphere *sphere, glm::vec3 *hit) {
+float IntersectSphere(glm::vec3 origin, glm::vec3 direction, Sphere *sphere, glm::vec3 *hit) {
     float a = powf((float)glm::length(direction), 2);
-    float b = 2 * (float)glm::dot(direction, origin - sphere->center);
-    float c = powf((float)glm::length(origin - sphere->center), 2) - powf(sphere->radius, 2);
+    float b = 2 * (float)glm::dot(direction, origin - sphere->get_center());
+    float c = powf((float)glm::length(origin - sphere->get_center()), 2) - powf(sphere->get_radius(), 2);
     float delta = powf(b, 2) - 4 * a * c;
     if (delta < 0) return -1;
 
@@ -81,21 +81,23 @@ float IntersectSphere(glm::vec3 origin, glm::vec3 direction, raychess::Sphere *s
 //       A pointer to the sphere object that the ray intersects first, nullptr if no intersection.
 //
 
-raychess::Sphere *IntersectScene(glm::vec3 origin, glm::vec3 direction, Sphere *spheres, glm::vec3 *hit, int sphere_ignore) {
-    Sphere *result = nullptr;
-    Sphere *current_sphere = spheres;
+Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int sphere_ignore) {
+    Object *result = nullptr;
+    Object *current_object = objects;
     glm::vec3 *current_hit = new glm::vec3();
-    while (current_sphere != nullptr) {
-        if (current_sphere->index != sphere_ignore) {
-            float distance = IntersectSphere(origin, direction, current_sphere, current_hit);
+    while (current_object != nullptr) {
+        //if (current_object->get_index() != sphere_ignore) {
+        if (current_object->get_type() == libconsts::kTypeSphere) {
+            float distance = IntersectSphere(origin, direction, (Sphere *)current_object, current_hit);
             if (distance != -1 && distance < libconsts::kMaxDistance) {
                 if (result == nullptr || (*hit - origin).length() > (*current_hit - origin).length()) {
                     *hit = *current_hit;
-                    result = current_sphere;
+                    result = current_object;
                 }
             }
         }
-        current_sphere = current_sphere->next;
+        //}
+        current_object = current_object->get_next();
     }
     delete current_hit;
     return result;
@@ -114,28 +116,29 @@ raychess::Sphere *IntersectScene(glm::vec3 origin, glm::vec3 direction, Sphere *
 //       void
 //
 
-raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float radius, glm::vec3 ambient,
-                            glm::vec3 diffuse, glm::vec3 specular, float shineness, float reflectance, int index) {
-    raychess::Sphere *new_sphere;
-    new_sphere = (raychess::Sphere *)malloc(sizeof(raychess::Sphere));
-    new_sphere->index = index;
-    new_sphere->center = center;
-    new_sphere->radius = radius;
-    (new_sphere->mat_ambient) = ambient;
-    (new_sphere->mat_diffuse) = diffuse;
-    (new_sphere->mat_specular) = specular;
-    new_sphere->mat_shininess = shineness;
-    new_sphere->reflectance = reflectance;
-    new_sphere->next = NULL;
+Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 ambient, glm::vec3 diffuse,
+                  glm::vec3 specular, float shininess, float reflectance, int index) {
+    Sphere *new_sphere;
+    new_sphere = (Sphere *)malloc(sizeof(Sphere));
+    new_sphere->set_index(index);
+    new_sphere->set_type(libconsts::kTypeSphere);
+    new_sphere->set_center(center);
+    new_sphere->set_radius(radius);
+    new_sphere->set_ambient(ambient);
+    new_sphere->set_diffuse(diffuse);
+    new_sphere->set_specular(specular);
+    new_sphere->set_shininess(shininess);
+    new_sphere->set_reflectance(reflectance);
+    new_sphere->set_next(nullptr);
 
-    if (spheres == NULL) {          // First object
-        spheres = new_sphere;
+    if (objects == nullptr) {          // First object
+        objects = (Object *)new_sphere;
     } else {                        // Insert at the beginning
-        new_sphere->next = spheres;
-        spheres = new_sphere;
+        new_sphere->set_next(objects);
+        objects = (Object *)new_sphere;
     }
 
-    return spheres;
+    return objects;
 }
 
 //
@@ -152,12 +155,12 @@ raychess::Sphere *AddSphere(raychess::Sphere *spheres, glm::vec3 center, float r
 //       sphere normal vector
 //
 
-glm::vec3 SphereNormal(glm::vec3 surf_point, raychess::Sphere *sphere) {
-    return glm::normalize(surf_point - sphere->center);
+glm::vec3 SphereNormal(glm::vec3 surf_point, Sphere *sphere) {
+    return glm::normalize(surf_point - sphere->get_center());
 }
 
 /*
-glm::vec3 PlanerNormal(raychess::Planer *planer) {
+glm::vec3 PlanerNormal(Planer *planer) {
     glm::vec3 u = planar_points[planer->a] - planar_points[planer->c];
     glm::vec3 v = planar_points[planer->b] - planar_points[planer->c];
     return glm::cross(u, v);

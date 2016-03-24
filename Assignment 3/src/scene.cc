@@ -18,7 +18,7 @@
 
 #include "scene.h"
 
-extern raychess::Sphere *scene;
+extern raychess::Object *scene;
 extern glm::vec3 background_color;
 extern glm::vec3 light;
 extern glm::vec3 light_ambient;

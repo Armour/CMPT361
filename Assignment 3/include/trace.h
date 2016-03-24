@@ -19,13 +19,14 @@
 #ifndef RAYCHESS_RAY_TRACE_H_
 #define RAYCHESS_RAY_TRACE_H_
 
-#include "sphere.h"
 #include "lib_consts.h"
+#include "sphere.h"
+#include "planer.h"
 
 namespace raychess {
 
 // The phong illumination implementation
-glm::vec3 PhongIllumination(raychess::Sphere *sphere, glm::vec3 hit, glm::vec3 surf_norm);
+glm::vec3 PhongIllumination(Sphere *sphere, glm::vec3 hit, glm::vec3 surf_norm);
 
 // This is the recursive ray trace function
 glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int sphere_ignore);

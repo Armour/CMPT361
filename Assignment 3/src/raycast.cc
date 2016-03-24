@@ -31,8 +31,8 @@ GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 // Background color
 glm::vec3 background_color;
 
-// List of spheres in the scene
-raychess::Sphere *scene = NULL;
+// List of objects in the scene
+raychess::Object *scene = nullptr;
 
 // Light position and color
 glm::vec3 light;
