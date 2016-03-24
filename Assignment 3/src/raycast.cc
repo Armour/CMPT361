@@ -218,13 +218,17 @@ int main(int argc, char **argv) {
 
     // Optional arguments
     for(int i = 3; i < argc; i++) {
-        if (strcmp(argv[i], "-s") == 0)
-            shadow_on = 1;
+        if (strcmp(argv[i], "-s") == 0) shadow_on = 1;
+        if (strcmp(argv[i], "-l") == 0) reflection_on = 1;
+        if (strcmp(argv[i], "-r") == 0) refraction_on = 1;
+        if (strcmp(argv[i], "-c") == 0) chess_board_on = 1;
+        if (strcmp(argv[i], "-f") == 0) diffuse_on = 1;
+        if (strcmp(argv[i], "-p") == 0) antialiasing_on = 1;
     }
 
     // Ray trace the scene now
     printf("Rendering scene using my fantastic ray tracer ...\n");
-    raychess::RayTrace();
+    raychess::RayTrace(step_max);
     printf("Done!\n");
 
     // Make sure that intensity values are normalized

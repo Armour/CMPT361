@@ -29,8 +29,8 @@ const float kDegreeToRadians = (float)M_PI / 180.0f;
 // Window size
 const int kWindowPositionX  = 400;
 const int kWindowPositionY  = 120;
-const int kWindowSizeWidth  = 256;
-const int kWindowSizeHeight = 256;
+const int kWindowSizeWidth  = 512;
+const int kWindowSizeHeight = 512;
 
 // Image size
 const int kImageWidth = 5;
@@ -41,6 +41,9 @@ const float kImagePlanePosZ = -1.5f;
 
 // Max distance
 const int kMaxDistance = 10000000;
+
+// Error epsilon
+const float kErrorEpsilon = 0.001f;
 
 // The eye position
 const glm::vec3 kEyePosition = {0.0, 0.0, 0.0};

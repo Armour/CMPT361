@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "trace.h"
-#include <iostream>
 
 extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 extern raychess::Sphere *scene;
@@ -31,6 +30,7 @@ extern float decay_a;
 extern float decay_b;
 extern float decay_c;
 extern int shadow_on;
+extern int reflection_on;
 extern int step_max;
 
 namespace raychess {
@@ -83,15 +83,21 @@ glm::vec3 PhongIllumination(raychess::Sphere *sphere, glm::vec3 hit, glm::vec3 s
 
 glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int sphere_ignore) {
     if (iteration == 0) {
-        return background_color;
+        return global_ambient;
     }
     glm::vec3 *hit = new glm::vec3();
     raychess::Sphere *sphere = IntersectScene(origin, direction, scene, hit, sphere_ignore);
     if (sphere != nullptr) {
         glm::vec3 surf_norm = SphereNormal(*hit, sphere);
         glm::vec3 color = PhongIllumination(sphere, *hit, surf_norm);
+        if (reflection_on) {
+            glm::vec3 reflection_ray = 2.0f * surf_norm * (glm::dot(surf_norm, -direction)) + direction;
+            color += sphere->reflectance * RecursiveRayTrace(*hit + surf_norm * libconsts::kErrorEpsilon,
+                                                             reflection_ray, iteration - 1, sphere_ignore);
+        }
         return color;
     }
+    delete hit;
     return background_color;
 }
 
@@ -108,7 +114,7 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
 //       void
 //
 
-void RayTrace() {
+void RayTrace(int iteration) {
     int i, j;
     float x_grid_size = libconsts::kImageWidth / float(libconsts::kWindowSizeWidth);
     float y_grid_size = libconsts::kImageHeight / float(libconsts::kWindowSizeHeight);
@@ -125,9 +131,9 @@ void RayTrace() {
 
     for (i = 0; i < libconsts::kWindowSizeHeight; i++) {
         for (j = 0; j < libconsts::kWindowSizeWidth; j++) {
-            ray = cur_pixel_pos - libconsts::kEyePosition;
+            ray = glm::normalize(cur_pixel_pos - libconsts::kEyePosition);
 
-            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, 1, 0);
+            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, iteration, 0);
 
             frame[i][j][0] = ret_color.r;
             frame[i][j][1] = ret_color.g;
