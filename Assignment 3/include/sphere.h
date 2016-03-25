@@ -39,8 +39,8 @@ public:
 };
 
 // Add a sphere to the object list
-Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 ambient, glm::vec3 diffuse,
-                  glm::vec3 specular, float shininess, float reflectance, int index);
+Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+                  float shininess, float reflectance, float refractance, float refract_ratio, int index);
 
 }  // namespace raychess
 

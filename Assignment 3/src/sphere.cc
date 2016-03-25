@@ -80,8 +80,8 @@ glm::vec3 Sphere::Normal(glm::vec3 surf_point) {
 //       void
 //
 
-Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 ambient, glm::vec3 diffuse,
-                  glm::vec3 specular, float shininess, float reflectance, int index) {
+Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+                  float shininess, float reflectance, float refractance, float refract_ratio, int index) {
     Sphere *new_sphere;
     new_sphere = (Sphere *)malloc(sizeof(Sphere));
     new_sphere->set_index(index);
@@ -93,6 +93,8 @@ Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 amb
     new_sphere->set_specular(specular);
     new_sphere->set_shininess(shininess);
     new_sphere->set_reflectance(reflectance);
+    new_sphere->set_refractance(refractance);
+    new_sphere->set_refract_ratio(refract_ratio);
     new_sphere->set_next(nullptr);
 
     if (objects == nullptr) {           // First object

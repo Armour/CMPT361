@@ -33,6 +33,8 @@ private:
     glm::vec3 mat_specular_;
     float mat_shininess_;
     float mat_reflectance_;         // Determines how much reflected light contributes to the color of a pixel
+    float mat_refractance_;         // Determines how much refracted light contributes to the color of a pixel
+    float mat_refract_ratio_;       // The refract ratio for this material (1.0 for vacuum)
     class Object *next_;
 public:
     inline int get_index(void) const { return index_; };
@@ -42,6 +44,8 @@ public:
     inline glm::vec3 get_specular(void) const { return mat_specular_; };
     inline float get_shininess(void) const { return mat_shininess_; };
     inline float get_reflectance(void) const { return mat_reflectance_; };
+    inline float get_refractance(void) const { return mat_refractance_; };
+    inline float get_refract_ratio(void) const { return mat_refract_ratio_; };
     inline Object *get_next(void) const { return next_; };
 
     inline void set_index(int index) { this->index_ = index; };
@@ -51,6 +55,8 @@ public:
     inline void set_specular(glm::vec3 specular) { this->mat_specular_ = specular; };
     inline void set_shininess(float shininess) { this->mat_shininess_ = shininess; };
     inline void set_reflectance(float reflectance) { this->mat_reflectance_ = reflectance; };
+    inline void set_refractance(float refractance) { this->mat_refractance_ = refractance; };
+    inline void set_refract_ratio(float refract_ratio) { this->mat_refract_ratio_ = refract_ratio; };
     inline void set_next(Object *next) { this->next_ = next; };
 };
 

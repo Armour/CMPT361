@@ -54,8 +54,8 @@ int step_max = 1;
 // The option flags
 int shadow_on = 0;
 int reflection_on = 0;
-int chessboard_on = 0;
 int refraction_on = 0;
+int chessboard_on = 0;
 int diffuse_on = 0;
 int antialiasing_on = 0;
 

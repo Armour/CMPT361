@@ -60,7 +60,7 @@ const glm::vec3 kColorWhite = {1.0, 1.0, 1.0};
 const int kChessBoardWidth = 8;
 const int kChessBoardHeight = 8;
 const float kChessBoardGridWidth = 5.0f;
-const glm::vec3 kChessBoardOffset = {-20.0f, -7.0f, -40.0f};
+const glm::vec3 kChessBoardOffset = {-20.0f, -6.5f, -40.0f};
 
 }  // namespace libconsts
 

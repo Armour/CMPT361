@@ -75,8 +75,8 @@ glm::vec3 Triangle::Normal(glm::vec3 dummy) {
 //       void
 //
 
-Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 ambient, glm::vec3 diffuse,
-                    glm::vec3 specular, float shininess, float reflectance, int index) {
+Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+                    float shininess, float reflectance, float refractance, float refract_ratio, int index) {
     Triangle *new_triangle;
     new_triangle = (Triangle *)malloc(sizeof(Triangle));
     new_triangle->set_index(index);
@@ -89,6 +89,8 @@ Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, g
     new_triangle->set_specular(specular);
     new_triangle->set_shininess(shininess);
     new_triangle->set_reflectance(reflectance);
+    new_triangle->set_refractance(refractance);
+    new_triangle->set_refract_ratio(refract_ratio);
     new_triangle->set_next(nullptr);
 
     if (objects == nullptr) {           // First object
