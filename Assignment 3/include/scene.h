@@ -20,6 +20,7 @@
 #define RAYCHESS_SCENE_H_
 
 #include "sphere.h"
+#include "triangle.h"
 
 namespace raychess {
 

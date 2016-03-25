@@ -2,7 +2,7 @@
 //
 //  sphere.h
 //
-//  The header file to handle spheres
+//  The header file for sphere class
 //
 //  Project         : RayChess
 //  Name            : Chong Guo
@@ -34,20 +34,13 @@ public:
     inline glm::vec3 get_center(void) const { return center_; };
     inline void set_radius(float radius) { this->radius_ = radius; };
     inline void set_center(glm::vec3 center) { this->center_ = center; };
+    glm::vec3 Normal(glm::vec3 surf_point);                                         // Get sphere surface normal
+    float IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit);      // Intersect with ray
 };
-
-// Intersect ray with sphere
-float IntersectSphere(glm::vec3 origin, glm::vec3 direction, Sphere *sphere, glm::vec3 *hit);
-
-// Intersect ray with scene
-Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int sphere_ignore);
 
 // Add a sphere to the object list
 Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 ambient, glm::vec3 diffuse,
                   glm::vec3 specular, float shininess, float reflectance, int index);
-
-// Return the unit normal at a point on sphere
-glm::vec3 SphereNormal(glm::vec3 surf_point, Sphere *sphere);
 
 }  // namespace raychess
 

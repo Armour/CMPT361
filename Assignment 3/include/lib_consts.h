@@ -41,16 +41,26 @@ const float kImagePlanePosZ = -1.5f;
 
 // Object type
 const int kTypeSphere = 1;
-const int kTypePlaner = 2;
+const int kTypeTriangle = 2;
 
 // Max distance
-const int kMaxDistance = 10000000;
+const int kMaxDistance = 10000;
 
 // Error epsilon
 const float kErrorEpsilon = 0.001f;
 
 // The eye position
 const glm::vec3 kEyePosition = {0.0, 0.0, 0.0};
+
+// Color category
+const glm::vec3 kColorBlack = {0.0, 0.0, 0.0};
+const glm::vec3 kColorWhite = {1.0, 1.0, 1.0};
+
+// Chessboard property
+const int kChessBoardWidth = 8;
+const int kChessBoardHeight = 8;
+const float kChessBoardGridWidth = 5.0f;
+const glm::vec3 kChessBoardOffset = {-20.0f, -7.0f, -40.0f};
 
 }  // namespace libconsts
 

@@ -12,12 +12,16 @@ set(SOURCE_FILES
         include/lib_consts.h
         include/lib_gl.h
         include/scene.h
+        include/object.h
+        include/triangle.h
         include/sphere.h
         include/trace.h
         src/image_util.cc
         src/init_shader.cc
         src/raycast.cc
         src/scene.cc
+        src/object.cc
+        src/triangle.cc
         src/sphere.cc
         src/trace.cc
         fshader_unix.glsl

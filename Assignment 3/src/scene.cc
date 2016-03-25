@@ -25,6 +25,7 @@ extern glm::vec3 light_ambient;
 extern glm::vec3 light_diffuse;
 extern glm::vec3 light_specular;
 extern glm::vec3 global_ambient;
+extern int chessboard_on;
 extern float decay_a;
 extern float decay_b;
 extern float decay_c;
@@ -45,6 +46,9 @@ namespace raychess {
 //
 
 void SetUpDefaultScene(void) {
+
+    // index
+    int index = 0;
 
     // Set background color
     background_color.r = 0.50f;
@@ -83,9 +87,8 @@ void SetUpDefaultScene(void) {
     float sphere1_radius = 1.23f;
     float sphere1_shininess = 10;
     float sphere1_reflectance = 0.4f;
-    scene = AddSphere(scene, sphere1_center, sphere1_radius, sphere1_ambient,
-                      sphere1_diffuse, sphere1_specular, sphere1_shininess,
-                      sphere1_reflectance, 1);
+    scene = AddSphere(scene, sphere1_center, sphere1_radius, sphere1_ambient, sphere1_diffuse,
+                      sphere1_specular, sphere1_shininess, sphere1_reflectance, ++index);
 
     // Sphere 2
     glm::vec3 sphere2_center = {-1.5f, 0.0f, -3.5f};
@@ -95,9 +98,8 @@ void SetUpDefaultScene(void) {
     float sphere2_radius = 1.5f;
     float sphere2_shininess = 6;
     float sphere2_reflectance = 0.3f;
-    scene = AddSphere(scene, sphere2_center, sphere2_radius, sphere2_ambient,
-                      sphere2_diffuse, sphere2_specular, sphere2_shininess,
-                      sphere2_reflectance, 2);
+    scene = AddSphere(scene, sphere2_center, sphere2_radius, sphere2_ambient, sphere2_diffuse,
+                      sphere2_specular, sphere2_shininess, sphere2_reflectance, ++index);
 
     // Sphere 3
     glm::vec3 sphere3_center = {-0.35f, 1.75f, -2.25f};
@@ -107,9 +109,30 @@ void SetUpDefaultScene(void) {
     float sphere3_radius = 0.5f;
     float sphere3_shininess = 30;
     float sphere3_reflectance = 0.3f;
-    scene = AddSphere(scene, sphere3_center, sphere3_radius, sphere3_ambient,
-                      sphere3_diffuse, sphere3_specular, sphere3_shininess,
-                      sphere3_reflectance, 3);
+    scene = AddSphere(scene, sphere3_center, sphere3_radius, sphere3_ambient, sphere3_diffuse,
+                      sphere3_specular, sphere3_shininess, sphere3_reflectance, ++index);
+
+    // Chessboard with many triangles
+    if (chessboard_on) {
+        glm::vec3 v1, v2, v3, v4;
+        float triangle_shininess = 30.0f;
+        float triangle_reflectance = 1.0f;
+        float width = libconsts::kChessBoardGridWidth;
+        glm::vec3 offset = libconsts::kChessBoardOffset;
+        for (int i = 0; i < libconsts::kChessBoardWidth; i++) {
+            for (int j = 0; j < libconsts::kChessBoardHeight; j++) {
+                glm::vec3 color = (i + j) % 2 == 0? libconsts::kColorBlack: libconsts::kColorWhite;
+                v1 = {i * width + 0.0f, 0.0f, j * width + 0.0f};
+                v2 = {i * width + width, 0.0f, j * width + 0.0f};
+                v3 = {i * width + 0.0f, 0.0f, j * width + width};
+                v4 = {i * width + width, 0.0f, j * width + width};
+                scene = AddTriangle(scene, v1 + offset, v3 + offset, v2 + offset, color, color, color,
+                                    triangle_shininess, triangle_reflectance, ++index);
+                scene = AddTriangle(scene, v2 + offset, v3 + offset, v4 + offset, color, color, color,
+                                    triangle_shininess, triangle_reflectance, ++index);
+            }
+        }
+    }
 }
 
 //

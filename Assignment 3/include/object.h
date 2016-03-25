@@ -44,8 +44,8 @@ public:
     inline float get_reflectance(void) const { return mat_reflectance_; };
     inline Object *get_next(void) const { return next_; };
 
-    inline void set_index(float index) { this->index_ = index; };
-    inline void set_type(float type) { this->type_ = type; };
+    inline void set_index(int index) { this->index_ = index; };
+    inline void set_type(int type) { this->type_ = type; };
     inline void set_ambient(glm::vec3 ambient) { this->mat_ambient_ = ambient; };
     inline void set_diffuse(glm::vec3 diffuse) { this->mat_diffuse_ = diffuse; };
     inline void set_specular(glm::vec3 specular) { this->mat_specular_ = specular; };
@@ -53,6 +53,9 @@ public:
     inline void set_reflectance(float reflectance) { this->mat_reflectance_ = reflectance; };
     inline void set_next(Object *next) { this->next_ = next; };
 };
+
+// Intersect ray with objects in scene
+Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int sphere_ignore);
 
 }  // namespace raychess
 

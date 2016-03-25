@@ -54,7 +54,7 @@ int step_max = 1;
 // The option flags
 int shadow_on = 0;
 int reflection_on = 0;
-int chess_board_on = 0;
+int chessboard_on = 0;
 int refraction_on = 0;
 int diffuse_on = 0;
 int antialiasing_on = 0;
@@ -208,6 +208,16 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    // Optional arguments
+    for(int i = 3; i < argc; i++) {
+        if (strcmp(argv[i], "+s") == 0) shadow_on = 1;
+        if (strcmp(argv[i], "+l") == 0) reflection_on = 1;
+        if (strcmp(argv[i], "+r") == 0) refraction_on = 1;
+        if (strcmp(argv[i], "+c") == 0) chessboard_on = 1;
+        if (strcmp(argv[i], "+f") == 0) diffuse_on = 1;
+        if (strcmp(argv[i], "+p") == 0) antialiasing_on = 1;
+    }
+
     // Check scene specification and max steps
     if (strcmp(argv[1], "-u") == 0) {   // user defined scene
         raychess::SetUpUserScene();
@@ -215,16 +225,6 @@ int main(int argc, char **argv) {
         raychess::SetUpDefaultScene();
     }
     step_max = atoi(argv[2]);           // maximum level of recursions
-
-    // Optional arguments
-    for(int i = 3; i < argc; i++) {
-        if (strcmp(argv[i], "-s") == 0) shadow_on = 1;
-        if (strcmp(argv[i], "-l") == 0) reflection_on = 1;
-        if (strcmp(argv[i], "-r") == 0) refraction_on = 1;
-        if (strcmp(argv[i], "-c") == 0) chess_board_on = 1;
-        if (strcmp(argv[i], "-f") == 0) diffuse_on = 1;
-        if (strcmp(argv[i], "-p") == 0) antialiasing_on = 1;
-    }
 
     // Ray trace the scene now
     printf("Rendering scene using my fantastic ray tracer ...\n");
