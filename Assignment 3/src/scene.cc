@@ -20,10 +20,8 @@
 
 extern raychess::Object *scene;
 extern glm::vec3 background_color;
-extern glm::vec3 light;
-extern glm::vec3 light_ambient;
-extern glm::vec3 light_diffuse;
-extern glm::vec3 light_specular;
+extern glm::vec3 light_position;
+extern glm::vec3 light_intensity;
 extern glm::vec3 global_ambient;
 extern int chessboard_on;
 extern float decay_a;
@@ -51,28 +49,14 @@ void SetUpDefaultScene(void) {
     int index = 0;
 
     // Set background color
-    background_color.r = 0.50f;
-    background_color.g = 0.05f;
-    background_color.b = 0.80f;
+    background_color = {0.50f, 0.05f, 0.80f};
 
     // Set up global ambient color
-    global_ambient.r = 0.2f;
-    global_ambient.g = 0.2f;
-    global_ambient.b = 0.2f;
+    global_ambient = {0.2f, 0.2f, 0.2f};
 
     // Set up light
-    light.x = -2.0f;
-    light.y = 5.0f;
-    light.z = 1.0f;
-    light_ambient.r = 0.1f;
-    light_ambient.g = 0.1f;
-    light_ambient.b = 0.1f;
-    light_diffuse.r = 1.0f;
-    light_diffuse.g = 1.0f;
-    light_diffuse.b = 1.0f;
-    light_specular.r = 1.0f;
-    light_specular.g = 1.0f;
-    light_specular.b = 1.0f;
+    light_position = {-2.0f, 5.0f, 1.0f};
+    light_intensity = {1.0f, 1.0f, 1.0f};
 
     // Set up decay parameters
     decay_a = 0.5f;

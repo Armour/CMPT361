@@ -21,10 +21,8 @@
 extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 extern raychess::Object *scene;
 extern glm::vec3 background_color;
-extern glm::vec3 light;
-extern glm::vec3 light_ambient;
-extern glm::vec3 light_diffuse;
-extern glm::vec3 light_specular;
+extern glm::vec3 light_position;
+extern glm::vec3 light_intensity;
 extern glm::vec3 global_ambient;
 extern float decay_a;
 extern float decay_b;
@@ -33,6 +31,8 @@ extern int shadow_on;
 extern int reflection_on;
 extern int refraction_on;
 extern int chessboard_on;
+extern int diffuse_on;
+extern int antialiasing_on;
 extern int step_max;
 
 namespace raychess {
@@ -53,17 +53,15 @@ namespace raychess {
 glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm) {
     glm::vec3 intensity(0.0f);
     glm::vec3 *dummy = new glm::vec3();
-    glm::vec3 l = glm::normalize(light - hit);
+    glm::vec3 l = glm::normalize(light_position - hit);
     if (!shadow_on || IntersectScene(hit + l * libconsts::kErrorEpsilon, l, scene, dummy, object->get_index ()) == nullptr) {
         glm::vec3 v = glm::normalize(libconsts::kEyePosition - hit);
         glm::vec3 r = 2.0f * surf_norm * (glm::dot(surf_norm, l)) - l;
         float diffuse = fmaxf(glm::dot(surf_norm, l), 0.0f);
         float specular = powf(fmaxf(glm::dot(v, r), 0.0f), object->get_shininess());
-        float delta = glm::length(light - hit);
-        intensity = (light_ambient * object->get_ambient() +
-                     light_diffuse * object->get_diffuse() * diffuse +
-                     light_specular * object->get_specular() * specular) /
-                    (decay_a + decay_b * delta + decay_c * delta * delta);
+        float delta = glm::length(light_position - hit);
+        float div = decay_a + decay_b * delta + decay_c * delta * delta;
+        intensity = light_intensity * (object->get_diffuse() * diffuse + object->get_specular() * specular) / div;
     }
     intensity += global_ambient * object->get_ambient();
     delete dummy;
@@ -91,11 +89,10 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
     Object *object = IntersectScene(origin, direction, scene, hit, sphere_ignore);
     if (object != nullptr) {
         glm::vec3 surf_norm;
-        if (object->get_type() == libconsts::kTypeSphere) {
+        if (object->get_type() == libconsts::kTypeSphere)
             surf_norm = ((Sphere *)object)->Normal(*hit);
-        } else if (object->get_type() == libconsts::kTypeTriangle) {
+        else if (object->get_type() == libconsts::kTypeTriangle)
             surf_norm = ((Triangle *)object)->Normal(*hit);
-        }
         if (in_object) surf_norm = -surf_norm;
 
         glm::vec3 color = PhongIllumination(object, *hit, surf_norm);
@@ -116,6 +113,10 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
                 color += object->get_refractance() * RecursiveRayTrace(*hit + refract_ray * libconsts::kErrorEpsilon, refract_ray,
                                                                        iteration - 1, sphere_ignore, !in_object);
             }
+        }
+
+        if (diffuse_on) {
+            // TODO: diffuse here
         }
 
         return color;
@@ -158,9 +159,17 @@ void RayTrace(int iteration) {
 
             ret_color = RecursiveRayTrace(cur_pixel_pos, ray, iteration, 0, false);
 
-            frame[i][j][0] = ret_color.r;
-            frame[i][j][1] = ret_color.g;
-            frame[i][j][2] = ret_color.b;
+            if (antialiasing_on) {
+                for (int k = 0; k < 4; k++) {
+                    glm::vec3 new_pixel_pos = cur_pixel_pos + libconsts::kAntialiasingOffset[k] * x_grid_size;
+                    ray = glm::normalize(new_pixel_pos - libconsts::kEyePosition);
+                    ret_color += RecursiveRayTrace(new_pixel_pos, ray, iteration, 0, false);
+                }
+            }
+
+            frame[i][j][0] = ret_color.r / 5.0f;
+            frame[i][j][1] = ret_color.g / 5.0f;
+            frame[i][j][2] = ret_color.b / 5.0f;
 
             cur_pixel_pos.x += x_grid_size;
         }

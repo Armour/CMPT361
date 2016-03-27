@@ -59,6 +59,14 @@ const int kChessBoardHeight = 8;
 const float kChessBoardGridWidth = 5.0f;
 const glm::vec3 kChessBoardOffset = {-20.0f, -2.5f, -40.0f};
 
+// Antialiasing offset
+const glm::vec3 kAntialiasingOffset[4] = {
+    { 0.25f,  0.25f, 0.0f},
+    {-0.25f,  0.25f, 0.0f},
+    { 0.25f, -0.25f, 0.0f},
+    {-0.25f, -0.25f, 0.0f}
+};
+
 }  // namespace libconsts
 
 #endif  //RAYCHESS_LIB_CONSTANTS_H_

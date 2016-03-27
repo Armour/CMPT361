@@ -36,10 +36,8 @@ glm::vec3 background_color;
 raychess::Object *scene = nullptr;
 
 // Light position and color
-glm::vec3 light;
-glm::vec3 light_ambient;
-glm::vec3 light_diffuse;
-glm::vec3 light_specular;
+glm::vec3 light_position;
+glm::vec3 light_intensity;
 
 // Global ambient term
 glm::vec3 global_ambient;
@@ -234,7 +232,7 @@ int main(int argc, char **argv) {
     raychess::RayTrace(step_max);       // Do ray trace!
     gettimeofday(&end, NULL);
     auto delta = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
-    printf("Time used: %.2lfs\n", delta);
+    printf("Done! Time used: %.2lfs\n", delta);
 
     // Make sure that intensity values are normalized
     image::HistogramNormalization();
