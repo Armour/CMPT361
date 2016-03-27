@@ -43,10 +43,8 @@ char *ReadShaderSource(const char *shader_file) {
 
     fseek(fp, 0L, SEEK_SET);
     char *buf = new char[size + 1];
-    size_t t = fread(buf, 1, (size_t)size, fp);
-    if (t == 0) {
-        std::cout << "" << std::endl;
-    }
+    fread(buf, 1, (size_t)size, fp);
+
     buf[size] = '\0';
     fclose(fp);
     return buf;
@@ -68,9 +66,9 @@ char *ReadShaderSource(const char *shader_file) {
 
 GLuint InitShader(const char *v_shader_file, const char *f_shader_file) {
     struct Shader {
-        const char *filename_;
-        GLenum type_;
-        GLchar *source_;
+        const char *filename;
+        GLenum type;
+        GLchar *source;
     } shaders[2] = {
         { v_shader_file, GL_VERTEX_SHADER, NULL },
         { f_shader_file, GL_FRAGMENT_SHADER, NULL }
@@ -82,20 +80,20 @@ GLuint InitShader(const char *v_shader_file, const char *f_shader_file) {
     // Compile and attach shaders
     for (int i = 0; i < 2; ++i) {
         Shader& s = shaders[i];
-        s.source_ = ReadShaderSource(s.filename_);
-        if (shaders[i].source_ == NULL) {
-            std::cerr << "Failed to read " << s.filename_ << std::endl;
+        s.source = ReadShaderSource(s.filename);
+        if (shaders[i].source == NULL) {
+            std::cerr << "Failed to read " << s.filename << std::endl;
             exit(EXIT_FAILURE);
         }
 
-        GLuint shader = glCreateShader(s.type_);
-        glShaderSource(shader, 1, (const GLchar**)&s.source_, NULL);
+        GLuint shader = glCreateShader(s.type);
+        glShaderSource(shader, 1, (const GLchar**)&s.source, NULL);
         glCompileShader(shader);
 
         GLint compiled;
         glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
         if (!compiled) {
-            std::cerr << s.filename_ << " failed to compile:" << std::endl;
+            std::cerr << s.filename << " failed to compile:" << std::endl;
             GLint logSize;
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
             char *logMsg = new char[logSize];
@@ -105,7 +103,7 @@ GLuint InitShader(const char *v_shader_file, const char *f_shader_file) {
             exit(EXIT_FAILURE);
         }
 
-        delete []s.source_;
+        delete []s.source;
         glAttachShader(program, shader);
     }
 
@@ -130,4 +128,4 @@ GLuint InitShader(const char *v_shader_file, const char *f_shader_file) {
     return program;
 }
 
-} // namespace angel
+}  // namespace angel

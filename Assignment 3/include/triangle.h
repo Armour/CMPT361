@@ -25,12 +25,12 @@ namespace raychess {
 
 class Triangle : public Object {
 private:
-    glm::vec3 v1, v2, v3;
+    glm::vec3 v1, v2, v3;               // The three vertex of this triangle
 public:
     inline void set_v1(glm::vec3 v1) { this->v1 = v1; };
     inline void set_v2(glm::vec3 v2) { this->v2 = v2; };
     inline void set_v3(glm::vec3 v3) { this->v3 = v3; };
-    glm::vec3 Normal(glm::vec3 dummy);                  // Get planer surface normal
+    glm::vec3 Normal(glm::vec3 dummy);          // Get planer surface normal
     float IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit);      // Intersect with ray
     bool InTriangle(glm::vec3);         // Check if the hit point in the triangle area
 };

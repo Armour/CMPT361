@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "trace.h"
-#include <iostream>
 
 extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 extern raychess::Object *scene;
@@ -55,8 +54,7 @@ glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm) 
     glm::vec3 intensity(0.0f);
     glm::vec3 *dummy = new glm::vec3();
     glm::vec3 l = glm::normalize(light - hit);
-    if (!shadow_on || IntersectScene(hit + l * libconsts::kErrorEpsilon,
-                                     l, scene, dummy, object->get_index ()) == nullptr) {
+    if (!shadow_on || IntersectScene(hit + l * libconsts::kErrorEpsilon, l, scene, dummy, object->get_index ()) == nullptr) {
         glm::vec3 v = glm::normalize(libconsts::kEyePosition - hit);
         glm::vec3 r = 2.0f * surf_norm * (glm::dot(surf_norm, l)) - l;
         float diffuse = fmaxf(glm::dot(surf_norm, l), 0.0f);
@@ -99,12 +97,15 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
             surf_norm = ((Triangle *)object)->Normal(*hit);
         }
         if (in_object) surf_norm = -surf_norm;
+
         glm::vec3 color = PhongIllumination(object, *hit, surf_norm);
+
         if (reflection_on) {
             glm::vec3 reflect_ray = 2.0f * surf_norm * (glm::dot(surf_norm, -direction)) + direction;
             color += object->get_reflectance() * RecursiveRayTrace(*hit + reflect_ray * libconsts::kErrorEpsilon, reflect_ray,
                                                                    iteration - 1, sphere_ignore, in_object);
         }
+
         if (refraction_on) {
             float refract_ratio = object->get_refract_ratio();
             float ratio = in_object? refract_ratio: 1.0f / refract_ratio;
@@ -116,6 +117,7 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
                                                                        iteration - 1, sphere_ignore, !in_object);
             }
         }
+
         return color;
     }
     delete hit;

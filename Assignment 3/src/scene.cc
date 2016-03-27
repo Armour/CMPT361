@@ -88,7 +88,7 @@ void SetUpDefaultScene(void) {
     float sphere1_shininess = 10;
     float sphere1_reflectance = 0.4f;
     float sphere1_refractance = 0.4f;
-    float sphere1_reflect_ratio = 1.5f;
+    float sphere1_reflect_ratio = 1.52f;
     scene = AddSphere(scene, sphere1_center, sphere1_radius, sphere1_ambient, sphere1_diffuse, sphere1_specular,
                       sphere1_shininess, sphere1_reflectance, sphere1_refractance, sphere1_reflect_ratio, ++index);
 
@@ -101,7 +101,7 @@ void SetUpDefaultScene(void) {
     float sphere2_shininess = 6;
     float sphere2_reflectance = 0.3f;
     float sphere2_refractance = 0.3f;
-    float sphere2_reflect_ratio = 1.5f;
+    float sphere2_reflect_ratio = 1.52f;
     scene = AddSphere(scene, sphere2_center, sphere2_radius, sphere2_ambient, sphere2_diffuse, sphere2_specular,
                       sphere2_shininess, sphere2_reflectance, sphere2_refractance, sphere2_reflect_ratio, ++index);
 
@@ -114,7 +114,7 @@ void SetUpDefaultScene(void) {
     float sphere3_shininess = 30;
     float sphere3_reflectance = 0.3f;
     float sphere3_refractance = 0.3f;
-    float sphere3_reflect_ratio = 1.5f;
+    float sphere3_reflect_ratio = 1.52f;
     scene = AddSphere(scene, sphere3_center, sphere3_radius, sphere3_ambient, sphere3_diffuse, sphere3_specular,
                       sphere3_shininess, sphere3_reflectance, sphere3_refractance, sphere3_reflect_ratio, ++index);
 

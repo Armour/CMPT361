@@ -47,11 +47,11 @@ Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, g
     while (current_object != nullptr) {
         //if (current_object->get_index() != sphere_ignore) {
         float distance = -1;
-        if (current_object->get_type() == libconsts::kTypeSphere) {
+        if (current_object->get_type() == libconsts::kTypeSphere)
             distance = ((Sphere *)current_object)->IntersectRay(origin, direction, current_hit);
-        } else if (current_object->get_type() == libconsts::kTypeTriangle) {
+        else if (current_object->get_type() == libconsts::kTypeTriangle)
             distance = ((Triangle *)current_object)->IntersectRay(origin, direction, current_hit);
-        }
+
         if (distance != -1 && distance < libconsts::kMaxDistance) {
             if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
                 *hit = *current_hit;

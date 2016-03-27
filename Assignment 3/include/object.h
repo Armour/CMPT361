@@ -65,4 +65,4 @@ Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, g
 
 }  // namespace raychess
 
-#endif //RAYCHESS_OBJECT_H_
+#endif  //RAYCHESS_OBJECT_H_

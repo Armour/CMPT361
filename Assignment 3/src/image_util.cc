@@ -42,7 +42,7 @@ void SaveImage(void) {
     unsigned char *bmp_image = new unsigned char[w * h * 3];
 
     int index = 0;
-    for (int y = 0; y < h; y++){
+    for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
 
             float r = frame[y][x][0];
@@ -61,19 +61,19 @@ void SaveImage(void) {
 
     int file_size = 54 + 3 * w * h;
 
-    bmp_file_header[ 2] = (unsigned char)(file_size      );
-    bmp_file_header[ 3] = (unsigned char)(file_size >>  8);
-    bmp_file_header[ 4] = (unsigned char)(file_size >> 16);
-    bmp_file_header[ 5] = (unsigned char)(file_size >> 24);
+    bmp_file_header[2] = (unsigned char)(file_size);
+    bmp_file_header[3] = (unsigned char)(file_size >>  8);
+    bmp_file_header[4] = (unsigned char)(file_size >> 16);
+    bmp_file_header[5] = (unsigned char)(file_size >> 24);
 
-    bmp_info_header[ 4] = (unsigned char)(        w      );
-    bmp_info_header[ 5] = (unsigned char)(        w >>  8);
-    bmp_info_header[ 6] = (unsigned char)(        w >> 16);
-    bmp_info_header[ 7] = (unsigned char)(        w >> 24);
-    bmp_info_header[ 8] = (unsigned char)(        h      );
-    bmp_info_header[ 9] = (unsigned char)(        h >>  8);
-    bmp_info_header[10] = (unsigned char)(        h >> 16);
-    bmp_info_header[11] = (unsigned char)(        h >> 24);
+    bmp_info_header[4] = (unsigned char)(w);
+    bmp_info_header[5] = (unsigned char)(w >>  8);
+    bmp_info_header[6] = (unsigned char)(w >> 16);
+    bmp_info_header[7] = (unsigned char)(w >> 24);
+    bmp_info_header[8] = (unsigned char)(h);
+    bmp_info_header[9] = (unsigned char)(h >>  8);
+    bmp_info_header[10] = (unsigned char)(h >> 16);
+    bmp_info_header[11] = (unsigned char)(h >> 24);
 
     FILE *fp;
     char file_name[32];
@@ -115,19 +115,21 @@ void HistogramNormalization(void) {
     GLfloat max_val = 0.0;
     int i, j;
 
-    for (i = 0; i < libconsts::kWindowSizeHeight; i++)
+    for (i = 0; i < libconsts::kWindowSizeHeight; i++) {
         for (j = 0; j < libconsts::kWindowSizeWidth; j++) {
             if (frame[i][j][0] > max_val) max_val = frame[i][j][0];
             if (frame[i][j][1] > max_val) max_val = frame[i][j][1];
             if (frame[i][j][2] > max_val) max_val = frame[i][j][2];
         }
+    }
 
-    for (i = 0; i < libconsts::kWindowSizeHeight; i++)
-        for (j=0; j < libconsts::kWindowSizeWidth; j++) {
+    for (i = 0; i < libconsts::kWindowSizeHeight; i++) {
+        for (j = 0; j < libconsts::kWindowSizeWidth; j++) {
             frame[i][j][0] /= max_val;
             frame[i][j][1] /= max_val;
             frame[i][j][2] /= max_val;
         }
+    }
 }
 
 }  // namespace image

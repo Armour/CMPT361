@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "image_util.h"
 #include "init_shader.h"
@@ -219,17 +220,21 @@ int main(int argc, char **argv) {
     }
 
     // Check scene specification and max steps
-    if (strcmp(argv[1], "-u") == 0) {   // user defined scene
+    if (strcmp(argv[1], "-u") == 0) {   // User defined scene
         raychess::SetUpUserScene();
-    } else {                            // default scene
+    } else {                            // Default scene
         raychess::SetUpDefaultScene();
     }
-    step_max = atoi(argv[2]);           // maximum level of recursions
+    step_max = atoi(argv[2]);           // Maximum level of recursions
 
-    // Ray trace the scene now
+    // Ray trace and get time
     printf("Rendering scene using my fantastic ray tracer ...\n");
-    raychess::RayTrace(step_max);
-    printf("Done!\n");
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+    raychess::RayTrace(step_max);       // Do ray trace!
+    gettimeofday(&end, NULL);
+    auto delta = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+    printf("Time used: %.2lfs\n", delta);
 
     // Make sure that intensity values are normalized
     image::HistogramNormalization();
