@@ -23,9 +23,6 @@
 
 namespace libconsts {
 
-// Math
-const float kDegreeToRadians = (float)M_PI / 180.0f;
-
 // Window size
 const int kWindowPositionX  = 400;
 const int kWindowPositionY  = 120;
@@ -60,7 +57,7 @@ const glm::vec3 kColorWhite = {1.0, 1.0, 1.0};
 const int kChessBoardWidth = 8;
 const int kChessBoardHeight = 8;
 const float kChessBoardGridWidth = 5.0f;
-const glm::vec3 kChessBoardOffset = {-20.0f, -6.5f, -40.0f};
+const glm::vec3 kChessBoardOffset = {-20.0f, -2.5f, -40.0f};
 
 }  // namespace libconsts
 

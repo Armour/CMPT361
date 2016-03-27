@@ -46,8 +46,8 @@ float Sphere::IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit
 
     glm::vec3 p2 = origin + direction * t2;
     glm::vec3 p1 = origin + direction * t1;
-    *hit = t1 <= t2? p1: p2;
-    return t1 <= t2? t1: t2;
+    *hit = t1 <= t2 && t1 >= 0? p1: p2;
+    return t1 <= t2 && t1 >= 0? t1: t2;
 }
 
 //
