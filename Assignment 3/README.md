@@ -9,12 +9,25 @@
 ## File Structure
 
 - src -- the source file folder
+    - image_util.cc -- Used for image manipulation
     - init_shader.cc -- Used to read shader
+    - object.cc -- The base class for object in scene
+    - sphere.cc -- The derived class from object
+    - triangle.cc -- The derived class from object
+    - scene.cc -- Used for set up default or user defined scene
+    - trace.cc -- Contains the function about recursive ray tracing
+    - raycast.cc -- The main source file contain OpenGL set up
 
 - include -- the header file folder
+    - image_util.h -- Used for image manipulation
     - init_shader.h -- Used to read shader
     - lib_consts.h -- Constant variables header
     - lib_gl.h -- Include GL related header
+    - object.h -- The base class for object in scene
+    - sphere.h -- The derived class from object
+    - triangle.h -- The derived class from object
+    - scene.h -- Used for set up default or user defined scene
+    - trace.h -- Contains the function about recursive ray tracing
     - glm -- OpenGL math library
 
 - cmake -- the cmake findmodule file folder
