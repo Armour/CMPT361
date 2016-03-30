@@ -59,33 +59,6 @@ int diffuse_on = 0;
 int antialiasing_on = 0;
 
 //
-// Function: Init
-// ---------------------------
-//
-//   Init OpenGL lighting, materials, shading and VAO, VBO
-//
-//   Parameters:
-//       void
-//
-//   Returns:
-//       void
-//
-
-void init() {
-    // Load shaders and use the shader program
-#ifdef __APPLE__
-    GLuint program = angel::InitShader("vshader_mac.glsl", "fshader_mac.glsl");
-#else
-    GLuint program = angel::InitShader("vshader_unix.glsl", "fshader_unix.glsl");
-#endif
-    glUseProgram(program);
-
-    glUniform1i(glGetUniformLocation(program, "texture"), 0);
-
-    glClearColor(1.0, 1.0, 1.0, 1.0);
-}
-
-//
 // Function: DisplayFunc
 // ---------------------------
 //
@@ -204,7 +177,6 @@ int main(int argc, char **argv) {
 #ifndef __APPLE__
     glewInit();
 #endif
-    init();
 
     // Set callback functions
     glutDisplayFunc(DisplayFunc);
