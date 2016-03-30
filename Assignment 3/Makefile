@@ -17,7 +17,7 @@ INCLUDEDIR=/usr/include/
 LIBDIR=/usr/lib
 
 # If you have more source files add them here
-SOURCE= src/scene.cc src/image_util.cc src/sphere.cc src/trace.cc src/raycast.cc src/init_shader.cc
+SOURCE= src/scene.cc src/image_util.cc src/object.cc src/sphere.cc src/triangle.cc src/trace.cc src/raycast.cc src/init_shader.cc
 
 # The compiler we are using
 CC= g++
@@ -25,7 +25,7 @@ CC= g++
 # The flags that will be used to compile the object file.
 # If you want to debug your program,
 # you can add '-g' on the following line
-CFLAGS= -std=c++11 -O3 -g -Wall -pedantic -DGL_GLEXT_PROTOTYPES
+CFLAGS= -std=c++11 -O4 -Wall -g -pedantic -DGL_GLEXT_PROTOTYPES
 
 # The name of the final executable
 EXECUTABLE= raycast

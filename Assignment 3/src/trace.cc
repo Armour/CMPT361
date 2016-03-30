@@ -157,7 +157,7 @@ void RayTrace(int iteration) {
 
             ray = glm::normalize(cur_pixel_pos - libconsts::kEyePosition);
 
-            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, iteration, 0, false);
+            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, iteration + 1, 0, false);
 
             if (antialiasing_on) {
                 for (int k = 0; k < 4; k++) {

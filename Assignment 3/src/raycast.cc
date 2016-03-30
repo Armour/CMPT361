@@ -72,47 +72,6 @@ int antialiasing_on = 0;
 //
 
 void init() {
-    // Vertices of a square
-    double ext = 1.0;
-    glm::vec4 points[6] = {
-        glm::vec4(-ext, -ext,  0, 1.0), // V1
-        glm::vec4( ext, -ext,  0, 1.0), // V2
-        glm::vec4(-ext,  ext,  0, 1.0), // V3
-        glm::vec4(-ext,  ext,  0, 1.0), // V3
-        glm::vec4( ext, -ext,  0, 1.0), // V2
-        glm::vec4( ext,  ext,  0, 1.0)  // V4
-    };
-
-    // Texture coordinates
-    glm::vec2 tex_coords[6] = {
-        glm::vec2(0.0, 0.0),
-        glm::vec2(1.0, 0.0),
-        glm::vec2(0.0, 1.0),
-        glm::vec2(0.0, 1.0),
-        glm::vec2(1.0, 0.0),
-        glm::vec2(1.0, 1.0)
-    };
-
-    // Initialize texture objects
-    GLuint texture;
-    glGenTextures(1, &texture);
-
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, libconsts::kWindowSizeWidth, libconsts::kWindowSizeHeight, 0, GL_RGB, GL_FLOAT, frame);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glActiveTexture(GL_TEXTURE0);
-
-    // Create and initialize a buffer object
-    GLuint buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(tex_coords), NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, NULL, sizeof(points), points);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(points), sizeof(tex_coords), tex_coords);
-
     // Load shaders and use the shader program
 #ifdef __APPLE__
     GLuint program = angel::InitShader("vshader_mac.glsl", "fshader_mac.glsl");
@@ -120,15 +79,6 @@ void init() {
     GLuint program = angel::InitShader("vshader_unix.glsl", "fshader_unix.glsl");
 #endif
     glUseProgram(program);
-
-    // set up vertex arrays
-    GLuint v_position = (GLuint)glGetAttribLocation(program, "v_position");
-    glEnableVertexAttribArray(v_position);
-    glVertexAttribPointer(v_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-    GLuint v_tex_coord = (GLuint)glGetAttribLocation(program, "v_tex_coord");
-    glEnableVertexAttribArray(v_tex_coord);
-    glVertexAttribPointer(v_tex_coord, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)sizeof(points));
 
     glUniform1i(glGetUniformLocation(program, "texture"), 0);
 
