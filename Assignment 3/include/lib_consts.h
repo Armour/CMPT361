@@ -59,6 +59,9 @@ const int kChessBoardHeight = 8;
 const float kChessBoardGridWidth = 5.0f;
 const glm::vec3 kChessBoardOffset = {-20.0f, -2.5f, -40.0f};
 
+// Diffuse reflected light number
+const int kDiffuseReflectNumber = 5;
+
 // Antialiasing offset
 const glm::vec3 kAntialiasingOffset[4] = {
     { 0.25f,  0.25f, 0.0f},

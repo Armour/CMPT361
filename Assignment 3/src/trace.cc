@@ -82,7 +82,7 @@ glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm) 
 //
 
 glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int sphere_ignore, bool in_object) {
-    if (iteration == 0) {
+    if (iteration == -1) {
         return background_color;
     }
     glm::vec3 *hit = new glm::vec3();
@@ -116,7 +116,13 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
         }
 
         if (diffuse_on) {
-            // TODO: diffuse here
+            for (int i = 0; i < libconsts::kDiffuseReflectNumber; i++) {
+                float degree = (rand() % 181) - 90;
+                glm::vec3 rotate_normal = glm::cross(surf_norm, direction);
+                glm::vec3 diffuse_ray = glm::rotate(surf_norm, degree, rotate_normal);
+                color += object->get_diffuse() * RecursiveRayTrace(*hit + diffuse_ray * libconsts::kErrorEpsilon, diffuse_ray,
+                                                                   iteration - 1, sphere_ignore, in_object);
+            }
         }
 
         return color;
@@ -157,7 +163,7 @@ void RayTrace(int iteration) {
 
             ray = glm::normalize(cur_pixel_pos - libconsts::kEyePosition);
 
-            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, iteration + 1, 0, false);
+            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, iteration, 0, false);
 
             if (antialiasing_on) {
                 for (int k = 0; k < 4; k++) {

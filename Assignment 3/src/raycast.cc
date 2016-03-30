@@ -148,6 +148,9 @@ int main(int argc, char **argv) {
     }
     step_max = atoi(argv[2]);           // Maximum level of recursions
 
+    // Initialize random seed
+    srand((unsigned int)time(NULL));
+
     // Ray trace and get time
     printf("Rendering scene using my fantastic ray tracer ...\n");
     struct timeval start, end;

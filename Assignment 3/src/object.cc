@@ -45,20 +45,20 @@ Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, g
     Object *current_object = objects;
     glm::vec3 *current_hit = new glm::vec3();
     while (current_object != nullptr) {
-        //if (current_object->get_index() != sphere_ignore) {
-        float distance = -1;
-        if (current_object->get_type() == libconsts::kTypeSphere)
-            distance = ((Sphere *)current_object)->IntersectRay(origin, direction, current_hit);
-        else if (current_object->get_type() == libconsts::kTypeTriangle)
-            distance = ((Triangle *)current_object)->IntersectRay(origin, direction, current_hit);
+        if (current_object->get_index() != sphere_ignore) {
+            float distance = -1;
+            if (current_object->get_type() == libconsts::kTypeSphere)
+                distance = ((Sphere *)current_object)->IntersectRay(origin, direction, current_hit);
+            else if (current_object->get_type() == libconsts::kTypeTriangle)
+                distance = ((Triangle *)current_object)->IntersectRay(origin, direction, current_hit);
 
-        if (distance != -1 && distance < libconsts::kMaxDistance) {
-            if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
-                *hit = *current_hit;
-                result = current_object;
+            if (distance != -1 && distance < libconsts::kMaxDistance) {
+                if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
+                    *hit = *current_hit;
+                    result = current_object;
+                }
             }
         }
-        //}
         current_object = current_object->get_next();
     }
     delete current_hit;
