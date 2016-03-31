@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "trace.h"
+#include <iostream>
 
 extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 extern raychess::Object *scene;
@@ -85,8 +86,10 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
     if (iteration == -1) {
         return background_color;
     }
+
     glm::vec3 *hit = new glm::vec3();
     Object *object = IntersectScene(origin, direction, scene, hit, sphere_ignore);
+    
     if (object != nullptr) {
         glm::vec3 surf_norm;
         if (object->get_type() == libconsts::kTypeSphere)
@@ -116,17 +119,20 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
         }
 
         if (diffuse_on) {
+        	glm::vec3 diffuse_color = glm::vec3(0.0f, 0.0f, 0.0f);
             for (int i = 0; i < libconsts::kDiffuseReflectNumber; i++) {
-                float degree = (rand() % 181) - 90;
-                glm::vec3 rotate_normal = glm::cross(surf_norm, direction);
-                glm::vec3 diffuse_ray = glm::rotate(surf_norm, degree, rotate_normal);
-                color += object->get_diffuse() * RecursiveRayTrace(*hit + diffuse_ray * libconsts::kErrorEpsilon, diffuse_ray,
-                                                                   iteration - 1, sphere_ignore, in_object);
+                float degree = (float)(rand() % 141) - 70.0f;				// -70 to 70
+                glm::vec3 rotate_normal = glm::normalize(glm::cross(surf_norm, -direction));
+                glm::vec3 diffuse_ray = glm::rotate(surf_norm, degree * libconsts::kDegreeToRadians, rotate_normal);
+                diffuse_color += object->get_diffuse() * RecursiveRayTrace(*hit + diffuse_ray * libconsts::kErrorEpsilon, diffuse_ray,
+                                                                           iteration - 1, sphere_ignore, in_object);
             }
+            color += diffuse_color / (float)libconsts::kDiffuseReflectNumber;
         }
 
         return color;
     }
+    
     delete hit;
     return background_color;
 }

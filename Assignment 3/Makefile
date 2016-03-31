@@ -37,26 +37,18 @@ EXECUTABLE= raycast
 LDFLAGS = -lGL -lglut -lGLEW -lglui -lXext -lX11 -lm
 
 # If you have other library files in a different directory add them here
-INCLUDEFLAG= -I. -I$(INCLUDEDIR) -Iinclude/
+INCLUDEFLAG= -I. -I./include/ -I$(INCLUDEDIR)
 LIBFLAG= -L$(LIBDIR)
 
 # Don't touch this one if you don't know what you're doing
 OBJECT= $(SOURCE:.cc=.o)
 
 # Don't touch any of these either if you don't know what you're doing
-all: $(OBJECT) depend
+all: $(OBJECT)
 	$(CC) $(CFLAGS) $(INCLUDEFLAG) $(LIBFLAG)  $(OBJECT) -o $(EXECUTABLE) $(LDFLAGS)
-
-depend:
-	$(CC) -M $(SOURCE) > depend
 
 $(OBJECT):
 	$(CC) $(CFLAGS) $(INCLUDEFLAG) -c -o $@ $(@:.o=.cc)
 
-clean_object:
-	rm -f $(OBJECT)
-
 clean:
-	rm -f $(OBJECT) depend $(EXECUTABLE)
-
-include depend
+	rm -f $(OBJECT) $(EXECUTABLE)

@@ -23,6 +23,9 @@
 
 namespace libconsts {
 
+// Math
+const float kDegreeToRadians = (float)M_PI / 180.0f;
+
 // Window size
 const int kWindowPositionX  = 400;
 const int kWindowPositionY  = 120;
