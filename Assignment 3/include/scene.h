@@ -21,6 +21,7 @@
 
 #include "sphere.h"
 #include "triangle.h"
+#include "smf_parser.h"
 
 namespace raychess {
 

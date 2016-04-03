@@ -22,7 +22,6 @@
 #include <sys/time.h>
 
 #include "image_util.h"
-#include "init_shader.h"
 #include "scene.h"
 #include "trace.h"
 

@@ -46,6 +46,10 @@ const int kTypeTriangle = 2;
 // Max distance
 const int kMaxDistance = 10000;
 
+// Flag indicate input is vertex or face data
+const int kFlagVertex = 0;
+const int kFlagFace   = 1;
+
 // Error epsilon
 const float kErrorEpsilon = 0.001f;
 

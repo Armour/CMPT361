@@ -16,6 +16,7 @@ set(SOURCE_FILES
         include/triangle.h
         include/sphere.h
         include/trace.h
+        include/smf_parser.h
         src/image_util.cc
         src/init_shader.cc
         src/raycast.cc
@@ -24,10 +25,7 @@ set(SOURCE_FILES
         src/triangle.cc
         src/sphere.cc
         src/trace.cc
-        fshader_unix.glsl
-        vshader_unix.glsl
-        fshader_mac.glsl
-        vshader_mac.glsl)
+        src/smf_parser.cc)
 
 # Add header include directories
 include_directories(include src cmake)

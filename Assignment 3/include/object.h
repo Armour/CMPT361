@@ -61,7 +61,7 @@ public:
 };
 
 // Intersect ray with objects in scene
-Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int sphere_ignore);
+Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int object_ignore);
 
 }  // namespace raychess
 

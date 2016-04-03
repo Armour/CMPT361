@@ -19,6 +19,8 @@
 #include "trace.h"
 #include <iostream>
 
+using namespace std;
+
 extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
 extern raychess::Object *scene;
 extern glm::vec3 background_color;
@@ -55,7 +57,7 @@ glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm) 
     glm::vec3 intensity(0.0f);
     glm::vec3 *dummy = new glm::vec3();
     glm::vec3 l = glm::normalize(light_position - hit);
-    if (!shadow_on || IntersectScene(hit + l * libconsts::kErrorEpsilon, l, scene, dummy, object->get_index ()) == nullptr) {
+    if (!shadow_on || IntersectScene(hit + l * libconsts::kErrorEpsilon, l, scene, dummy, object->get_index()) == nullptr) {
         glm::vec3 v = glm::normalize(libconsts::kEyePosition - hit);
         glm::vec3 r = 2.0f * surf_norm * (glm::dot(surf_norm, l)) - l;
         float diffuse = fmaxf(glm::dot(surf_norm, l), 0.0f);
@@ -83,7 +85,7 @@ glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm) 
 //
 
 glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int sphere_ignore, bool in_object) {
-    if (iteration == -1) {
+    if (iteration < 0) {
         return background_color;
     }
 
@@ -121,13 +123,13 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
         if (diffuse_on) {
         	glm::vec3 diffuse_color = glm::vec3(0.0f, 0.0f, 0.0f);
             for (int i = 0; i < libconsts::kDiffuseReflectNumber; i++) {
-                float degree = (float)(rand() % 141) - 70.0f;				// -70 to 70
+                float degree = (float)(rand() % 161) - 80.0f;				// Random -80 to 80 degree
                 glm::vec3 rotate_normal = glm::normalize(glm::cross(surf_norm, -direction));
                 glm::vec3 diffuse_ray = glm::rotate(surf_norm, degree * libconsts::kDegreeToRadians, rotate_normal);
-                diffuse_color += object->get_diffuse() * RecursiveRayTrace(*hit + diffuse_ray * libconsts::kErrorEpsilon, diffuse_ray,
-                                                                           iteration - 1, sphere_ignore, in_object);
+                diffuse_color += RecursiveRayTrace(*hit + diffuse_ray * libconsts::kErrorEpsilon, diffuse_ray,
+                                                   iteration - 1, sphere_ignore, in_object);
             }
-            color += diffuse_color / (float)libconsts::kDiffuseReflectNumber;
+            color += object->get_diffuse() * diffuse_color / (float)libconsts::kDiffuseReflectNumber;
         }
 
         return color;

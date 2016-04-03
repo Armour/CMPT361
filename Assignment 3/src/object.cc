@@ -34,18 +34,18 @@ namespace raychess {
 //       spheres: the sphere list (scene objects)
 //       max_distance: the max distance we can accept
 //       hit: the intersection point
-//       sphere_ignore: the sphere index that we need to ignore
+//       object_ignore: the sphere index that we need to ignore
 //
 //   Returns:
 //       A pointer to the sphere object that the ray intersects first, nullptr if no intersection.
 //
 
-Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int sphere_ignore) {
+Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int object_ignore) {
     Object *result = nullptr;
     Object *current_object = objects;
     glm::vec3 *current_hit = new glm::vec3();
     while (current_object != nullptr) {
-        if (current_object->get_index() != sphere_ignore) {
+        if (current_object->get_index() != object_ignore) {
             float distance = -1;
             if (current_object->get_type() == libconsts::kTypeSphere)
                 distance = ((Sphere *)current_object)->IntersectRay(origin, direction, current_hit);
