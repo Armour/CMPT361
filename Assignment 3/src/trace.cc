@@ -55,18 +55,23 @@ namespace raychess {
 
 glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm) {
     glm::vec3 intensity(0.0f);
+    glm::vec3 grid_color = ((int)round((hit.x - 2.5) / 5.0f) + (int)round(hit.z / 5.0f)) % 2 == 0?
+                           libconsts::kColorBlack: libconsts::kColorWhite;
+    glm::vec3 kd = object->get_infinite()? grid_color: object->get_diffuse();
+    glm::vec3 ks = object->get_infinite()? grid_color: object->get_specular();
+    glm::vec3 ka = object->get_infinite()? grid_color: object->get_ambient();
     glm::vec3 *dummy = new glm::vec3();
     glm::vec3 l = glm::normalize(light_position - hit);
     if (!shadow_on || IntersectScene(hit + l * libconsts::kErrorEpsilon, l, scene, dummy, object->get_index()) == nullptr) {
         glm::vec3 v = glm::normalize(libconsts::kEyePosition - hit);
-        glm::vec3 r = 2.0f * surf_norm * (glm::dot(surf_norm, l)) - l;
+        glm::vec3 r = 2.0f * glm::dot(l, surf_norm) * surf_norm - l;
         float diffuse = fmaxf(glm::dot(surf_norm, l), 0.0f);
-        float specular = powf(fmaxf(glm::dot(v, r), 0.0f), object->get_shininess());
+        float specular = powf(fmaxf(glm::dot(r, v), 0.0f), object->get_shininess());
         float delta = glm::length(light_position - hit);
         float div = decay_a + decay_b * delta + decay_c * delta * delta;
-        intensity = light_intensity * (object->get_diffuse() * diffuse + object->get_specular() * specular) / div;
+        intensity = light_intensity * (kd * diffuse + ks * specular) / div;
     }
-    intensity += global_ambient * object->get_ambient();
+    intensity += ka * global_ambient;
     delete dummy;
     return intensity;
 }
@@ -134,7 +139,7 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
 
         return color;
     }
-    
+
     delete hit;
     return background_color;
 }

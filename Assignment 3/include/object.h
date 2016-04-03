@@ -35,6 +35,7 @@ private:
     float mat_reflectance_;         // Determines how much reflected light contributes to the color of a pixel
     float mat_refractance_;         // Determines how much refracted light contributes to the color of a pixel
     float mat_refract_ratio_;       // The refract ratio for this material (1.0 for vacuum)
+    bool infinite = false;
     class Object *next_;
 public:
     inline int get_index(void) const { return index_; };
@@ -46,6 +47,7 @@ public:
     inline float get_reflectance(void) const { return mat_reflectance_; };
     inline float get_refractance(void) const { return mat_refractance_; };
     inline float get_refract_ratio(void) const { return mat_refract_ratio_; };
+    inline bool get_infinite(void) { return infinite; };
     inline Object *get_next(void) const { return next_; };
 
     inline void set_index(int index) { this->index_ = index; };
@@ -57,6 +59,7 @@ public:
     inline void set_reflectance(float reflectance) { this->mat_reflectance_ = reflectance; };
     inline void set_refractance(float refractance) { this->mat_refractance_ = refractance; };
     inline void set_refract_ratio(float refract_ratio) { this->mat_refract_ratio_ = refract_ratio; };
+    inline void set_infinite(bool infinite) { this->infinite = infinite; };
     inline void set_next(Object *next) { this->next_ = next; };
 };
 

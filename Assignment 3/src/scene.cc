@@ -105,6 +105,7 @@ void SetUpDefaultScene(void) {
     // Chessboard with many triangles
     if (chessboard_on) {
         glm::vec3 v1, v2, v3, v4;
+        bool infinite = false;
         float triangle_shininess = 30.0f;
         float triangle_reflectance = 1.0f;
         float triangle_refractance = 0.0f;
@@ -119,9 +120,9 @@ void SetUpDefaultScene(void) {
                 v3 = {i * width + 0.0f, 0.0f, j * width + width};
                 v4 = {i * width + width, 0.0f, j * width + width};
                 scene = AddTriangle(scene, v1 + offset, v3 + offset, v2 + offset, color, color, color, triangle_shininess,
-                                    triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index);
+                                    triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index, infinite);
                 scene = AddTriangle(scene, v2 + offset, v3 + offset, v4 + offset, color, color, color, triangle_shininess,
-                                    triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index);
+                                    triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index, infinite);
             }
         }
     }
@@ -160,32 +161,26 @@ void SetUpUserScene(void) {
     decay_c = 0.0f;
 
     // Import from mesh file
-    smfparser::ImportMeshFile("chess_piece.smf", 3.0f, 0, glm::vec3(-0.0f, -1.8f, -4.30f), index, glm::vec3(1.0f, 0.0f, 0.0f));
+    smfparser::ImportMeshFile("chess_piece.smf", 3.0f, 0, glm::vec3(-0.0f, -2.0f, -4.50f), index, glm::vec3(1.0f, 0.0f, 0.0f));
     smfparser::ImportMeshFile("bishop.smf", 35.0f, -100, glm::vec3(-1.5f, -1.2f, -2.80f), index, glm::vec3(0.0f, 0.0f, 1.0f));
     //smfparser::ImportMeshFile("chess_piece.smf", 2.5f, -90, glm::vec3(-1.2f, -0.8f, -2.80f), index, glm::vec3(0.5, 0.0, 0.5));
 
     // Chessboard with many triangles
     if (chessboard_on) {
-        glm::vec3 v1, v2, v3, v4;
+        bool infinite = true;
+        glm::vec3 v1, v2, v3;
         float triangle_shininess = 30.0f;
-        float triangle_reflectance = 1.0f;
-        float triangle_refractance = 0.0f;
-        float triangle_reflect_ratio = 1.00f;
+        float triangle_reflectance = 0.8f;
+        float triangle_refractance = 1.0f;
+        float triangle_reflect_ratio = 1.52f;
         float width = libconsts::kChessBoardGridWidth;
         glm::vec3 offset = libconsts::kChessBoardOffset;
-        for (int i = 0; i < libconsts::kChessBoardWidth; i++) {
-            for (int j = 0; j < libconsts::kChessBoardHeight; j++) {
-                glm::vec3 color = (i + j) % 2 == 0? libconsts::kColorBlack: libconsts::kColorWhite;
-                v1 = {i * width + 0.0f, 0.0f, j * width + 0.0f};
-                v2 = {i * width + width, 0.0f, j * width + 0.0f};
-                v3 = {i * width + 0.0f, 0.0f, j * width + width};
-                v4 = {i * width + width, 0.0f, j * width + width};
-                scene = AddTriangle(scene, v1 + offset, v3 + offset, v2 + offset, color, color, color, triangle_shininess,
-                                    triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index);
-                scene = AddTriangle(scene, v2 + offset, v3 + offset, v4 + offset, color, color, color, triangle_shininess,
-                                    triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index);
-            }
-        }
+        glm::vec3 color = libconsts::kColorWhite;
+        v1 = {0.0f, 0.0f, 0.0f};
+        v2 = {width, 0.0f, 0.0f};
+        v3 = {0.0f, 0.0f, width};
+        scene = AddTriangle(scene, v1 + offset, v3 + offset, v2 + offset, color, color, color, triangle_shininess,
+                            triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index, infinite);
     }
 }
 

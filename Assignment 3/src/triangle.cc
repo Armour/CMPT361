@@ -38,7 +38,7 @@ float Triangle::IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *h
     float t = -(glm::dot(norm, origin) - glm::dot(norm, v1)) / glm::dot(norm, direction);
     if (t < 0) return -1;
     *hit = origin + t * direction;
-    if (!InTriangle(*hit)) return -1;
+    if (!get_infinite() && !InTriangle(*hit)) return -1;
     return t;
 }
 
@@ -75,7 +75,7 @@ glm::vec3 Triangle::Normal(glm::vec3 dummy) {
 //
 
 Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
-                    float shininess, float reflectance, float refractance, float refract_ratio, int index) {
+                    float shininess, float reflectance, float refractance, float refract_ratio, int index, bool infinite) {
     Triangle *new_triangle;
     new_triangle = (Triangle *)malloc(sizeof(Triangle));
     new_triangle->set_index(index);
@@ -91,6 +91,7 @@ Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, g
     new_triangle->set_refractance(refractance);
     new_triangle->set_refract_ratio(refract_ratio);
     new_triangle->set_next(nullptr);
+    new_triangle->set_infinite(infinite);
 
     if (objects == nullptr) {           // First object
         objects = (Object *)new_triangle;
