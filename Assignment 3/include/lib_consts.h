@@ -63,8 +63,8 @@ const glm::vec3 kColorWhite = {1.0, 1.0, 1.0};
 // Chessboard property
 const int kChessBoardWidth = 8;
 const int kChessBoardHeight = 8;
-const float kChessBoardGridWidth = 5.0f;
-const glm::vec3 kChessBoardOffset = {-20.0f, -2.5f, -40.0f};
+const float kChessBoardGridWidth = 2.0f;
+const glm::vec3 kChessBoardOffset = {-8.0f, -2.5f, -16.0f};
 
 // Diffuse reflected light number
 const int kDiffuseReflectNumber = 5;

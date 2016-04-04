@@ -146,7 +146,7 @@ void SetUpUserScene(void) {
     int index = 0;
 
     // Set background color
-    background_color = {0.10f, 0.50f, 0.10f};
+    background_color = {0.10f, 0.80f, 0.10f};
 
     // Set up global ambient color
     global_ambient = {0.3f, 0.3f, 0.3f};
@@ -170,7 +170,7 @@ void SetUpUserScene(void) {
         bool infinite = true;
         glm::vec3 v1, v2, v3;
         float triangle_shininess = 30.0f;
-        float triangle_reflectance = 0.8f;
+        float triangle_reflectance = 0.5f;
         float triangle_refractance = 1.0f;
         float triangle_reflect_ratio = 1.52f;
         float width = libconsts::kChessBoardGridWidth;

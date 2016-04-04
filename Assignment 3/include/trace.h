@@ -26,7 +26,7 @@
 namespace raychess {
 
 // The phong illumination implementation
-glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm);
+glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm, bool shadow_on);
 
 // This is the recursive ray trace function
 glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int sphere_ignore, bool in_object);

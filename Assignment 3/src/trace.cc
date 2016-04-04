@@ -53,7 +53,7 @@ namespace raychess {
 //       void
 //
 
-glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm) {
+glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm, bool shadow_on) {
     glm::vec3 intensity(0.0f);
     glm::vec3 grid_color = ((int)round((hit.x - 2.5) / 5.0f) + (int)round(hit.z / 5.0f)) % 2 == 0?
                            libconsts::kColorBlack: libconsts::kColorWhite;
@@ -89,13 +89,13 @@ glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm) 
 //       void
 //
 
-glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int sphere_ignore, bool in_object) {
+glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int object_ignore, bool in_object) {
     if (iteration < 0) {
         return background_color;
     }
 
     glm::vec3 *hit = new glm::vec3();
-    Object *object = IntersectScene(origin, direction, scene, hit, sphere_ignore);
+    Object *object = IntersectScene(origin, direction, scene, hit, object_ignore);
     
     if (object != nullptr) {
         glm::vec3 surf_norm;
@@ -105,23 +105,23 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
             surf_norm = ((Triangle *)object)->Normal(*hit);
         if (in_object) surf_norm = -surf_norm;
 
-        glm::vec3 color = PhongIllumination(object, *hit, surf_norm);
+        glm::vec3 color = PhongIllumination(object, *hit, surf_norm, shadow_on && !in_object);
 
-        if (reflection_on) {
+        if (iteration > 0 && reflection_on) {
             glm::vec3 reflect_ray = 2.0f * surf_norm * (glm::dot(surf_norm, -direction)) + direction;
             color += object->get_reflectance() * RecursiveRayTrace(*hit + reflect_ray * libconsts::kErrorEpsilon, reflect_ray,
-                                                                   iteration - 1, sphere_ignore, in_object);
+                                                                   iteration - 1, object_ignore, in_object);
         }
 
-        if (refraction_on) {
+        if (iteration > 0 && refraction_on && object->get_refractance() > 0.001f) {
             float refract_ratio = object->get_refract_ratio();
             float ratio = in_object? refract_ratio: 1.0f / refract_ratio;
-            float c1 = glm::dot(surf_norm, -direction);
+            float c1 = -glm::dot(surf_norm, direction);
             float c2 = 1.0f - ratio * ratio * (1.0f - c1 * c1);
-            if (c2 > 0.0f && object->get_refractance() != 0.0f) {
+            if (c2 > 0.0f) {
                 glm::vec3 refract_ray = glm::normalize((ratio * c1 - sqrtf(c2)) * surf_norm + c1 * direction);
                 color += object->get_refractance() * RecursiveRayTrace(*hit + refract_ray * libconsts::kErrorEpsilon, refract_ray,
-                                                                       iteration - 1, sphere_ignore, !in_object);
+                                                                       iteration - 1, object_ignore, !in_object);
             }
         }
 
@@ -132,11 +132,13 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
                 glm::vec3 rotate_normal = glm::normalize(glm::cross(surf_norm, -direction));
                 glm::vec3 diffuse_ray = glm::rotate(surf_norm, degree * libconsts::kDegreeToRadians, rotate_normal);
                 diffuse_color += RecursiveRayTrace(*hit + diffuse_ray * libconsts::kErrorEpsilon, diffuse_ray,
-                                                   iteration - 1, sphere_ignore, in_object);
+                                                   iteration - 1, object_ignore, in_object);
             }
-            color += object->get_diffuse() * diffuse_color / (float)libconsts::kDiffuseReflectNumber;
+            color += object->get_diffuse() / (float)libconsts::kDiffuseReflectNumber *
+                     diffuse_color / (float)libconsts::kDiffuseReflectNumber;
         }
 
+        delete hit;
         return color;
     }
 

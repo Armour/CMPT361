@@ -95,6 +95,7 @@ Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 amb
     new_sphere->set_reflectance(reflectance);
     new_sphere->set_refractance(refractance);
     new_sphere->set_refract_ratio(refract_ratio);
+    new_sphere->set_infinite(false);
     new_sphere->set_next(nullptr);
 
     if (objects == nullptr) {           // First object
