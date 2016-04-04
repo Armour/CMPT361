@@ -13,22 +13,23 @@
 # Including of non standard library files:
 #   INCLUDEDIR is where the header files can be found
 #   LIBDIR is where the library object files can be found
-INCLUDEDIR=/usr/include/
-LIBDIR=/usr/lib
+INCLUDEDIR = /usr/include/
+LIBDIR = /usr/lib
 
 # If you have more source files add them here
-SOURCE= src/scene.cc src/image_util.cc src/object.cc src/sphere.cc src/triangle.cc src/trace.cc src/raycast.cc src/init_shader.cc
+SOURCE = src/scene.cc src/image_util.cc src/smf_parser.cc src/object.cc src/sphere.cc src/triangle.cc src/trace.cc src/raycast.cc src/init_shader.cc
 
 # The compiler we are using
-CC= g++
+CC = g++
 
 # The flags that will be used to compile the object file.
 # If you want to debug your program,
 # you can add '-g' on the following line
-CFLAGS= -std=c++11 -O4 -Wall -g -pedantic -DGL_GLEXT_PROTOTYPES
+CFLAGS = -std=c++11 -O3 -Wall -g -pedantic -DGL_GLEXT_PROTOTYPES
 
 # The name of the final executable
-EXECUTABLE= raycast
+RAYCAST = raycast
+RAYCHESS = raychess
 
 # The basic library we are using add the other libraries you want to link
 # to your program here
@@ -37,18 +38,23 @@ EXECUTABLE= raycast
 LDFLAGS = -lGL -lglut -lGLEW -lglui -lXext -lX11 -lm
 
 # If you have other library files in a different directory add them here
-INCLUDEFLAG= -I. -I./include/ -I$(INCLUDEDIR)
-LIBFLAG= -L$(LIBDIR)
+INCLUDEFLAG = -I. -I./include/ -I$(INCLUDEDIR)
+LIBFLAG = -L$(LIBDIR)
 
 # Don't touch this one if you don't know what you're doing
-OBJECT= $(SOURCE:.cc=.o)
+OBJECT = $(SOURCE:.cc=.o)
 
 # Don't touch any of these either if you don't know what you're doing
-all: $(OBJECT)
-	$(CC) $(CFLAGS) $(INCLUDEFLAG) $(LIBFLAG)  $(OBJECT) -o $(EXECUTABLE) $(LDFLAGS)
+all: raycast raychess
+
+raycast: $(OBJECT)
+	$(CC) $(CFLAGS) $(INCLUDEFLAG) $(LIBFLAG)  $(OBJECT) -o $(RAYCAST) $(LDFLAGS)
+
+raychess: $(OBJECT)
+	$(CC) $(CFLAGS) $(INCLUDEFLAG) $(LIBFLAG)  $(OBJECT) -o $(RAYCHESS) $(LDFLAGS)
 
 $(OBJECT):
 	$(CC) $(CFLAGS) $(INCLUDEFLAG) -c -o $@ $(@:.o=.cc)
 
 clean:
-	rm -f $(OBJECT) $(EXECUTABLE)
+	rm -f $(OBJECT) $(RAYCAST) $(RAYCHESS)

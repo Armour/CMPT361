@@ -47,7 +47,7 @@ float decay_b;
 float decay_c;
 
 // Maximum level of recursions of reflection
-int step_max = 1;
+int step_max;
 
 // The option flags
 int shadow_on = 0;
