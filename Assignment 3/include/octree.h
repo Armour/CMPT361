@@ -25,25 +25,36 @@
 
 namespace raychess {
 
-class Octree {
+enum NodePosition {
+    FAR_BOTTOM_LEFT = 0,
+    NEAR_BOTTOM_LEFT = 1,
+    FAR_TOP_LEFT = 2,
+    NEAR_TOP_LEFT = 3,
+    FAR_BOTTOM_RIGHT = 4,
+    NEAR_BOTTOM_RIGHT = 5,
+    FAR_TOP_RIGHT = 6,
+    NEAR_TOP_RIGHT = 7,
+    MAX_NODE_COUNT = 8 // Any defined node should be < 8 && > 0
+};
+
+class OctreeNode {
 private:
     bool is_leaf_;
     glm::vec3 min_pos_;
     glm::vec3 max_pos_;
 
 public:
-    Octree() {
-        Octree(glm::vec3(0.0f), glm::vec3(0.0f));
-    };
-    Octree(glm::vec3 min, glm::vec3 max): is_leaf_(true), min_pos_(min), max_pos_(max) {
-        for (int i = 0; i < 8; i++) {
+    OctreeNode() {};
+    OctreeNode(glm::vec3 min, glm::vec3 max): min_pos_(min), max_pos_(max) {
+        is_leaf_ = true;
+        for (int i = 0; i < MAX_NODE_COUNT; i++) {
             sub_space_[i] = nullptr;
         }
         objects_.clear();
     };
-    ~Octree() {};
+    ~OctreeNode() {};
 
-    Octree *sub_space_[8];
+    OctreeNode *sub_space_[MAX_NODE_COUNT];
     std::vector<Object *> objects_;
 
     inline void set_leaf(bool is_leaf) { this->is_leaf_ = is_leaf; };
@@ -57,6 +68,18 @@ public:
     void AddObject(Object *object);
     void SplitSpace(int step);
 };
+
+// This function used to get the first node to be entered by the ray
+unsigned int GetFirstNode(glm::vec3 t0, glm::vec3 tm);
+
+// This function used for calculating the exit plane and the next node, once the current parent node is exited
+unsigned int GetNextNode(glm::vec3 tm, unsigned int x, unsigned int y, unsigned int z);
+
+// This function used to process ray casting in sub node of one node
+void ProcessSubNode(glm::vec3 origin, OctreeNode* node, glm::vec3 t0, glm::vec3 t1, std::vector<OctreeNode*> &nodes, unsigned int a);
+
+// Run ray traverse in octree space
+void RayTraverse(OctreeNode* root, glm::vec3 origin, glm::vec3 direction, std::vector<OctreeNode*> &nodes);
 
 }  // namespace raychess
 

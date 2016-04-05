@@ -36,7 +36,7 @@ glm::vec3 background_color;
 raychess::Object *scene = nullptr;
 
 // The octree for ray casting
-raychess::Octree *octree = nullptr;
+raychess::OctreeNode *octree = nullptr;
 
 // Light position and color
 glm::vec3 light_position;
