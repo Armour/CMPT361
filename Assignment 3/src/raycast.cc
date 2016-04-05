@@ -24,6 +24,7 @@
 #include "image_util.h"
 #include "scene.h"
 #include "trace.h"
+#include "octree.h"
 
 // The array for the final image
 GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
@@ -33,6 +34,9 @@ glm::vec3 background_color;
 
 // List of objects in the scene
 raychess::Object *scene = nullptr;
+
+// The octree for ray casting
+raychess::Octree *octree = nullptr;
 
 // Light position and color
 glm::vec3 light_position;

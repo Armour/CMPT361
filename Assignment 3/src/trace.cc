@@ -125,7 +125,7 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
             }
         }
 
-        if (diffuse_on) {
+        if (!in_object && diffuse_on) {
         	glm::vec3 diffuse_color = glm::vec3(0.0f, 0.0f, 0.0f);
             for (int i = 0; i < libconsts::kDiffuseReflectNumber; i++) {
                 float degree = (float)(rand() % 161) - 80.0f;				// Random -80 to 80 degree
@@ -134,8 +134,7 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
                 diffuse_color += RecursiveRayTrace(*hit + diffuse_ray * libconsts::kErrorEpsilon, diffuse_ray,
                                                    iteration - 1, object_ignore, in_object);
             }
-            color += object->get_diffuse() / (float)libconsts::kDiffuseReflectNumber *
-                     diffuse_color / (float)libconsts::kDiffuseReflectNumber;
+            color += object->get_diffuse() * diffuse_color / (float)libconsts::kDiffuseReflectNumber * 0.2f;
         }
 
         delete hit;

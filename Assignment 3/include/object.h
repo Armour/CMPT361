@@ -38,6 +38,9 @@ private:
     bool infinite;
     class Object *next_;
 public:
+    Object() {};
+    virtual ~Object() {};
+
     inline int get_index(void) const { return index_; };
     inline int get_type(void) const { return type_; };
     inline glm::vec3 get_ambient(void) const { return mat_ambient_; };
@@ -68,4 +71,4 @@ Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, g
 
 }  // namespace raychess
 
-#endif  //RAYCHESS_OBJECT_H_
+#endif  // RAYCHESS_OBJECT_H_

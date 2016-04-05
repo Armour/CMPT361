@@ -138,5 +138,31 @@ bool Triangle::InTriangle(glm::vec3 hit) {
     return true;
 }
 
+//
+// Function: InCubeRange
+// ---------------------------
+//   Check if a triangle in specific cube range
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+bool Triangle::InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos) {
+    if (get_infinite()) {
+        if (v1.y <= max_pos.y && v1.y >= min_pos.y) return true;
+        return false;
+    }
+    if (v1.x <= max_pos.x && v1.y <= max_pos.y && v1.z <= max_pos.z &&
+        v1.x >= min_pos.x && v1.y >= min_pos.y && v1.z >= min_pos.z) return true;
+    if (v2.x <= max_pos.x && v2.y <= max_pos.y && v2.z <= max_pos.z &&
+        v2.x >= min_pos.x && v2.y >= min_pos.y && v2.z >= min_pos.z) return true;
+    if (v3.x <= max_pos.x && v3.y <= max_pos.y && v3.z <= max_pos.z &&
+        v3.x >= min_pos.x && v3.y >= min_pos.y && v3.z >= min_pos.z) return true;
+    return false;
+}
+
 }  // namespace raychess
 

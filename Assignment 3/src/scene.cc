@@ -17,8 +17,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "scene.h"
+#include "octree.h"
 
 extern raychess::Object *scene;
+extern raychess::Octree *octree;
 extern glm::vec3 background_color;
 extern glm::vec3 light_position;
 extern glm::vec3 light_intensity;
@@ -182,6 +184,14 @@ void SetUpUserScene(void) {
         scene = AddTriangle(scene, v1 + offset, v3 + offset, v2 + offset, color, color, color, triangle_shininess,
                             triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index, infinite);
     }
+
+    octree = new Octree(glm::vec3(-10.0f, -10.0f, -10.0f), glm::vec3(10.0f, 10.0f, 10.0f));
+    Object *object = scene;
+    while (object != nullptr) {
+        octree->AddObject(object);
+        object = object->get_next();
+    }
+    octree->SplitSpace(12);
 }
 
 }  // namespace raychess

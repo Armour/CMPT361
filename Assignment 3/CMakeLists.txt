@@ -17,10 +17,12 @@ set(SOURCE_FILES
         include/sphere.h
         include/trace.h
         include/smf_parser.h
+        include/octree.h
         src/image_util.cc
         src/init_shader.cc
         src/raycast.cc
         src/scene.cc
+        src/octree.cc
         src/object.cc
         src/triangle.cc
         src/sphere.cc

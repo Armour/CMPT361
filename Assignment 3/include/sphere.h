@@ -30,6 +30,8 @@ private:
     float radius_;               // The radius of this sphere
     glm::vec3 center_;           // The center point of this sphere
 public:
+    Sphere() {};
+    ~Sphere() {};
     inline float get_radius(void) const { return radius_; };
     inline glm::vec3 get_center(void) const { return center_; };
     inline void set_radius(float radius) { this->radius_ = radius; };
