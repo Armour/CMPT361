@@ -81,10 +81,6 @@ void OctreeNode::SplitSpace(int step) {
     }
     glm::vec3 mid_pos = (min_pos_ + max_pos_) / 2.0f;
 
-    //std::cout << "(" << step << ")new split on X: " << mid_pos.x << std::endl;
-    //std::cout << "(" << step << ")new split on Y: " << mid_pos.y << std::endl;
-    //std::cout << "(" << step << ")new split on Z: " << mid_pos.z << std::endl;
-
     // Set sub space range
     sub_space_[FAR_BOTTOM_LEFT]->SetRange(glm::vec3(min_pos_.x, min_pos_.y, min_pos_.z), glm::vec3(mid_pos.x, mid_pos.y, mid_pos.z));
     sub_space_[NEAR_BOTTOM_LEFT]->SetRange(glm::vec3(min_pos_.x, min_pos_.y, mid_pos.z), glm::vec3(mid_pos.x, mid_pos.y, max_pos_.z));
@@ -104,13 +100,10 @@ void OctreeNode::SplitSpace(int step) {
             }
         }
     }
-
-    //std::cout << "transfer " << objects_.size() << " node(s) into sub space\n";
     objects_.clear();
 
     // Recursive split space
     for (int i = 0; i < MAX_NODE_COUNT; i++) {
-        //std::cout << "  " << sub_space_[i]->objects_.size() << " node(s) in tree with index: " << i << std::endl;
         sub_space_[i]->SplitSpace(step - 1);
     }
 }
@@ -191,8 +184,8 @@ unsigned int GetNextNode(glm::vec3 tm, unsigned int x, unsigned int y, unsigned 
 void ProcessSubNode(glm::vec3 origin, OctreeNode* node, glm::vec3 t0, glm::vec3 t1, std::vector<OctreeNode*> &nodes, unsigned int a) {
     if (t1.x < 0 || t1.y < 0 || t1.z < 0) return;
 
-    std::cout << "!!!" << node->get_min_pos().x << " " << node->get_min_pos().y << " " << node->get_min_pos().z << " --- "
-                       << node->get_max_pos().x << " " << node->get_max_pos().y << " " << node->get_max_pos().z << std::endl;
+    //std::cout << "!!!" << node->get_min_pos().x << " " << node->get_min_pos().y << " " << node->get_min_pos().z << " --- "
+    //                   << node->get_max_pos().x << " " << node->get_max_pos().y << " " << node->get_max_pos().z << std::endl;
 
     if (node->get_leaf()) {
         nodes.push_back(node);

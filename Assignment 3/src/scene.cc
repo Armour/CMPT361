@@ -164,7 +164,7 @@ void SetUpUserScene(void) {
 
     // Import from mesh file
     smfparser::ImportMeshFile("chess_piece.smf", 3.0f, 0, glm::vec3(-0.0f, -2.0f, -4.50f), index, glm::vec3(1.0f, 0.0f, 0.0f));
-    //smfparser::ImportMeshFile("bishop.smf", 35.0f, -100, glm::vec3(-1.5f, -1.2f, -2.80f), index, glm::vec3(0.0f, 0.0f, 1.0f));
+    smfparser::ImportMeshFile("bishop.smf", 35.0f, -100, glm::vec3(-1.5f, -1.2f, -2.80f), index, glm::vec3(0.0f, 0.0f, 1.0f));
     //smfparser::ImportMeshFile("chess_piece.smf", 2.5f, -90, glm::vec3(-1.2f, -0.8f, -2.80f), index, glm::vec3(0.5, 0.0, 0.5));
 
     // Chessboard with many triangles
@@ -191,16 +191,17 @@ void SetUpUserScene(void) {
         octree->AddObject(object);
         object = object->get_next();
     }
-    octree->SplitSpace(5);
+    octree->SplitSpace(8);
 
+    /* Octree ray traverse test
     std::vector<OctreeNode *> nodes;
-    raychess::RayTraverse(octree, glm::vec3(1.0f, 1.0f, 1.0f), glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f)), nodes);
+    raychess::RayTraverse(octree, glm::vec3(-1.0f, -1.0f, 1.0f), glm::normalize(glm::vec3(1.0f, 1.0f, -1.0f)), nodes);
     cout << nodes.size() << endl;
     for (auto node: nodes) {
         cout << node->get_min_pos().x << " " << node->get_min_pos().y << " " << node->get_min_pos().z << " --- "
              << node->get_max_pos().x << " " << node->get_max_pos().y << " " << node->get_max_pos().z << endl;
     }
-
+    */
 }
 
 }  // namespace raychess

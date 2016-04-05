@@ -18,6 +18,61 @@
 
 #include "triangle.h"
 
+#define FIND_MIN_MAX(x0, x1, x2, min, max) \
+                     min = max = x0; \
+                     if (x1 < min) min = x1; \
+                     if (x1 > max) max = x1; \
+                     if (x2 < min) min = x2; \
+                     if (x2 > max) max = x2;
+
+#define AXIS_TEST_X12(a, b, fa, fb)	\
+                      p1 = a * v1.y - b * v1.z; \
+                      p3 = a * v3.y - b * v3.z; \
+                      if (p1 < p3) { min = p1; max = p3; } \
+                          else { min = p3; max = p1; } \
+                      rad = fa * half_size.y + fb * half_size.z; \
+                      if (min > rad || max < -rad) return 0;
+
+#define AXIS_TEST_X3(a, b, fa, fb) \
+                     p1 = a * v1.y - b * v1.z; \
+                     p2 = a * v2.y - b * v2.z; \
+                     if (p1 < p2) { min = p1; max = p2; } \
+                         else { min = p2; max = p1; } \
+                     rad = fa * half_size.y + fb * half_size.z; \
+                     if (min > rad || max < -rad) return 0;
+
+#define AXIS_TEST_Y13(a, b, fa, fb) \
+                      p1 = -a * v1.x + b * v1.z; \
+                      p3 = -a * v3.x + b * v3.z; \
+                      if (p1 < p3) { min = p1; max = p3; } \
+                          else { min = p3; max = p1; } \
+                      rad = fa * half_size.x + fb * half_size.z; \
+                      if (min > rad || max < -rad) return 0;
+
+#define AXIS_TEST_Y2(a, b, fa, fb) \
+                     p1 = -a * v1.x + b * v1.z; \
+                     p2 = -a * v2.x + b * v2.z; \
+                     if (p1 < p2) { min = p1; max = p2; } \
+                         else { min = p2; max = p1; } \
+                     rad = fa * half_size.x + fb * half_size.z; \
+                     if (min > rad || max < -rad) return 0;
+
+#define AXIS_TEST_Z23(a, b, fa, fb) \
+                      p2 = a * v2.x - b * v2.y; \
+                      p3 = a * v3.x - b * v3.y; \
+                      if (p3 < p2) { min = p3; max = p2; } \
+                          else { min = p2; max = p3; } \
+                      rad = fa * half_size.x + fb * half_size.y; \
+                      if (min > rad || max < -rad) return 0;
+
+#define AXIS_TEST_Z1(a, b, fa, fb) \
+                     p1 = a * v1.x - b * v1.y; \
+                     p2 = a * v2.x - b * v2.y; \
+                     if (p1 < p2) { min = p1; max = p2; } \
+                         else { min = p2; max = p1; } \
+                     rad = fa * half_size.x + fb * half_size.y; \
+                     if (min > rad || max < -rad) return 0;
+
 namespace raychess {
 
 //
@@ -155,13 +210,90 @@ bool Triangle::InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos) {
         if (v1.y <= max_pos.y && v1.y >= min_pos.y) return true;
         return false;
     }
-    if (v1.x <= max_pos.x && v1.y <= max_pos.y && v1.z <= max_pos.z &&
-        v1.x >= min_pos.x && v1.y >= min_pos.y && v1.z >= min_pos.z) return true;
-    if (v2.x <= max_pos.x && v2.y <= max_pos.y && v2.z <= max_pos.z &&
-        v2.x >= min_pos.x && v2.y >= min_pos.y && v2.z >= min_pos.z) return true;
-    if (v3.x <= max_pos.x && v3.y <= max_pos.y && v3.z <= max_pos.z &&
-        v3.x >= min_pos.x && v3.y >= min_pos.y && v3.z >= min_pos.z) return true;
-    return false;
+
+    glm::vec3 half_size = (max_pos - min_pos) / 2.0f;
+    glm::vec3 center = (max_pos + min_pos) / 2.0f;
+    glm::vec3 v1, v2, v3;
+    int min, max;
+    float rad, p1, p2, p3;
+
+    // Move everything so that the box center is in (0,0,0)
+    v1 = this->v1 - center;
+    v2 = this->v2 - center;
+    v3 = this->v3 - center;
+
+    // Compute triangle edges
+    glm::vec3 e1 = v2 - v1;
+    glm::vec3 e2 = v3 - v2;
+    glm::vec3 e3 = v1 - v3;
+
+    // Test the 9 tests first (this was faster)
+    float fex = fabsf(e1.x);
+    float fey = fabsf(e1.y);
+    float fez = fabsf(e1.z);
+    AXIS_TEST_X12(e1.z, e1.y, fez, fey);
+    AXIS_TEST_Y13(e1.z, e1.x, fez, fex);
+    AXIS_TEST_Z23(e1.y, e1.x, fey, fex);
+
+    fex = fabsf(e2.x);
+    fey = fabsf(e2.y);
+    fez = fabsf(e2.z);
+    AXIS_TEST_X12(e2.z, e2.y, fez, fey);
+    AXIS_TEST_Y13(e2.z, e2.x, fez, fex);
+    AXIS_TEST_Z1(e2.y, e2.x, fey, fex);
+
+    fex = fabsf(e3.x);
+    fey = fabsf(e3.y);
+    fez = fabsf(e3.z);
+    AXIS_TEST_X3(e3.z, e3.y, fez, fey);
+    AXIS_TEST_Y2(e3.z, e3.x, fez, fex);
+    AXIS_TEST_Z23(e3.y, e3.x, fey, fex);
+
+    // Test in X-direction
+    FIND_MIN_MAX(v1.x, v2.x, v3.x, min, max);
+    if (min > half_size.x || max < -half_size.x) return 0;
+
+    // Test in Y-direction
+    FIND_MIN_MAX(v1.y, v2.y, v3.y, min, max);
+    if (min > half_size.y || max < -half_size.y) return 0;
+
+    // Test in Z-direction
+    FIND_MIN_MAX(v1.z, v2.z, v3.z, min, max);
+    if (min > half_size.z || max < -half_size.y) return 0;
+
+    // Test if the box intersects the plane of the triangle
+    glm::vec3 normal = glm::normalize(glm::cross(e1, e2));
+    if (!PlaneBoxOverlap(normal, v1, half_size)) return 0;
+
+    return true;
+}
+
+//
+// Function: PlaneBoxOverlap
+// ---------------------------
+//   Test if a plane overlap with a AABB box
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+int PlaneBoxOverlap(glm::vec3 normal, glm::vec3 vertex, glm::vec3 box_size) {
+    glm::vec3 vmin, vmax;
+    for (int i = 0; i <= 2; i++) {
+        if (normal[i] > 0.0f) {
+            vmin[i] = -box_size[i] - vertex[i];
+            vmax[i] =  box_size[i] - vertex[i];
+        } else {
+            vmin[i] =  box_size[i] - vertex[i];
+            vmax[i] = -box_size[i] - vertex[i];
+        }
+    }
+    if (glm::dot(normal, vmin) > 0.0f) return 0;
+    if (glm::dot(normal, vmax) >= 0.0f) return 1;
+    return 0;
 }
 
 }  // namespace raychess

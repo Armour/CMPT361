@@ -42,6 +42,8 @@ public:
 Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
                     float shininess, float reflectance, float refractance, float refract_ratio, int index, bool infinite);
 
+int PlaneBoxOverlap(glm::vec3 normal, glm::vec3 vertex, glm::vec3 box_size);
+
 }  // namespace raychess
 
 #endif //RAYCHESS_TRIANGLE_H_
