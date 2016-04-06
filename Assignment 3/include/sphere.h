@@ -29,14 +29,15 @@ class Sphere : public Object {
 private:
     float radius_;               // The radius of this sphere
     glm::vec3 center_;           // The center point of this sphere
+
 public:
     Sphere() {};
     ~Sphere() {};
-    inline float get_radius(void) const { return radius_; };
-    inline glm::vec3 get_center(void) const { return center_; };
+
     inline void set_radius(float radius) { this->radius_ = radius; };
     inline void set_center(glm::vec3 center) { this->center_ = center; };
-    glm::vec3 Normal(glm::vec3 surf_point);                                         // Get sphere surface normal
+
+    glm::vec3 GetNormal(glm::vec3 surf_point);                                      // Get sphere surface normal
     float IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit);      // Intersect with ray
     bool InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos);         // Check if a sphere is in a specific cube range
 };

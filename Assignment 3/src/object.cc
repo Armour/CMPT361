@@ -20,7 +20,6 @@
 #include "sphere.h"
 #include "triangle.h"
 #include "octree.h"
-#include <iostream>
 
 extern raychess::OctreeNode *octree;
 extern int octree_on;
@@ -37,7 +36,6 @@ namespace raychess {
 //       origin: the origin point of ray
 //       direction: the direction vector of ray
 //       spheres: the sphere list (scene objects)
-//       max_distance: the max distance we can accept
 //       hit: the intersection point
 //       object_ignore: the sphere index that we need to ignore
 //
@@ -51,19 +49,13 @@ Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, g
 
     if (octree_on) {          // Ray intersection test with octree
         std::vector<OctreeNode *> nodes;
-        raychess::RayTraverse(octree, origin, direction, nodes);
-
+        raychess::RayTraverse(octree, origin, direction, nodes);            // Do the ray traverse on octree space
         for (auto node : nodes) {
             for (auto object : node->objects_) {
                 if (object->get_index() != object_ignore) {
-                    float distance = -1;
-                    if (object->get_type() == libconsts::kTypeSphere)
-                        distance = ((Sphere *) object)->IntersectRay(origin, direction, current_hit);
-                    else if (object->get_type() == libconsts::kTypeTriangle)
-                        distance = ((Triangle *) object)->IntersectRay(origin, direction, current_hit);
-
-                    if (distance != -1 && distance < libconsts::kMaxDistance) {
-                        if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
+                    float distance = object->IntersectRay(origin, direction, current_hit);      // Get distance
+                    if (distance != -1 && distance < libconsts::kMaxDistance) {                 // If intersected
+                        if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {         // Update hit
                             *hit = *current_hit;
                             result = object;
                         }
@@ -75,20 +67,15 @@ Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, g
         Object *current_object = objects;
         while (current_object != nullptr) {
             if (current_object->get_index() != object_ignore) {
-                float distance = -1;
-                if (current_object->get_type() == libconsts::kTypeSphere)
-                    distance = ((Sphere *) current_object)->IntersectRay(origin, direction, current_hit);
-                else if (current_object->get_type() == libconsts::kTypeTriangle)
-                    distance = ((Triangle *) current_object)->IntersectRay(origin, direction, current_hit);
-
-                if (distance != -1 && distance < libconsts::kMaxDistance) {
-                    if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
+                float distance = current_object->IntersectRay(origin, direction, current_hit);      // Get distance
+                if (distance != -1 && distance < libconsts::kMaxDistance) {                         // If intersected
+                    if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {         // Update hit
                         *hit = *current_hit;
                         result = current_object;
                     }
                 }
             }
-            current_object = current_object->get_next();
+            current_object = current_object->get_next();            // Test next object
         }
     }
 

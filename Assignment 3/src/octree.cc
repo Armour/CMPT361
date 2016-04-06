@@ -21,6 +21,29 @@
 namespace raychess {
 
 //
+// Function: OctreeNode
+// ---------------------------
+//
+//   Constructor function
+//
+//   Parameters:
+//       min_pos: the minimum position of this octree space
+//       max_pos: the maximum position of this octree space
+//
+//   Returns:
+//       void
+//
+
+OctreeNode::OctreeNode(glm::vec3 min_pos, glm::vec3 max_pos) {
+    is_leaf_ = true;
+    SetRange(min_pos, max_pos);
+    for (int i = 0; i < MAX_NODE_COUNT; i++) {
+        sub_space_[i] = nullptr;
+    }
+    objects_.clear();
+};
+
+//
 // Function: SetRange
 // ---------------------------
 //
@@ -35,8 +58,8 @@ namespace raychess {
 //
 
 void OctreeNode::SetRange(glm::vec3 min_pos, glm::vec3 max_pos) {
-    set_min_pos(min_pos);
-    set_max_pos(max_pos);
+    min_pos_ = min_pos;
+    max_pos_ = max_pos;
 }
 
 //
@@ -57,14 +80,13 @@ void OctreeNode::AddObject(Object *object) {
 }
 
 //
-// Function: SetRange
+// Function: SplitSpace
 // ---------------------------
 //
-//   This function set the range of the octree
+//   This function split the space into eight sub spaces
 //
 //   Parameters:
-//       min_pos: the minimum position of this octree space
-//       max_pos: the maximum position of this octree space
+//       step: the maximum step we can split
 //
 //   Returns:
 //       void
@@ -73,8 +95,8 @@ void OctreeNode::AddObject(Object *object) {
 void OctreeNode::SplitSpace(int step) {
     if (step == 0 || objects_.size() < 10) return;
 
-    // Inital state
-    set_leaf(false);
+    // Initial state
+    is_leaf_ = false;
     for (int i = 0; i < MAX_NODE_COUNT; i++) {
         sub_space_[i] = new OctreeNode(glm::vec3(0.0f), glm::vec3(0.0f));
     }
@@ -94,12 +116,8 @@ void OctreeNode::SplitSpace(int step) {
     for (Object *object : objects_) {
         for (int i = 0; i < MAX_NODE_COUNT; i++) {
             glm::vec3 loose = glm::vec3(0.01f, 0.01f, 0.01f);
-            if (object->get_type() == libconsts::kTypeSphere) {
-                if (((Sphere *)object)->InCubeRange(sub_space_[i]->min_pos_ - loose, sub_space_[i]->max_pos_ + loose))
-                    sub_space_[i]->AddObject(object);
-            } else if (object->get_type() == libconsts::kTypeTriangle) {
-                if (((Triangle *)object)->InCubeRange(sub_space_[i]->min_pos_ - loose, sub_space_[i]->max_pos_ + loose))
-                    sub_space_[i]->AddObject(object);
+            if (object->InCubeRange(sub_space_[i]->min_pos_ - loose, sub_space_[i]->max_pos_ + loose)) {
+                sub_space_[i]->AddObject(object);
             }
         }
     }
@@ -118,10 +136,11 @@ void OctreeNode::SplitSpace(int step) {
 //   This function used to get the first node to be entered by the ray
 //
 //   Parameters:
-//       void
+//       t0: a vector used to judge first node
+//       tm: a vector used to judge first ndoe
 //
 //   Returns:
-//       void
+//       the first node the ray entered
 //
 
 unsigned int GetFirstNode(glm::vec3 t0, glm::vec3 tm) {
@@ -152,10 +171,11 @@ unsigned int GetFirstNode(glm::vec3 t0, glm::vec3 tm) {
 //   This function used for calculating the exit plane and the next node, once the current parent node is exited
 //
 //   Parameters:
-//       void
+//       tm: a vector used to judge next node
+//       x, y, z: the three possible node
 //
 //   Returns:
-//       void
+//       the next node that ray entered
 //
 
 unsigned int GetNextNode(glm::vec3 tm, unsigned int x, unsigned int y, unsigned int z) {
@@ -178,7 +198,11 @@ unsigned int GetNextNode(glm::vec3 tm, unsigned int x, unsigned int y, unsigned 
 //   This function used to process ray casting in sub node of one node
 //
 //   Parameters:
-//       void
+//       origin: the origin point of ray
+//       node: the octree node that processed now
+//       t0, t1: vectors that used to decide sub space
+//       nodes: the return array which contains nodes that ray intersected
+//       a: the flag for negative ray components
 //
 //   Returns:
 //       void
@@ -187,21 +211,22 @@ unsigned int GetNextNode(glm::vec3 tm, unsigned int x, unsigned int y, unsigned 
 void ProcessSubNode(glm::vec3 origin, OctreeNode* node, glm::vec3 t0, glm::vec3 t1, std::vector<OctreeNode*> &nodes, unsigned int a) {
     if (t1.x < 0 || t1.y < 0 || t1.z < 0) return;
 
-    //std::cout << "!!!" << node->get_min_pos().x << " " << node->get_min_pos().y << " " << node->get_min_pos().z << " --- "
-    //                   << node->get_max_pos().x << " " << node->get_max_pos().y << " " << node->get_max_pos().z << std::endl;
-
+    // Terminate node
     if (node->get_leaf()) {
         nodes.push_back(node);
         return;
     }
 
+    // Get middle t
     glm::vec3 tm = 0.5f * (t0 + t1);
     if (glm::isnan(tm.x)) tm.x = origin.x < 0.5f * (node->get_min_pos().x + node->get_max_pos().x)? INFINITY: -INFINITY;
     if (glm::isnan(tm.y)) tm.y = origin.y < 0.5f * (node->get_min_pos().y + node->get_max_pos().y)? INFINITY: -INFINITY;
     if (glm::isnan(tm.z)) tm.z = origin.z < 0.5f * (node->get_min_pos().z + node->get_max_pos().z)? INFINITY: -INFINITY;
 
+    // Get first node as current node
     unsigned int current_node = GetFirstNode(t0, tm);
 
+    // Recursively get next node and process it
     do {
         switch (current_node) {
             case 0: ProcessSubNode(origin, node->sub_space_[a], glm::vec3(t0.x, t0.y, t0.z), glm::vec3(tm.x, tm.y, tm.z), nodes, a);
@@ -250,7 +275,10 @@ void ProcessSubNode(glm::vec3 origin, OctreeNode* node, glm::vec3 t0, glm::vec3 
 //   Run ray traverse in octree space
 //
 //   Parameters:
-//       void
+//       root: the root node that our ray in now
+//       origin: the origin point of ray
+//       direction: the direction of ray
+//       nodes: the return array which contains nodes that ray intersected
 //
 //   Returns:
 //       void
@@ -285,6 +313,7 @@ void RayTraverse(OctreeNode* root, glm::vec3 origin, glm::vec3 direction, std::v
         a |= 1;
     }
 
+    // Get intersect point t0 and t1
     glm::vec3 t0 = (min_pos - origin) / direction;
     glm::vec3 t1 = (max_pos - origin) / direction;
 

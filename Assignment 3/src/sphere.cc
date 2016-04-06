@@ -27,16 +27,18 @@ namespace raychess {
 //   This function intersects a ray with a sphere
 //
 //   Parameters:
-//       void
+//       origin: the origin point of the ray
+//       direction: the direction of the ray
+//       hit: the intersection point, nullptr if not intersect
 //
 //   Returns:
-//       void
+//       the length from origin to hit point
 //
 
 float Sphere::IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit) {
     float a = powf((float)glm::length(direction), 2);
-    float b = 2 * (float)glm::dot(direction, origin - this->get_center());
-    float c = powf((float)glm::length(origin - this->get_center()), 2) - powf(this->get_radius(), 2);
+    float b = 2 * (float)glm::dot(direction, origin - center_);
+    float c = powf((float)glm::length(origin - center_), 2) - powf(radius_, 2);
     float delta = powf(b, 2) - 4 * a * c;
     if (delta < 0) return -1;
 
@@ -51,7 +53,7 @@ float Sphere::IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit
 }
 
 //
-// Function: Normal
+// Function: GetNormal
 // ---------------------------
 //
 //   Return the unit normal at a point on the sphere
@@ -63,8 +65,8 @@ float Sphere::IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit
 //       sphere normal vector
 //
 
-glm::vec3 Sphere::Normal(glm::vec3 surf_point) {
-    return glm::normalize(surf_point - this->get_center());
+glm::vec3 Sphere::GetNormal(glm::vec3 surf_point) {
+    return glm::normalize(surf_point - center_);
 }
 
 //
@@ -74,18 +76,16 @@ glm::vec3 Sphere::Normal(glm::vec3 surf_point) {
 //   This function adds a sphere into the object list
 //
 //   Parameters:
-//       void
+//       the parameters for the sphere
 //
 //   Returns:
-//       void
+//       the pointer to the object list
 //
 
 Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
                   float shininess, float reflectance, float refractance, float refract_ratio, int index) {
-    Sphere *new_sphere;
-    new_sphere = (Sphere *)malloc(sizeof(Sphere));
+    Sphere *new_sphere = new Sphere();
     new_sphere->set_index(index);
-    new_sphere->set_type(libconsts::kTypeSphere);
     new_sphere->set_center(center);
     new_sphere->set_radius(radius);
     new_sphere->set_ambient(ambient);
@@ -98,11 +98,12 @@ Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 amb
     new_sphere->set_infinite(false);
     new_sphere->set_next(nullptr);
 
+    Object *object = new_sphere;
     if (objects == nullptr) {           // First object
-        objects = (Object *)new_sphere;
+        objects = object;
     } else {                            // Insert at the beginning
-        new_sphere->set_next(objects);
-        objects = (Object *)new_sphere;
+        object->set_next(objects);
+        objects = object;
     }
 
     return objects;
@@ -114,10 +115,11 @@ Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 amb
 //   Check if a sphere is in a specific cube range
 //
 //   Parameters:
-//       void
+//       min_pos: the minimum position of the cube
+//       max_pos: the maximum position of the cube
 //
 //   Returns:
-//       void
+//       if the sphere is in the cube
 //
 
 bool Sphere::InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos) {

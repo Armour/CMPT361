@@ -98,7 +98,12 @@ void TrimTailingSpace(string &s) {
 //   Import mesh data from file to memory
 //
 //   Parameters:
-//       void
+//       file_path: the path of the import file
+//       scale: the scale factor of the imported mesh
+//       rotate: the rotate factor of the imported mesh
+//       offset: the offset of the imported mesh
+//       index: the index of the object in the scene
+//       color: the color of the imported mesh
 //
 //   Returns:
 //       void
@@ -142,20 +147,19 @@ void ImportMeshFile(string file_path, float scale, float rotate, glm::vec3 offse
             vector<int> face_vertex;
             split(line, ' ', face_vertex);
             int size = (int)face_vertex.size();
-            if (size >= 3) {
-                // Mesh with many triangles
+            if (size >= 3) {                        // Mesh with many triangles
                 glm::vec3 v1, v2, v3;
                 bool infinite = false;
-                float triangle_shininess = 30.0f;
-                float triangle_reflectance = 0.3f;
-                float triangle_refractance = 1.0f;
-                float triangle_reflect_ratio = 1.52f;
+                float triangle_shininess = libconsts::kMeshShininess;
+                float triangle_reflectance = libconsts::kMeshReflectance;
+                float triangle_refractance = libconsts::kMeshRefractance;
+                float triangle_reflect_ratio = libconsts::kMeshRefractRatio;
                 v1 = mesh_vertex[face_vertex[0] - 1];
                 v2 = mesh_vertex[face_vertex[1] - 1];
                 v3 = mesh_vertex[face_vertex[2] - 1];
                 scene = AddTriangle(scene, v1, v2, v3, color, color, color, triangle_shininess, triangle_reflectance,
                                     triangle_refractance, triangle_reflect_ratio, ++index, infinite);
-            } else {        // If size is less than 3, then this is not a valid smf file
+            } else {                                // If size is less than 3, then this is not a valid smf file
                 cout << "Fatal! Smf file import error!" << endl;
                 exit(EXIT_FAILURE);
             }

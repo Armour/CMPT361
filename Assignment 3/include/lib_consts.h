@@ -39,10 +39,6 @@ const int kImageHeight = kWindowSizeHeight / kWindowSizeWidth * kImageWidth;
 // Image plane position
 const float kImagePlanePosZ = -1.5f;
 
-// Object type
-const int kTypeSphere = 1;
-const int kTypeTriangle = 2;
-
 // Max distance
 const int kMaxDistance = 10000;
 
@@ -64,6 +60,7 @@ const glm::vec3 kColorWhite = {1.0, 1.0, 1.0};
 const int kChessBoardWidth = 8;
 const int kChessBoardHeight = 8;
 const float kChessBoardGridWidth = 2.0f;
+const float kInfiniteChessBoardGridWidth = 2.0f;
 const glm::vec3 kChessBoardOffset = {-8.0f, -2.5f, -16.0f};
 
 // Diffuse reflected light number
@@ -76,6 +73,12 @@ const glm::vec3 kAntialiasingOffset[4] = {
     { 0.25f, -0.25f, 0.0f},
     {-0.25f, -0.25f, 0.0f}
 };
+
+// The parameters for the imported mesh
+const float kMeshShininess = 30.0f;
+const float kMeshReflectance = 0.3f;
+const float kMeshRefractance = 0.6f;
+const float kMeshRefractRatio = 1.2f;
 
 }  // namespace libconsts
 

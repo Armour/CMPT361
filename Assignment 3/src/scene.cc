@@ -47,7 +47,6 @@ namespace raychess {
 //
 
 void SetUpDefaultScene(void) {
-
     // Index
     int index = 0;
 
@@ -160,7 +159,7 @@ void SetUpUserScene(void) {
     int index = 0;
 
     // Set background color
-    background_color = {0.10f, 0.80f, 0.10f};
+    background_color = {0.50f, 0.05f, 0.80f};
 
     // Set up global ambient color
     global_ambient = {0.2f, 0.2f, 0.2f};
@@ -175,20 +174,18 @@ void SetUpUserScene(void) {
     decay_c = 0.0f;
 
     // Import from mesh file
-    //smfparser::ImportMeshFile("chess_piece.smf", 3.5f, 0, glm::vec3(-3.0f, -2.6f, -5.20f), index, glm::vec3(1.0f, 0.0f, 0.0f));
-    //smfparser::ImportMeshFile("bishop.smf", 45.0f, 0, glm::vec3(1.5f, -2.5f, -4.00f), index, glm::vec3(0.0f, 0.0f, 1.0f));
-    smfparser::ImportMeshFile("chess_hires.smf", 3.5f, 0, glm::vec3(-3.0f, -2.6f, -5.20f), index, glm::vec3(1.0f, 0.0f, 0.0f));
-    smfparser::ImportMeshFile("bishop_hires.smf", 45.0f, 0, glm::vec3(1.5f, -2.5f, -4.00f), index, glm::vec3(0.0f, 0.0f, 1.0f));
+    //smfparser::ImportMeshFile("chess_piece.smf", 3.5f, 0, glm::vec3(-3.0f, -1.5f, -5.20f), index, glm::vec3(0.6f, 0.0f, 0.0f));
+    //smfparser::ImportMeshFile("bishop.smf", 45.0f, 0, glm::vec3(1.5f, -1.5f, -4.00f), index, glm::vec3(0.0f, 0.0f, 0.6f));
+    smfparser::ImportMeshFile("chess_hires.smf", 3.5f, 0, glm::vec3(-3.0f, -0.6f, -5.20f), index, glm::vec3(0.6f, 0.0f, 0.2f));
+    //smfparser::ImportMeshFile("bishop_hires.smf", 45.0f, 0, glm::vec3(1.5f, -0.5f, -4.00f), index, glm::vec3(0.6f, 0.0f, 0.2f));
 
-
-    // TODO: change this to mesh chess board
-    // Chessboard with many triangles
+    // Add infinite chessboard
     if (chessboard_on) {
         bool infinite = true;
         glm::vec3 v1, v2, v3;
         float triangle_shininess = 30.0f;
         float triangle_reflectance = 0.4f;
-        float triangle_refractance = 1.0f;
+        float triangle_refractance = 0.0f;
         float triangle_reflect_ratio = 1.00f;
         float width = libconsts::kChessBoardGridWidth;
         glm::vec3 offset = libconsts::kChessBoardOffset;
@@ -202,13 +199,13 @@ void SetUpUserScene(void) {
 
     // Create octree with all the objects in scene
     if (octree_on) {
-        octree = new OctreeNode(glm::vec3(-12.0f, -12.0f, -12.0f), glm::vec3(12.0f, 12.0f, 12.0f));
+        octree = new OctreeNode(glm::vec3(-20.0f, -20.0f, -20.0f), glm::vec3(20.0f, 20.0f, 20.0f));
         Object *object = scene;
         while (object != nullptr) {
             octree->AddObject(object);
             object = object->get_next();
         }
-        octree->SplitSpace(8);
+        octree->SplitSpace(9);
     }
 }
 

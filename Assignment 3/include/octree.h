@@ -26,7 +26,7 @@
 
 namespace raychess {
 
-enum NodePosition {
+enum NodePosition {             // The octree node position
     FAR_BOTTOM_LEFT = 0,
     NEAR_BOTTOM_LEFT = 1,
     FAR_TOP_LEFT = 2,
@@ -35,39 +35,30 @@ enum NodePosition {
     NEAR_BOTTOM_RIGHT = 5,
     FAR_TOP_RIGHT = 6,
     NEAR_TOP_RIGHT = 7,
-    MAX_NODE_COUNT = 8 // Any defined node should be < 8 && > 0
+    MAX_NODE_COUNT = 8          // Any defined node should be < 8 && > 0
 };
 
 class OctreeNode {
 private:
-    bool is_leaf_;
-    glm::vec3 min_pos_;
-    glm::vec3 max_pos_;
+    bool is_leaf_;              // If the octree node is leaf (termination)
+    glm::vec3 min_pos_;         // The minimum position of the space
+    glm::vec3 max_pos_;         // The maximum position of the space
 
 public:
     OctreeNode() {};
-    OctreeNode(glm::vec3 min, glm::vec3 max): min_pos_(min), max_pos_(max) {
-        is_leaf_ = true;
-        for (int i = 0; i < MAX_NODE_COUNT; i++) {
-            sub_space_[i] = nullptr;
-        }
-        objects_.clear();
-    };
+    OctreeNode(glm::vec3 min, glm::vec3 max);
     ~OctreeNode() {};
 
     OctreeNode *sub_space_[MAX_NODE_COUNT];
     std::vector<Object *> objects_;
 
-    inline void set_leaf(bool is_leaf) { this->is_leaf_ = is_leaf; };
-    inline void set_min_pos(glm::vec3 min_pos) { this->min_pos_ = min_pos; };
-    inline void set_max_pos(glm::vec3 max_pos) { this->max_pos_ = max_pos; };
-    inline bool get_leaf(void) { return is_leaf_; };
-    inline glm::vec3 get_min_pos(void) { return min_pos_; };
-    inline glm::vec3 get_max_pos(void) { return max_pos_; };
+    inline bool get_leaf(void) const { return is_leaf_; };
+    inline glm::vec3 get_min_pos(void) const { return min_pos_; };
+    inline glm::vec3 get_max_pos(void) const { return max_pos_; };
 
-    void SetRange(glm::vec3 min_pos, glm::vec3 max_pos);
-    void AddObject(Object *object);
-    void SplitSpace(int step);
+    void SetRange(glm::vec3 min_pos, glm::vec3 max_pos);        // The the range of the node
+    void AddObject(Object *object);             // Add one object into the objects_
+    void SplitSpace(int step);          // Split the node into eight sub spaces
 };
 
 // This function used to get the first node to be entered by the ray

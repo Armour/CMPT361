@@ -82,14 +82,16 @@ namespace raychess {
 //   This function intersects a ray with a triangle
 //
 //   Parameters:
-//       void
+//       origin: the origin point of the ray
+//       direction: the direction of the ray
+//       hit: the intersection point, nullptr if not intersect
 //
 //   Returns:
 //       void
 //
 
 float Triangle::IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit) {
-    glm::vec3 norm = Normal(glm::vec3(0.0f));
+    glm::vec3 norm = GetNormal(glm::vec3(0.0f));
     float t = -(glm::dot(norm, origin) - glm::dot(norm, v1)) / glm::dot(norm, direction);
     if (t < 0) return -1;
     *hit = origin + t * direction;
@@ -98,7 +100,7 @@ float Triangle::IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *h
 }
 
 //
-// Function: Normal
+// Function: GetNormal
 // ---------------------------
 //
 //   Return the unit normal at a point on the triangle
@@ -110,7 +112,7 @@ float Triangle::IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *h
 //       triangle normal vector
 //
 
-glm::vec3 Triangle::Normal(glm::vec3 dummy) {
+glm::vec3 Triangle::GetNormal(glm::vec3 dummy) {
     glm::vec3 u = v1 - v3;
     glm::vec3 v = v2 - v3;
     return glm::normalize(glm::cross(u, v));
@@ -123,18 +125,16 @@ glm::vec3 Triangle::Normal(glm::vec3 dummy) {
 //   This function adds a triangle into the object list
 //
 //   Parameters:
-//       void
+//       the parameters for the sphere
 //
 //   Returns:
-//       void
+//       the pointer to the object list
 //
 
 Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
                     float shininess, float reflectance, float refractance, float refract_ratio, int index, bool infinite) {
-    Triangle *new_triangle;
-    new_triangle = (Triangle *)malloc(sizeof(Triangle));
+    Triangle *new_triangle = new Triangle();
     new_triangle->set_index(index);
-    new_triangle->set_type(libconsts::kTypeTriangle);
     new_triangle->set_v1(v1);
     new_triangle->set_v2(v2);
     new_triangle->set_v3(v3);
@@ -148,11 +148,12 @@ Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, g
     new_triangle->set_next(nullptr);
     new_triangle->set_infinite(infinite);
 
+    Object *object = new_triangle;
     if (objects == nullptr) {           // First object
-        objects = (Object *)new_triangle;
+        objects = object;
     } else {                            // Insert at the beginning
-        new_triangle->set_next(objects);
-        objects = (Object *)new_triangle;
+        object->set_next(objects);
+        objects = object;
     }
 
     return objects;
@@ -165,10 +166,10 @@ Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, g
 //   Check if the hit point in the triangle area
 //
 //   Parameters:
-//       void
+//       hit: the hit point
 //
 //   Returns:
-//       void
+//       if the hit point in the tirangle
 //
 
 bool Triangle::InTriangle(glm::vec3 hit) {
@@ -199,10 +200,11 @@ bool Triangle::InTriangle(glm::vec3 hit) {
 //   Check if a triangle is in a specific cube range
 //
 //   Parameters:
-//       void
+//       min_pos: the minimum position of the cube
+//       max_pos: the maximum position of the cube
 //
 //   Returns:
-//       void
+//       if the sphere is in the cube
 //
 
 bool Triangle::InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos) {
@@ -251,19 +253,19 @@ bool Triangle::InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos) {
 
     // Test in X-direction
     FIND_MIN_MAX(v1.x, v2.x, v3.x, min, max);
-    if (min > half_size.x || max < -half_size.x) return 0;
+    if (min > half_size.x || max < -half_size.x) return false;
 
     // Test in Y-direction
     FIND_MIN_MAX(v1.y, v2.y, v3.y, min, max);
-    if (min > half_size.y || max < -half_size.y) return 0;
+    if (min > half_size.y || max < -half_size.y) return false;
 
     // Test in Z-direction
     FIND_MIN_MAX(v1.z, v2.z, v3.z, min, max);
-    if (min > half_size.z || max < -half_size.y) return 0;
+    if (min > half_size.z || max < -half_size.y) return false;
 
     // Test if the box intersects the plane of the triangle
     glm::vec3 normal = glm::normalize(glm::cross(e1, e2));
-    if (!PlaneBoxOverlap(normal, v1, half_size)) return 0;
+    if (!PlaneBoxOverlap(normal, v1, half_size)) return false;
 
     return true;
 }
@@ -274,13 +276,15 @@ bool Triangle::InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos) {
 //   Test if a plane overlap with a AABB box
 //
 //   Parameters:
-//       void
+//       normal: the normal vector of he plane
+//       vertex: a vertex in the plane
+//       box_size: the size of the box
 //
 //   Returns:
-//       void
+//       if the plane is overlap with the box
 //
 
-int PlaneBoxOverlap(glm::vec3 normal, glm::vec3 vertex, glm::vec3 box_size) {
+bool PlaneBoxOverlap(glm::vec3 normal, glm::vec3 vertex, glm::vec3 box_size) {
     glm::vec3 vmin, vmax;
     for (int i = 0; i <= 2; i++) {
         if (normal[i] > 0.0f) {
@@ -291,9 +295,9 @@ int PlaneBoxOverlap(glm::vec3 normal, glm::vec3 vertex, glm::vec3 box_size) {
             vmax[i] = -box_size[i] - vertex[i];
         }
     }
-    if (glm::dot(normal, vmin) > 0.0f) return 0;
-    if (glm::dot(normal, vmax) >= 0.0f) return 1;
-    return 0;
+    if (glm::dot(normal, vmin) > 0.0f) return false;
+    if (glm::dot(normal, vmax) >= 0.0f) return true;
+    return true;
 }
 
 }  // namespace raychess
