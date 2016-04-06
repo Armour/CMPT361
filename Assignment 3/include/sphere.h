@@ -38,6 +38,7 @@ public:
     inline void set_center(glm::vec3 center) { this->center_ = center; };
     glm::vec3 Normal(glm::vec3 surf_point);                                         // Get sphere surface normal
     float IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit);      // Intersect with ray
+    bool InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos);         // Check if a sphere is in a specific cube range
 };
 
 // Add a sphere to the object list

@@ -23,6 +23,7 @@
 #include <iostream>
 
 extern raychess::OctreeNode *octree;
+extern int octree_on;
 
 namespace raychess {
 
@@ -48,51 +49,48 @@ Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, g
     Object *result = nullptr;
     glm::vec3 *current_hit = new glm::vec3();
 
-    // Ray intersect test with octree
-    std::vector<OctreeNode *> nodes;
-    raychess::RayTraverse(octree, origin, direction, nodes);
+    if (octree_on) {          // Ray intersection test with octree
+        std::vector<OctreeNode *> nodes;
+        raychess::RayTraverse(octree, origin, direction, nodes);
 
-    for (auto node : nodes) {
-        for (auto object : node->objects_) {
-            if (object->get_index() != object_ignore) {
-                float distance = -1;
-                if (object->get_type() == libconsts::kTypeSphere)
-                    distance = ((Sphere *)object)->IntersectRay(origin, direction, current_hit);
-                else if (object->get_type() == libconsts::kTypeTriangle)
-                    distance = ((Triangle *)object)->IntersectRay(origin, direction, current_hit);
+        for (auto node : nodes) {
+            for (auto object : node->objects_) {
+                if (object->get_index() != object_ignore) {
+                    float distance = -1;
+                    if (object->get_type() == libconsts::kTypeSphere)
+                        distance = ((Sphere *) object)->IntersectRay(origin, direction, current_hit);
+                    else if (object->get_type() == libconsts::kTypeTriangle)
+                        distance = ((Triangle *) object)->IntersectRay(origin, direction, current_hit);
 
-                if (distance != -1 && distance < libconsts::kMaxDistance) {
-                    if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
-                        *hit = *current_hit;
-                        result = object;
+                    if (distance != -1 && distance < libconsts::kMaxDistance) {
+                        if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
+                            *hit = *current_hit;
+                            result = object;
+                        }
                     }
                 }
             }
         }
-        if (result != nullptr) break;
-    }
+    } else {                // Do ray intersection test without octree
+        Object *current_object = objects;
+        while (current_object != nullptr) {
+            if (current_object->get_index() != object_ignore) {
+                float distance = -1;
+                if (current_object->get_type() == libconsts::kTypeSphere)
+                    distance = ((Sphere *) current_object)->IntersectRay(origin, direction, current_hit);
+                else if (current_object->get_type() == libconsts::kTypeTriangle)
+                    distance = ((Triangle *) current_object)->IntersectRay(origin, direction, current_hit);
 
-    // This part is for intersect test without octree :P
-    /*
-    Object *current_object = objects;
-    while (current_object != nullptr) {
-        if (current_object->get_index() != object_ignore) {
-            float distance = -1;
-            if (current_object->get_type() == libconsts::kTypeSphere)
-                distance = ((Sphere *)current_object)->IntersectRay(origin, direction, current_hit);
-            else if (current_object->get_type() == libconsts::kTypeTriangle)
-                distance = ((Triangle *)current_object)->IntersectRay(origin, direction, current_hit);
-
-            if (distance != -1 && distance < libconsts::kMaxDistance) {
-                if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
-                    *hit = *current_hit;
-                    result = current_object;
+                if (distance != -1 && distance < libconsts::kMaxDistance) {
+                    if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {
+                        *hit = *current_hit;
+                        result = current_object;
+                    }
                 }
             }
+            current_object = current_object->get_next();
         }
-        current_object = current_object->get_next();
     }
-    */
 
     delete current_hit;
     return result;

@@ -60,6 +60,7 @@ int refraction_on = 0;
 int chessboard_on = 0;
 int diffuse_on = 0;
 int antialiasing_on = 0;
+int octree_on = 0;
 
 //
 // Function: DisplayFunc
@@ -141,6 +142,7 @@ int main(int argc, char **argv) {
         if (strcmp(argv[i], "+c") == 0) chessboard_on = 1;
         if (strcmp(argv[i], "+f") == 0) diffuse_on = 1;
         if (strcmp(argv[i], "+p") == 0) antialiasing_on = 1;
+        if (strcmp(argv[i], "+o") == 0) octree_on = 1;
     }
 
     // Check scene specification and max steps

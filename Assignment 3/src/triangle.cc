@@ -196,7 +196,7 @@ bool Triangle::InTriangle(glm::vec3 hit) {
 //
 // Function: InCubeRange
 // ---------------------------
-//   Check if a triangle in specific cube range
+//   Check if a triangle is in a specific cube range
 //
 //   Parameters:
 //       void

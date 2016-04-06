@@ -22,6 +22,7 @@
 #include "lib_consts.h"
 #include "lib_gl.h"
 #include "triangle.h"
+#include "sphere.h"
 
 namespace raychess {
 

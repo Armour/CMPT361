@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "trace.h"
-#include <iostream>
 
 using namespace std;
 
@@ -55,8 +54,8 @@ namespace raychess {
 
 glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm, bool shadow_on) {
     glm::vec3 intensity(0.0f);
-    glm::vec3 grid_color = ((int)round((hit.x - 2.5) / 5.0f) + (int)round(hit.z / 5.0f)) % 2 == 0?
-                           libconsts::kColorBlack: libconsts::kColorWhite;
+    glm::vec3 grid_color = //((int)round((hit.x - 2.5) / 5.0f) + (int)round(hit.z / 5.0f)) % 2 == 0?
+                           libconsts::kColorBlack;//: libconsts::kColorWhite;
     glm::vec3 kd = object->get_infinite()? grid_color: object->get_diffuse();
     glm::vec3 ks = object->get_infinite()? grid_color: object->get_specular();
     glm::vec3 ka = object->get_infinite()? grid_color: object->get_ambient();

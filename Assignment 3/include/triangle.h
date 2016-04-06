@@ -35,13 +35,14 @@ public:
     glm::vec3 Normal(glm::vec3 dummy);          // Get planer surface normal
     float IntersectRay(glm::vec3 origin, glm::vec3 direction, glm::vec3 *hit);      // Intersect with ray
     bool InTriangle(glm::vec3 point);           // Check if the hit point in the triangle area
-    bool InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos);         // Check if a triangle in specific cube range
+    bool InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos);         // Check if a triangle is in a specific cube range
 };
 
 // Add a triangle to the object list
 Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
                     float shininess, float reflectance, float refractance, float refract_ratio, int index, bool infinite);
 
+// Test if a plane is overlap with an AABB box
 int PlaneBoxOverlap(glm::vec3 normal, glm::vec3 vertex, glm::vec3 box_size);
 
 }  // namespace raychess

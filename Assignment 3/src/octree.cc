@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "octree.h"
-#include <iostream>
 
 namespace raychess {
 
@@ -72,7 +71,7 @@ void OctreeNode::AddObject(Object *object) {
 //
 
 void OctreeNode::SplitSpace(int step) {
-    if (step == 0 || objects_.size() < 3) return;
+    if (step == 0 || objects_.size() < 10) return;
 
     // Inital state
     set_leaf(false);
@@ -94,9 +93,13 @@ void OctreeNode::SplitSpace(int step) {
     // Put objects to sub space
     for (Object *object : objects_) {
         for (int i = 0; i < MAX_NODE_COUNT; i++) {
-            glm::vec3 loose = glm::vec3(0.02f, 0.02f, 0.02f);
-            if (((Triangle *)object)->InCubeRange(sub_space_[i]->min_pos_ - loose, sub_space_[i]->max_pos_ + loose)) {
-                sub_space_[i]->AddObject(object);
+            glm::vec3 loose = glm::vec3(0.01f, 0.01f, 0.01f);
+            if (object->get_type() == libconsts::kTypeSphere) {
+                if (((Sphere *)object)->InCubeRange(sub_space_[i]->min_pos_ - loose, sub_space_[i]->max_pos_ + loose))
+                    sub_space_[i]->AddObject(object);
+            } else if (object->get_type() == libconsts::kTypeTriangle) {
+                if (((Triangle *)object)->InCubeRange(sub_space_[i]->min_pos_ - loose, sub_space_[i]->max_pos_ + loose))
+                    sub_space_[i]->AddObject(object);
             }
         }
     }

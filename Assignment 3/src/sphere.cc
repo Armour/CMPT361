@@ -108,4 +108,27 @@ Object *AddSphere(Object *objects, glm::vec3 center, float radius, glm::vec3 amb
     return objects;
 }
 
+//
+// Function: InCubeRange
+// ---------------------------
+//   Check if a sphere is in a specific cube range
+//
+//   Parameters:
+//       void
+//
+//   Returns:
+//       void
+//
+
+bool Sphere::InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos) {
+    float dist_squared = powf(radius_, 2);
+    if (center_.x < min_pos.x) dist_squared -= powf(center_.x - min_pos.x, 2);
+        else if (center_.x > max_pos.x) dist_squared -= powf(center_.x - max_pos.x, 2);
+    if (center_.y < min_pos.y) dist_squared -= powf(center_.y - min_pos.y, 2);
+        else if (center_.y > max_pos.y) dist_squared -= powf(center_.y - max_pos.y, 2);
+    if (center_.z < min_pos.z) dist_squared -= powf(center_.z - min_pos.z, 2);
+        else if (center_.z > max_pos.z) dist_squared -= powf(center_.z - max_pos.z, 2);
+    return dist_squared > 0;
+}
+
 }  // namespace raychess

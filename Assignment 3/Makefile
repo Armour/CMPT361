@@ -17,7 +17,7 @@ INCLUDEDIR = /usr/include/
 LIBDIR = /usr/lib
 
 # If you have more source files add them here
-SOURCE = src/scene.cc src/image_util.cc src/smf_parser.cc src/object.cc src/sphere.cc src/triangle.cc src/trace.cc src/raycast.cc src/init_shader.cc
+SOURCE = src/scene.cc src/image_util.cc src/smf_parser.cc src/octree.cc src/object.cc src/sphere.cc src/triangle.cc src/trace.cc src/raycast.cc src/init_shader.cc
 
 # The compiler we are using
 CC = g++

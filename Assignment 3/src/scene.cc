@@ -26,6 +26,7 @@ extern glm::vec3 light_position;
 extern glm::vec3 light_intensity;
 extern glm::vec3 global_ambient;
 extern int chessboard_on;
+extern int octree_on;
 extern float decay_a;
 extern float decay_b;
 extern float decay_c;
@@ -128,6 +129,17 @@ void SetUpDefaultScene(void) {
             }
         }
     }
+
+    // Create octree with all the objects in scene
+    if (octree_on) {
+        octree = new OctreeNode(glm::vec3(-20.0f, -20.0f, -20.0f), glm::vec3(20.0f, 20.0f, 20.0f));
+        Object *object = scene;
+        while (object != nullptr) {
+            octree->AddObject(object);
+            object = object->get_next();
+        }
+        octree->SplitSpace(8);
+    }
 }
 
 //
@@ -163,9 +175,10 @@ void SetUpUserScene(void) {
     decay_c = 0.0f;
 
     // Import from mesh file
-    smfparser::ImportMeshFile("chess_piece.smf", 3.0f, 0, glm::vec3(-0.0f, -2.0f, -4.50f), index, glm::vec3(1.0f, 0.0f, 0.0f));
-    smfparser::ImportMeshFile("bishop.smf", 35.0f, -100, glm::vec3(-1.5f, -1.2f, -2.80f), index, glm::vec3(0.0f, 0.0f, 1.0f));
-    //smfparser::ImportMeshFile("chess_piece.smf", 2.5f, -90, glm::vec3(-1.2f, -0.8f, -2.80f), index, glm::vec3(0.5, 0.0, 0.5));
+    //smfparser::ImportMeshFile("chess_piece.smf", 3.0f, 0, glm::vec3(-0.0f, -2.0f, -4.50f), index, glm::vec3(1.0f, 0.0f, 0.0f));
+    //smfparser::ImportMeshFile("bishop.smf", 35.0f, -100, glm::vec3(-1.5f, -1.2f, -2.80f), index, glm::vec3(0.0f, 0.0f, 1.0f));
+    smfparser::ImportMeshFile("chess_hires.smf", 3.0f, 0, glm::vec3(-0.0f, -2.0f, -4.50f), index, glm::vec3(1.0f, 0.0f, 0.0f));
+    smfparser::ImportMeshFile("bishop_hires.smf", 35.0f, -100, glm::vec3(-1.5f, -1.2f, -2.80f), index, glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Chessboard with many triangles
     if (chessboard_on) {
@@ -185,23 +198,16 @@ void SetUpUserScene(void) {
                             triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index, infinite);
     }
 
-    octree = new OctreeNode(glm::vec3(-10.0f, -10.0f, -10.0f), glm::vec3(10.0f, 10.0f, 10.0f));
-    Object *object = scene;
-    while (object != nullptr) {
-        octree->AddObject(object);
-        object = object->get_next();
+    // Create octree with all the objects in scene
+    if (octree_on) {
+        octree = new OctreeNode(glm::vec3(-12.0f, -12.0f, -12.0f), glm::vec3(12.0f, 12.0f, 12.0f));
+        Object *object = scene;
+        while (object != nullptr) {
+            octree->AddObject(object);
+            object = object->get_next();
+        }
+        octree->SplitSpace(8);
     }
-    octree->SplitSpace(8);
-
-    /* Octree ray traverse test
-    std::vector<OctreeNode *> nodes;
-    raychess::RayTraverse(octree, glm::vec3(-1.0f, -1.0f, 1.0f), glm::normalize(glm::vec3(1.0f, 1.0f, -1.0f)), nodes);
-    cout << nodes.size() << endl;
-    for (auto node: nodes) {
-        cout << node->get_min_pos().x << " " << node->get_min_pos().y << " " << node->get_min_pos().z << " --- "
-             << node->get_max_pos().x << " " << node->get_max_pos().y << " " << node->get_max_pos().z << endl;
-    }
-    */
 }
 
 }  // namespace raychess
