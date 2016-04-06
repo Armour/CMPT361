@@ -147,8 +147,8 @@ void ImportMeshFile(string file_path, float scale, float rotate, glm::vec3 offse
                 glm::vec3 v1, v2, v3;
                 bool infinite = false;
                 float triangle_shininess = 30.0f;
-                float triangle_reflectance = 0.5f;
-                float triangle_refractance = 0.9f;
+                float triangle_reflectance = 0.3f;
+                float triangle_refractance = 1.0f;
                 float triangle_reflect_ratio = 1.52f;
                 v1 = mesh_vertex[face_vertex[0] - 1];
                 v2 = mesh_vertex[face_vertex[1] - 1];

@@ -163,7 +163,7 @@ void SetUpUserScene(void) {
     background_color = {0.10f, 0.80f, 0.10f};
 
     // Set up global ambient color
-    global_ambient = {0.3f, 0.3f, 0.3f};
+    global_ambient = {0.2f, 0.2f, 0.2f};
 
     // Set up light
     light_position = {-2.0f, 5.0f, 1.0f};
@@ -175,19 +175,21 @@ void SetUpUserScene(void) {
     decay_c = 0.0f;
 
     // Import from mesh file
-    //smfparser::ImportMeshFile("chess_piece.smf", 3.0f, 0, glm::vec3(-0.0f, -2.0f, -4.50f), index, glm::vec3(1.0f, 0.0f, 0.0f));
-    //smfparser::ImportMeshFile("bishop.smf", 35.0f, -100, glm::vec3(-1.5f, -1.2f, -2.80f), index, glm::vec3(0.0f, 0.0f, 1.0f));
-    smfparser::ImportMeshFile("chess_hires.smf", 3.0f, 0, glm::vec3(-0.0f, -2.0f, -4.50f), index, glm::vec3(1.0f, 0.0f, 0.0f));
-    smfparser::ImportMeshFile("bishop_hires.smf", 35.0f, -100, glm::vec3(-1.5f, -1.2f, -2.80f), index, glm::vec3(0.0f, 0.0f, 1.0f));
+    //smfparser::ImportMeshFile("chess_piece.smf", 3.5f, 0, glm::vec3(-3.0f, -2.6f, -5.20f), index, glm::vec3(1.0f, 0.0f, 0.0f));
+    //smfparser::ImportMeshFile("bishop.smf", 45.0f, 0, glm::vec3(1.5f, -2.5f, -4.00f), index, glm::vec3(0.0f, 0.0f, 1.0f));
+    smfparser::ImportMeshFile("chess_hires.smf", 3.5f, 0, glm::vec3(-3.0f, -2.6f, -5.20f), index, glm::vec3(1.0f, 0.0f, 0.0f));
+    smfparser::ImportMeshFile("bishop_hires.smf", 45.0f, 0, glm::vec3(1.5f, -2.5f, -4.00f), index, glm::vec3(0.0f, 0.0f, 1.0f));
 
+
+    // TODO: change this to mesh chess board
     // Chessboard with many triangles
     if (chessboard_on) {
         bool infinite = true;
         glm::vec3 v1, v2, v3;
         float triangle_shininess = 30.0f;
-        float triangle_reflectance = 0.5f;
+        float triangle_reflectance = 0.4f;
         float triangle_refractance = 1.0f;
-        float triangle_reflect_ratio = 1.52f;
+        float triangle_reflect_ratio = 1.00f;
         float width = libconsts::kChessBoardGridWidth;
         glm::vec3 offset = libconsts::kChessBoardOffset;
         glm::vec3 color = libconsts::kColorWhite;

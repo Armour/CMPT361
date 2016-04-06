@@ -54,8 +54,8 @@ namespace raychess {
 
 glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm, bool shadow_on) {
     glm::vec3 intensity(0.0f);
-    glm::vec3 grid_color = //((int)round((hit.x - 2.5) / 5.0f) + (int)round(hit.z / 5.0f)) % 2 == 0?
-                           libconsts::kColorBlack;//: libconsts::kColorWhite;
+    glm::vec3 grid_color = ((int)round((hit.x - 1.0) / 2.0f) + (int)round(hit.z / 2.0f)) % 2 == 0?
+                           libconsts::kColorBlack: libconsts::kColorWhite;
     glm::vec3 kd = object->get_infinite()? grid_color: object->get_diffuse();
     glm::vec3 ks = object->get_infinite()? grid_color: object->get_specular();
     glm::vec3 ka = object->get_infinite()? grid_color: object->get_ambient();
@@ -88,9 +88,9 @@ glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm, 
 //       void
 //
 
-glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration, int object_ignore, bool in_object) {
-    if (iteration < 0) {
-        return background_color;
+glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int depth, int object_ignore, bool in_object) {
+    if (depth > step_max) {
+        return global_ambient;
     }
 
     glm::vec3 *hit = new glm::vec3();
@@ -106,13 +106,13 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
 
         glm::vec3 color = PhongIllumination(object, *hit, surf_norm, shadow_on && !in_object);
 
-        if (iteration > 0 && reflection_on) {
+        if (depth < step_max && reflection_on) {
             glm::vec3 reflect_ray = 2.0f * surf_norm * (glm::dot(surf_norm, -direction)) + direction;
             color += object->get_reflectance() * RecursiveRayTrace(*hit + reflect_ray * libconsts::kErrorEpsilon, reflect_ray,
-                                                                   iteration - 1, object_ignore, in_object);
+                                                                   depth + 1, object_ignore, in_object);
         }
 
-        if (iteration > 0 && refraction_on && object->get_refractance() > 0.001f) {
+        if (depth < step_max && refraction_on && object->get_refractance() > 0.001f) {
             float refract_ratio = object->get_refract_ratio();
             float ratio = in_object? refract_ratio: 1.0f / refract_ratio;
             float c1 = -glm::dot(surf_norm, direction);
@@ -120,18 +120,18 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
             if (c2 > 0.0f) {
                 glm::vec3 refract_ray = glm::normalize((ratio * c1 - sqrtf(c2)) * surf_norm + c1 * direction);
                 color += object->get_refractance() * RecursiveRayTrace(*hit + refract_ray * libconsts::kErrorEpsilon, refract_ray,
-                                                                       iteration - 1, object_ignore, !in_object);
+                                                                       depth + 1, object_ignore, !in_object);
             }
         }
 
-        if (!in_object && diffuse_on) {
+        if (depth < 2 && !in_object && diffuse_on) {
         	glm::vec3 diffuse_color = glm::vec3(0.0f, 0.0f, 0.0f);
             for (int i = 0; i < libconsts::kDiffuseReflectNumber; i++) {
                 float degree = (float)(rand() % 161) - 80.0f;				// Random -80 to 80 degree
                 glm::vec3 rotate_normal = glm::normalize(glm::cross(surf_norm, -direction));
                 glm::vec3 diffuse_ray = glm::rotate(surf_norm, degree * libconsts::kDegreeToRadians, rotate_normal);
                 diffuse_color += RecursiveRayTrace(*hit + diffuse_ray * libconsts::kErrorEpsilon, diffuse_ray,
-                                                   iteration - 1, object_ignore, in_object);
+                                                   depth + 1, object_ignore, in_object);
             }
             color += object->get_diffuse() * diffuse_color / (float)libconsts::kDiffuseReflectNumber * 0.2f;
         }
@@ -141,7 +141,11 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
     }
 
     delete hit;
-    return background_color;
+
+    if (depth == 0)
+    	return background_color;
+    else
+    	return global_ambient;
 }
 
 //
@@ -157,7 +161,7 @@ glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int iteration
 //       void
 //
 
-void RayTrace(int iteration) {
+void RayTrace() {
     int i, j;
     float x_grid_size = libconsts::kImageWidth / float(libconsts::kWindowSizeWidth);
     float y_grid_size = libconsts::kImageHeight / float(libconsts::kWindowSizeHeight);
@@ -176,13 +180,13 @@ void RayTrace(int iteration) {
 
             ray = glm::normalize(cur_pixel_pos - libconsts::kEyePosition);
 
-            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, iteration, 0, false);
+            ret_color = RecursiveRayTrace(cur_pixel_pos, ray, 0, 0, false);
 
             if (antialiasing_on) {
                 for (int k = 0; k < 4; k++) {
                     glm::vec3 new_pixel_pos = cur_pixel_pos + libconsts::kAntialiasingOffset[k] * x_grid_size;
                     ray = glm::normalize(new_pixel_pos - libconsts::kEyePosition);
-                    ret_color += RecursiveRayTrace(new_pixel_pos, ray, iteration, 0, false);
+                    ret_color += RecursiveRayTrace(new_pixel_pos, ray, 0, 0, false);
                 }
             }
 

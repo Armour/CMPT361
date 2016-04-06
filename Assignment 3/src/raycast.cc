@@ -51,7 +51,7 @@ float decay_b;
 float decay_c;
 
 // Maximum level of recursions of reflection
-int step_max;
+int step_max = 0;
 
 // The option flags
 int shadow_on = 0;
@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
     printf("Rendering scene using my fantastic ray tracer ...\n");
     struct timeval start, end;
     gettimeofday(&start, NULL);
-    raychess::RayTrace(step_max);       // Do ray trace!
+    raychess::RayTrace();       // Do ray trace!
     gettimeofday(&end, NULL);
     auto delta = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
     printf("Done! Time used: %.2lfs\n", delta);
