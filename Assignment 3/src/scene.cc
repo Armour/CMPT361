@@ -99,33 +99,31 @@ void SetUpDefaultScene(RenderManager *manager) {
                             sphere3_refractance, sphere3_reflect_ratio, ++index);
     manager->set_scene_objects(object_list);
 
-    // Chessboard with many triangles
+    // Add chessboard
     if (manager->chessboard_on_) {
-        glm::vec3 v1, v2, v3, v4;
         bool infinite = false;
+        bool chessboard = true;
+        glm::vec3 v1, v2, v3, v4;
         float triangle_shininess = 30.0f;
         float triangle_reflectance = 1.0f;
         float triangle_refractance = 0.0f;
         float triangle_reflect_ratio = 1.00f;
         float width = libconsts::kChessBoardGridWidth;
         glm::vec3 offset = libconsts::kChessBoardOffset;
-        for (int i = 0; i < libconsts::kChessBoardWidth; i++) {
-            for (int j = 0; j < libconsts::kChessBoardHeight; j++) {
-                glm::vec3 color = (i + j) % 2 == 0? libconsts::kColorBlack: libconsts::kColorWhite;
-                v1 = {i * width + 0.0f, 0.0f, j * width + 0.0f};
-                v2 = {i * width + width, 0.0f, j * width + 0.0f};
-                v3 = {i * width + 0.0f, 0.0f, j * width + width};
-                v4 = {i * width + width, 0.0f, j * width + width};
-                object_list = AddTriangle(manager->get_scene_objects(), v1 + offset, v3 + offset, v2 + offset,
-                                          color, color, color, triangle_shininess, triangle_reflectance, triangle_refractance,
-                                          triangle_reflect_ratio, ++index, infinite);
-                manager->set_scene_objects(object_list);
-                object_list = AddTriangle(manager->get_scene_objects(), v2 + offset, v3 + offset, v4 + offset,
-                                          color, color, color, triangle_shininess, triangle_reflectance, triangle_refractance,
-                                          triangle_reflect_ratio, ++index, infinite);
-                manager->set_scene_objects(object_list);
-            }
-        }
+        glm::vec3 color = libconsts::kColorWhite;
+        v1 = {0.0f, 0.0f, 0.0f};
+        v2 = {width * 8.0f, 0.0f, 0.0f};
+        v3 = {0.0f, 0.0f, width * 8.0f};
+        v4 = {width * 8.0f, 0.0f, width * 8.0f};
+        Object *object_list;
+        object_list = AddTriangle(manager->get_scene_objects(), v1 + offset, v3 + offset, v2 + offset,
+                                  color, color, color, triangle_shininess, triangle_reflectance, triangle_refractance,
+                                  triangle_reflect_ratio, ++index, infinite, chessboard);
+        manager->set_scene_objects(object_list);
+        object_list = AddTriangle(manager->get_scene_objects(), v2 + offset, v3 + offset, v4 + offset,
+                                  color, color, color, triangle_shininess, triangle_reflectance, triangle_refractance,
+                                  triangle_reflect_ratio, ++index, infinite, chessboard);
+        manager->set_scene_objects(object_list);
     }
 
     // Create octree with all the objects in scene
@@ -172,19 +170,20 @@ void SetUpUserScene(RenderManager *manager) {
     manager->set_decay_c(0.0f);
 
     // Import from mesh file
-    smfparser::ImportMeshFile(manager, "chess_piece.smf", 3.5f, 0, glm::vec3(-3.0f, -1.5f, -5.20f), index);
-    smfparser::ImportMeshFile(manager, "bishop.smf", 45.0f, 0, glm::vec3(1.5f, -1.5f, -4.00f), index);
-    //smfparser::ImportMeshFile("chess_hires.smf", 3.5f, 0, glm::vec3(-3.0f, -0.6f, -5.20f), index);
-    //smfparser::ImportMeshFile("bishop_hires.smf", 45.0f, 0, glm::vec3(1.5f, -0.5f, -4.00f), index);
+    smfparser::ImportMeshFile(manager, "chess_piece.smf", 3.5f, 0, glm::vec3(-3.0f, -2.5f, -5.20f), index);
+    smfparser::ImportMeshFile(manager, "bishop.smf", 45.0f, 0, glm::vec3(1.5f, -2.5f, -4.00f), index);
+    //smfparser::ImportMeshFile(manager, "chess_hires.smf", 3.5f, 0, glm::vec3(-3.0f, -2.5f, -5.20f), index);
+    //smfparser::ImportMeshFile(manager, "bishop_hires.smf", 45.0f, 0, glm::vec3(1.5f, -2.5f, -4.00f), index);
 
     // Add infinite chessboard
     if (manager->chessboard_on_) {
         bool infinite = true;
+        bool chessboard = true;
         glm::vec3 v1, v2, v3;
         float triangle_shininess = 30.0f;
         float triangle_reflectance = 0.4f;
         float triangle_refractance = 0.0f;
-        float triangle_reflect_ratio = 1.00f;
+        float triangle_reflect_ratio = 1.20f;
         float width = libconsts::kChessBoardGridWidth;
         glm::vec3 offset = libconsts::kChessBoardOffset;
         glm::vec3 color = libconsts::kColorWhite;
@@ -193,11 +192,11 @@ void SetUpUserScene(RenderManager *manager) {
         v3 = {0.0f, 0.0f, width};
         Object *object_list = AddTriangle(manager->get_scene_objects(), v1 + offset, v3 + offset, v2 + offset,
                                           color, color, color, triangle_shininess, triangle_reflectance, triangle_refractance,
-                                          triangle_reflect_ratio, ++index, infinite);
+                                          triangle_reflect_ratio, ++index, infinite, chessboard);
         manager->set_scene_objects(object_list);
     }
 
-    // Create octree with all the objects in scene
+    // Create octree with all the objects in scene without chessboard
     if (manager->octree_on_) {
         Object *object = manager->get_scene_objects();
         while (object != nullptr) {

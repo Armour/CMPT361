@@ -42,28 +42,60 @@
     - Manual compile
         - `cmake .` (Optional)
         - `make`
-        - Use `./raycast` to run basic part
-        - Use `./raychess` to run bonus part
-        - (PS: Actually they are the same lol)
+        - `./raychess`
 
 - Ubuntu
     - Use `Clion`
     - Manual compile
         - `cmake .` (Optional)
         - `make`
-        - Use `./raycast` to run basic part
-        - Use `./raychess` to run bonus part
-        - (PS: Actually they are the same lol)
+        - `./raychess`
 
-## Additional Features
+## Features
 
-- Functions
-    - **Parallel programming** (OpenMP)
-    - **Octree** implemented, use `+o` to open it
-    - OOP with **Polymorphism**
+- Speed Up
+    - **Octree** implemented, use `+o` to enable it	
+
+	- For a single chess piece in the chessboard:
+	    - Without Octree:
+	        - Time: 13.05s
+	        - Intersection number: 211523500
+	    - With Octree:
+	        - Time: 5.38s
+	        - Intersection number: 14265930
+
+	- For two chess pieces in the chessboard:
+	    - Without Octree:
+	        - Time: 201.32s
+	        - Intersection number: 3355443200
+	    - With Octree:
+	        - Time: 19.13s
+	        - Intersection number: 39631770
+
+	- Comment:
+	    - Reduce lots of unnecessary intersection tests (>= 90%)
+
+    - **Parallel programming** added (using OpenMP)
+
+	- For two chess pieces in the chessboard:
+	    - Without OpenMP:
+	        - Time: 201.32s
+	        - Intersection number: 3355443200
+	    - With OpenMP:
+	        - Time: 83.78s
+	        - Intersection number: 3355443200
+
+	- Comment:
+	    - Doesn't reduce the intersection test number, but saved more than half time.
     
 - Others
+    - OOP with **Polymorphism**
     - Cross platform (Clion + Cmake)
     - Following Google C++ Style, well commented
     - Self-write almost all the skeleton code with comment
     - Put all constant values to one header file, elegant and easy to modify
+
+## Result
+
+- See images in `results` folder
+    - Four images with different meterial parameters set (one with refraction ratio about 1.0f)

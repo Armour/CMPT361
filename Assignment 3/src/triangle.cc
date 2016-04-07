@@ -132,7 +132,7 @@ glm::vec3 Triangle::GetNormal(glm::vec3 dummy) {
 //
 
 Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
-                    float shininess, float reflectance, float refractance, float refract_ratio, int index, bool infinite) {
+                    float shininess, float reflectance, float refractance, float refract_ratio, int index, bool infinite, bool chessboard) {
     Triangle *new_triangle = new Triangle();
     new_triangle->set_index(index);
     new_triangle->set_v1(v1);
@@ -147,6 +147,7 @@ Object *AddTriangle(Object *objects, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, g
     new_triangle->set_refract_ratio(refract_ratio);
     new_triangle->set_next(nullptr);
     new_triangle->set_infinite(infinite);
+    new_triangle->set_chessboard(chessboard);
 
     Object *object = new_triangle;
     if (objects == nullptr) {           // First object
@@ -297,7 +298,7 @@ bool PlaneBoxOverlap(glm::vec3 normal, glm::vec3 vertex, glm::vec3 box_size) {
     }
     if (glm::dot(normal, vmin) > 0.0f) return false;
     if (glm::dot(normal, vmax) >= 0.0f) return true;
-    return true;
+    return false;
 }
 
 }  // namespace raychess

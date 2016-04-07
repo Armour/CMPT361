@@ -60,7 +60,6 @@ const glm::vec3 kColorWhite = {1.0, 1.0, 1.0};
 const int kChessBoardWidth = 8;
 const int kChessBoardHeight = 8;
 const float kChessBoardGridWidth = 2.0f;
-const float kInfiniteChessBoardGridWidth = 2.0f;
 const glm::vec3 kChessBoardOffset = {-8.0f, -2.5f, -16.0f};
 
 // Diffuse reflected light number
@@ -78,9 +77,9 @@ const glm::vec3 kAntialiasingOffset[4] = {
 const float kMeshShininess = 30.0f;
 const float kMeshReflectance = 0.3f;
 const float kMeshRefractance = 0.6f;
-const float kMeshRefractRatio = 1.2f;
-const glm::vec3 kMeshAmbient = {0.7f, 0.7f, 0.7f};
-const glm::vec3 kMeshDiffuse = {0.4f, 0.05f, 0.4f};
+const float kMeshRefractRatio = 1.52f;
+const glm::vec3 kMeshAmbient = {0.6f, 0.6f, 0.6f};
+const glm::vec3 kMeshDiffuse = {0.6f, 0.00f, 0.0f};
 const glm::vec3 kMeshSpecular = {1.0f, 1.0f, 1.0f};
 
 }  // namespace libconsts

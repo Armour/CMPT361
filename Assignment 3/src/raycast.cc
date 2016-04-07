@@ -28,7 +28,9 @@
 
 GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];    // The array for the final image
 
-raychess::RenderManager *manager;   // The render manager
+raychess::RenderManager *manager;       // The render manager
+
+long long intersection_count = 0;       // The number of intersection test of ray and polygon
 
 //
 // Function: DisplayFunc
@@ -116,8 +118,10 @@ int main(int argc, char **argv) {
 
     // Check scene specification and max steps
     if (strcmp(argv[1], "-u") == 0) {   // User defined scene
+        manager->infinite_on_ = 1;
         raychess::SetUpUserScene(manager);
     } else {                            // Default scene
+        manager->infinite_on_ = 0;
         raychess::SetUpDefaultScene(manager);
     }
     manager->set_step_max(atoi(argv[2]));           // Maximum level of recursions
@@ -132,7 +136,7 @@ int main(int argc, char **argv) {
     raychess::RayTrace(manager);       // Do ray trace!
     gettimeofday(&end, NULL);
     auto delta = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
-    printf("Done! Time used: %.2lfs\n", delta);
+    printf("Done! Time used: %.2lfs, intersection test number: %lld\n", delta, intersection_count);
 
     // Make sure that intensity values are normalized
     image::HistogramNormalization();

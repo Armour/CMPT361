@@ -148,6 +148,7 @@ void ImportMeshFile(raychess::RenderManager *manager, string file_path, float sc
             if (size >= 3) {                        // Mesh with many triangles
                 glm::vec3 v1, v2, v3;
                 bool infinite = false;
+                bool chessboard = false;
                 float triangle_shininess = libconsts::kMeshShininess;
                 float triangle_reflectance = libconsts::kMeshReflectance;
                 float triangle_refractance = libconsts::kMeshRefractance;
@@ -160,7 +161,7 @@ void ImportMeshFile(raychess::RenderManager *manager, string file_path, float sc
                 v3 = mesh_vertex[face_vertex[2] - 1];
                 raychess::Object *object_list = AddTriangle(manager->get_scene_objects(), v1, v2, v3, triangle_ambient, triangle_diffuse,
                                                             triangle_specular, triangle_shininess, triangle_reflectance,
-                                                            triangle_refractance, triangle_reflect_ratio, ++index, infinite);
+                                                            triangle_refractance, triangle_reflect_ratio, ++index, infinite, chessboard);
                 manager->set_scene_objects(object_list);
             } else {                                // If size is less than 3, then this is not a valid smf file
                 cout << "Fatal! Smf file import error!" << endl;

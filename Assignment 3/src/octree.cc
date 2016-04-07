@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "octree.h"
+#include <iostream>
 
 namespace raychess {
 
@@ -41,7 +42,7 @@ OctreeNode::OctreeNode(glm::vec3 min_pos, glm::vec3 max_pos) {
         sub_space_[i] = nullptr;
     }
     objects_.clear();
-};
+}
 
 //
 // Function: SetRange
@@ -115,7 +116,7 @@ void OctreeNode::SplitSpace(int step) {
     // Put objects to sub space
     for (Object *object : objects_) {
         for (int i = 0; i < MAX_NODE_COUNT; i++) {
-            glm::vec3 loose = glm::vec3(0.01f, 0.01f, 0.01f);
+            glm::vec3 loose = glm::vec3(0.0001f, 0.0001f, 0.0001f);
             if (object->InCubeRange(sub_space_[i]->min_pos_ - loose, sub_space_[i]->max_pos_ + loose)) {
                 sub_space_[i]->AddObject(object);
             }

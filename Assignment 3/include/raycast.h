@@ -54,13 +54,14 @@ public:
     };
     ~RenderManager() {};
 
-    int shadow_on_;          // The option flags
+    int shadow_on_;             // The option flags
     int reflection_on_;
     int refraction_on_;
     int chessboard_on_;
     int diffuse_on_;
     int antialiasing_on_;
     int octree_on_;
+    int infinite_on_;           // Infinite chessboard for bonus
 
     inline glm::vec3 get_light_position(void) const { return light_position_; };
     inline glm::vec3 get_light_intensity(void) const { return light_intensity_; };

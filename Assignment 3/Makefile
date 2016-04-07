@@ -28,7 +28,6 @@ CC = g++
 CFLAGS = -std=c++11 -O3 -Wall -g -pedantic -DGL_GLEXT_PROTOTYPES
 
 # The name of the final executable
-RAYCAST = raycast
 RAYCHESS = raychess
 
 # The basic library we are using add the other libraries you want to link
@@ -45,10 +44,7 @@ LIBFLAG = -L$(LIBDIR)
 OBJECT = $(SOURCE:.cc=.o)
 
 # Don't touch any of these either if you don't know what you're doing
-all: raycast raychess
-
-raycast: $(OBJECT)
-	$(CC) $(CFLAGS) $(INCLUDEFLAG) $(LIBFLAG)  $(OBJECT) -o $(RAYCAST) $(LDFLAGS)
+all: raychess
 
 raychess: $(OBJECT)
 	$(CC) $(CFLAGS) $(INCLUDEFLAG) $(LIBFLAG)  $(OBJECT) -o $(RAYCHESS) $(LDFLAGS)
@@ -57,4 +53,4 @@ $(OBJECT):
 	$(CC) $(CFLAGS) $(INCLUDEFLAG) -c -o $@ $(@:.o=.cc)
 
 clean:
-	rm -f $(OBJECT) $(RAYCAST) $(RAYCHESS)
+	rm -f $(OBJECT) $(RAYCHESS)

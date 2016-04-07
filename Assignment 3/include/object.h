@@ -27,7 +27,8 @@ namespace raychess {
 class Object {
 private:
     int index_;                     // Identifies an object, must be greater than 0
-    bool infinite;                  // Whether the object is infinitely expand or not
+    bool infinite_;                  // Whether the object is infinitely expand or not
+    bool chessboard_;                // Whether the object is in chessboard pattern or not
     glm::vec3 mat_ambient_;         // Material property used in Phong model
     glm::vec3 mat_diffuse_;
     glm::vec3 mat_specular_;
@@ -42,7 +43,8 @@ public:
     virtual ~Object() {};
 
     inline int get_index(void) const { return index_; };
-    inline bool get_infinite(void) { return infinite; };
+    inline bool get_infinite(void) { return infinite_; };
+    inline bool get_chessboard(void) { return chessboard_; };
     inline glm::vec3 get_ambient(void) const { return mat_ambient_; };
     inline glm::vec3 get_diffuse(void) const { return mat_diffuse_; };
     inline glm::vec3 get_specular(void) const { return mat_specular_; };
@@ -53,7 +55,8 @@ public:
     inline Object *get_next(void) const { return next_; };
 
     inline void set_index(int index) { this->index_ = index; };
-    inline void set_infinite(bool infinite) { this->infinite = infinite; };
+    inline void set_infinite(bool infinite) { this->infinite_ = infinite; };
+    inline void set_chessboard(bool chessboard) { this->chessboard_ = chessboard; };
     inline void set_ambient(glm::vec3 ambient) { this->mat_ambient_ = ambient; };
     inline void set_diffuse(glm::vec3 diffuse) { this->mat_diffuse_ = diffuse; };
     inline void set_specular(glm::vec3 specular) { this->mat_specular_ = specular; };

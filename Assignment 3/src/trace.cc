@@ -17,8 +17,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "trace.h"
+#include <omp.h>
+#include <iostream>
+#include <set>
 
 extern GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
+extern long long intersection_count;
 
 namespace raychess {
 
@@ -44,9 +48,9 @@ glm::vec3 PhongIllumination(RenderManager *manager, Object *object, glm::vec3 hi
     glm::vec3 kd = object->get_diffuse();
     glm::vec3 ks = object->get_specular();
     glm::vec3 ka = object->get_ambient();
-    if (object->get_infinite()) {       // If is infinite chessboard
-        float width = libconsts::kInfiniteChessBoardGridWidth;
-        glm::vec3 grid_color = ((int) round((hit.x - width / 2.0f) / width) + (int) round(hit.z / width)) % 2 == 0?
+    if (object->get_chessboard()) {       // If is in chessboard pattern
+        float width = libconsts::kChessBoardGridWidth;
+        glm::vec3 grid_color = ((int)round((hit.x - width / 2.0f) / width) + (int)floor(hit.z / width)) % 2 == 0?
                                libconsts::kColorBlack: libconsts::kColorWhite;
         kd = ks = ka = grid_color;
     }
@@ -104,34 +108,42 @@ glm::vec3 RecursiveRayTrace(RenderManager *manager, glm::vec3 origin, glm::vec3 
 
         glm::vec3 color = PhongIllumination(manager, object, *hit, surf_norm, manager->shadow_on_ && !in_object);       // Phong
 
-        if (depth < manager->get_step_max() && manager->reflection_on_) {            // Reflection
-            glm::vec3 reflect_ray = 2.0f * surf_norm * (glm::dot(surf_norm, -direction)) + direction;
-            color += object->get_reflectance() * RecursiveRayTrace(manager, *hit + reflect_ray * libconsts::kErrorEpsilon,
-                                                                   reflect_ray, depth + 1, object_ignore);
-        }
+//#pragma omp parallel sections
+        {
 
-        if (depth < manager->get_step_max() && manager->refraction_on_ && object->get_refractance() > 0.001f) {          // Refraction
-            float refract_ratio = object->get_refract_ratio();
-            float ratio = in_object? refract_ratio: (1.0f / refract_ratio);
-            float c1 = -glm::dot(surf_norm, direction);
-            float c2 = 1.0f - ratio * ratio * (1.0f - c1 * c1);
-            if (c2 > 0.0f) {
-                glm::vec3 refract_ray = glm::normalize((ratio * c1 - sqrtf(c2)) * surf_norm + c1 * direction);
-                color += object->get_refractance() * RecursiveRayTrace(manager, *hit + refract_ray * libconsts::kErrorEpsilon,
-                                                                       refract_ray, depth + 1, object_ignore);
+//#pragma omp section
+            if (depth < manager->get_step_max() && manager->reflection_on_) {            // Reflection
+                glm::vec3 reflect_ray = 2.0f * surf_norm * (glm::dot(surf_norm, -direction)) + direction;
+                color += object->get_reflectance() * RecursiveRayTrace(manager, *hit + reflect_ray * libconsts::kErrorEpsilon,
+                                                                       reflect_ray, depth + 1, object_ignore);
             }
-        }
 
-        if (depth < 2 && !in_object && manager->diffuse_on_) {        // Diffuse
-        	glm::vec3 diffuse_color = glm::vec3(0.0f, 0.0f, 0.0f);
-            for (int i = 0; i < libconsts::kDiffuseReflectNumber; i++) {
-                float degree = (float)(rand() % 161) - 80.0f;				// Random -80 to 80 degree
-                glm::vec3 rotate_normal = glm::normalize(glm::cross(surf_norm, -direction));
-                glm::vec3 diffuse_ray = glm::rotate(surf_norm, degree * libconsts::kDegreeToRadians, rotate_normal);
-                diffuse_color += RecursiveRayTrace(manager, *hit + diffuse_ray * libconsts::kErrorEpsilon,
-                                                   diffuse_ray, depth + 1, object_ignore);
+//#pragma omp section
+            if (depth < manager->get_step_max() && manager->refraction_on_ && object->get_refractance() > 0.001f) {          // Refraction
+                float refract_ratio = object->get_refract_ratio();
+                float ratio = in_object? refract_ratio: (1.0f / refract_ratio);
+                float c1 = -glm::dot(surf_norm, direction);
+                float c2 = 1.0f - ratio * ratio * (1.0f - c1 * c1);
+                if (c2 > 0.0f) {
+                    glm::vec3 refract_ray = glm::normalize((ratio * c1 - sqrtf(c2)) * surf_norm + c1 * direction);
+                    color += object->get_refractance() * RecursiveRayTrace(manager, *hit + refract_ray * libconsts::kErrorEpsilon,
+                                                                           refract_ray, depth + 1, object_ignore);
+                }
             }
-            color += object->get_diffuse() * diffuse_color / (float)libconsts::kDiffuseReflectNumber * 0.2f;
+
+//#pragma omp section
+            if (depth < 2 && !in_object && manager->diffuse_on_) {        // Diffuse
+            	glm::vec3 diffuse_color = glm::vec3(0.0f, 0.0f, 0.0f);
+                for (int i = 0; i < libconsts::kDiffuseReflectNumber; i++) {
+                    float degree = (float)(rand() % 161) - 80.0f;				// Random -80 to 80 degree
+                    glm::vec3 rotate_normal = glm::normalize(glm::cross(surf_norm, -direction));
+                    glm::vec3 diffuse_ray = glm::rotate(surf_norm, degree * libconsts::kDegreeToRadians, rotate_normal);
+                    diffuse_color += RecursiveRayTrace(manager, *hit + diffuse_ray * libconsts::kErrorEpsilon,
+                                                       diffuse_ray, depth + 1, object_ignore);
+                }
+                color += object->get_diffuse() * diffuse_color / (float)libconsts::kDiffuseReflectNumber * 0.2f;
+            }
+            
         }
 
         delete hit;
@@ -169,7 +181,9 @@ void RayTrace(RenderManager *manager) {
     glm::vec3 ret_color;
     glm::vec3 cur_pixel_pos;
 
+//#pragma omp parallel for private(i)
     for (i = 0; i < libconsts::kWindowSizeHeight; i++) {
+//#pragma omp parallel for private(j)
         for (j = 0; j < libconsts::kWindowSizeWidth; j++) {
 
             // Ray is cast through center of pixel
@@ -229,10 +243,12 @@ Object *IntersectScene(RenderManager *manager, glm::vec3 origin, glm::vec3 direc
 
     if (manager->octree_on_) {          // Ray intersection test with octree
         std::vector<OctreeNode *> nodes;
+        std::set<int> tested;
         raychess::RayTraverse(manager->get_octree_root(), origin, direction, nodes);            // Do the ray traverse on octree space
         for (auto node : nodes) {
             for (auto object : node->objects_) {
-                if (object->get_index() != object_ignore) {
+                int index = object->get_index();
+                if (tested.find(index) == tested.end() && index != object_ignore) {
                     float distance = object->IntersectRay(origin, direction, current_hit);      // Get distance
                     if (distance != -1 && distance < libconsts::kMaxDistance) {                 // If intersected
                         if (result == nullptr || glm::length(*hit - origin) > glm::length(*current_hit - origin)) {         // Update hit
@@ -240,10 +256,13 @@ Object *IntersectScene(RenderManager *manager, glm::vec3 origin, glm::vec3 direc
                             result = object;
                         }
                     }
+                    tested.insert(index);
+                    intersection_count++;
                 }
             }
         }
     } else {                // Do ray intersection test without octree
+        result = nullptr;
         Object *current_object = objects;
         while (current_object != nullptr) {
             if (current_object->get_index() != object_ignore) {
@@ -254,6 +273,7 @@ Object *IntersectScene(RenderManager *manager, glm::vec3 origin, glm::vec3 direc
                         result = current_object;
                     }
                 }
+                intersection_count++;
             }
             current_object = current_object->get_next();            // Test next object
         }
