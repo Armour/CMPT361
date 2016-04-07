@@ -24,43 +24,11 @@
 #include "image_util.h"
 #include "scene.h"
 #include "trace.h"
-#include "octree.h"
+#include "raycast.h"
 
-// The array for the final image
-GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];
+GLfloat frame[libconsts::kWindowSizeHeight][libconsts::kWindowSizeWidth][3];    // The array for the final image
 
-// Background color
-glm::vec3 background_color;
-
-// List of objects in the scene
-raychess::Object *scene = nullptr;
-
-// The octree for ray casting
-raychess::OctreeNode *octree = nullptr;
-
-// Light position and color
-glm::vec3 light_position;
-glm::vec3 light_intensity;
-
-// Global ambient term
-glm::vec3 global_ambient;
-
-// Light decay parameters
-float decay_a;
-float decay_b;
-float decay_c;
-
-// Maximum level of recursions of reflection
-int step_max = 0;
-
-// The option flags
-int shadow_on = 0;
-int reflection_on = 0;
-int refraction_on = 0;
-int chessboard_on = 0;
-int diffuse_on = 0;
-int antialiasing_on = 0;
-int octree_on = 0;
+raychess::RenderManager *manager;   // The render manager
 
 //
 // Function: DisplayFunc
@@ -100,8 +68,7 @@ void KeyboardFunc(unsigned char key, int, int) {
     switch (key) {
     case 'q':       // 'q' and 'Q' keys for quit function
     case 'Q':
-        free(scene);
-        exit(0);
+        exit(EXIT_SUCCESS);
     case 's':       // 's' and 'S' keys for save image function
     case 'S':
         image::SaveImage();
@@ -134,24 +101,26 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    manager = new raychess::RenderManager();
+
     // Optional arguments
     for(int i = 3; i < argc; i++) {
-        if (strcmp(argv[i], "+s") == 0) shadow_on = 1;
-        if (strcmp(argv[i], "+l") == 0) reflection_on = 1;
-        if (strcmp(argv[i], "+r") == 0) refraction_on = 1;
-        if (strcmp(argv[i], "+c") == 0) chessboard_on = 1;
-        if (strcmp(argv[i], "+f") == 0) diffuse_on = 1;
-        if (strcmp(argv[i], "+p") == 0) antialiasing_on = 1;
-        if (strcmp(argv[i], "+o") == 0) octree_on = 1;
+        if (strcmp(argv[i], "+s") == 0) manager->shadow_on_ = 1;
+        if (strcmp(argv[i], "+l") == 0) manager->reflection_on_ = 1;
+        if (strcmp(argv[i], "+r") == 0) manager->refraction_on_ = 1;
+        if (strcmp(argv[i], "+c") == 0) manager->chessboard_on_ = 1;
+        if (strcmp(argv[i], "+f") == 0) manager->diffuse_on_ = 1;
+        if (strcmp(argv[i], "+p") == 0) manager->antialiasing_on_ = 1;
+        if (strcmp(argv[i], "+o") == 0) manager->octree_on_ = 1;
     }
 
     // Check scene specification and max steps
     if (strcmp(argv[1], "-u") == 0) {   // User defined scene
-        raychess::SetUpUserScene();
+        raychess::SetUpUserScene(manager);
     } else {                            // Default scene
-        raychess::SetUpDefaultScene();
+        raychess::SetUpDefaultScene(manager);
     }
-    step_max = atoi(argv[2]);           // Maximum level of recursions
+    manager->set_step_max(atoi(argv[2]));           // Maximum level of recursions
 
     // Initialize random seed
     srand((unsigned int)time(NULL));
@@ -160,7 +129,7 @@ int main(int argc, char **argv) {
     printf("Rendering scene using my fantastic ray tracer ...\n");
     struct timeval start, end;
     gettimeofday(&start, NULL);
-    raychess::RayTrace();       // Do ray trace!
+    raychess::RayTrace(manager);       // Do ray trace!
     gettimeofday(&end, NULL);
     auto delta = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
     printf("Done! Time used: %.2lfs\n", delta);

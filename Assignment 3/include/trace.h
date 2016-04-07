@@ -20,19 +20,22 @@
 #define RAYCHESS_RAY_TRACE_H_
 
 #include "lib_consts.h"
-#include "sphere.h"
-#include "triangle.h"
+#include "object.h"
+#include "raycast.h"
 
 namespace raychess {
 
 // The phong illumination implementation
-glm::vec3 PhongIllumination(Object *object, glm::vec3 hit, glm::vec3 surf_norm, bool shadow_on);
+glm::vec3 PhongIllumination(RenderManager *manager, Object *object, glm::vec3 hit, glm::vec3 surf_norm, bool shadow_on);
 
 // This is the recursive ray trace function
-glm::vec3 RecursiveRayTrace(glm::vec3 origin, glm::vec3 direction, int depth, int sphere_ignore);
+glm::vec3 RecursiveRayTrace(RenderManager *manager, glm::vec3 origin, glm::vec3 direction, int depth, int object_ignore);
 
 // This function do the ray trace, using the recursive ray trace above for every pixels
-void RayTrace(void);
+void RayTrace(RenderManager *manager);
+
+// Intersect ray with objects in scene
+Object *IntersectScene(RenderManager *manager, glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int object_ignore);
 
 }  // namespace raychess
 

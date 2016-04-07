@@ -79,6 +79,9 @@ const float kMeshShininess = 30.0f;
 const float kMeshReflectance = 0.3f;
 const float kMeshRefractance = 0.6f;
 const float kMeshRefractRatio = 1.2f;
+const glm::vec3 kMeshAmbient = {0.7f, 0.7f, 0.7f};
+const glm::vec3 kMeshDiffuse = {0.4f, 0.05f, 0.4f};
+const glm::vec3 kMeshSpecular = {1.0f, 1.0f, 1.0f};
 
 }  // namespace libconsts
 

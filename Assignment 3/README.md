@@ -4,13 +4,14 @@
 ## Not Finished Features
 
 - None
-- Bonus Added
+- **Bonus Added**
 
 ## File Structure
 
 - src -- the source file folder
     - image_util.cc -- Used for image manipulation
     - init_shader.cc -- Used to read shader
+    - **octree.cc** -- Used to reduce intersection test
     - object.cc -- The base class for object in scene
     - sphere.cc -- The derived class from object
     - triangle.cc -- The derived class from object
@@ -23,6 +24,7 @@
     - init_shader.h -- Used to read shader
     - lib_consts.h -- Constant variables header
     - lib_gl.h -- Include GL related header
+    - **octree.h** -- Used to reduce intersection test
     - object.h -- The base class for object in scene
     - sphere.h -- The derived class from object
     - triangle.h -- The derived class from object
@@ -40,21 +42,26 @@
     - Manual compile
         - `cmake .` (Optional)
         - `make`
-        - `./raychess` 
+        - Use `./raycast` to run basic part
+        - Use `./raychess` to run bonus part
+        - (PS: Actually they are the same lol)
 
 - Ubuntu
     - Use `Clion`
     - Manual compile
         - `cmake .` (Optional)
         - `make`
-        - `./raychess` 
-
-- If `make` in ubuntu failed, you should remove depend and try to run `make` twice.
+        - Use `./raycast` to run basic part
+        - Use `./raychess` to run bonus part
+        - (PS: Actually they are the same lol)
 
 ## Additional Features
 
 - Functions
-
+    - **Parallel programming** (OpenMP)
+    - **Octree** implemented, use `+o` to open it
+    - OOP with **Polymorphism**
+    
 - Others
     - Cross platform (Clion + Cmake)
     - Following Google C++ Style, well commented

@@ -19,17 +19,15 @@
 #ifndef RAYCHESS_SCENE_H_
 #define RAYCHESS_SCENE_H_
 
-#include "sphere.h"
-#include "triangle.h"
-#include "smf_parser.h"
+#include "raycast.h"
 
 namespace raychess {
 
 // This function set up the default scene
-void SetUpDefaultScene(void);
+void SetUpDefaultScene(RenderManager *manager);
 
 // This function set up my own scene
-void SetUpUserScene(void);
+void SetUpUserScene(RenderManager *manager);
 
 }  // namespace raychess
 

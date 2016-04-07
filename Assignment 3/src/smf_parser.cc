@@ -18,8 +18,6 @@
 
 #include "smf_parser.h"
 
-extern raychess::Object *scene;
-
 namespace smfparser {
 
 // The mesh vertices stored in memory
@@ -98,18 +96,18 @@ void TrimTailingSpace(string &s) {
 //   Import mesh data from file to memory
 //
 //   Parameters:
+//       manager: the render manager for ray tracing
 //       file_path: the path of the import file
 //       scale: the scale factor of the imported mesh
 //       rotate: the rotate factor of the imported mesh
 //       offset: the offset of the imported mesh
 //       index: the index of the object in the scene
-//       color: the color of the imported mesh
 //
 //   Returns:
 //       void
 //
 
-void ImportMeshFile(string file_path, float scale, float rotate, glm::vec3 offset, int &index, glm::vec3 color) {
+void ImportMeshFile(raychess::RenderManager *manager, string file_path, float scale, float rotate, glm::vec3 offset, int &index) {
 
     string line;
     ifstream fin("chess_pieces/" + file_path, ifstream::in);
@@ -154,11 +152,16 @@ void ImportMeshFile(string file_path, float scale, float rotate, glm::vec3 offse
                 float triangle_reflectance = libconsts::kMeshReflectance;
                 float triangle_refractance = libconsts::kMeshRefractance;
                 float triangle_reflect_ratio = libconsts::kMeshRefractRatio;
+                glm::vec3 triangle_ambient = libconsts::kMeshAmbient;
+                glm::vec3 triangle_diffuse = libconsts::kMeshDiffuse;
+                glm::vec3 triangle_specular = libconsts::kMeshSpecular;
                 v1 = mesh_vertex[face_vertex[0] - 1];
                 v2 = mesh_vertex[face_vertex[1] - 1];
                 v3 = mesh_vertex[face_vertex[2] - 1];
-                scene = AddTriangle(scene, v1, v2, v3, color, color, color, triangle_shininess, triangle_reflectance,
-                                    triangle_refractance, triangle_reflect_ratio, ++index, infinite);
+                raychess::Object *object_list = AddTriangle(manager->get_scene_objects(), v1, v2, v3, triangle_ambient, triangle_diffuse,
+                                                            triangle_specular, triangle_shininess, triangle_reflectance,
+                                                            triangle_refractance, triangle_reflect_ratio, ++index, infinite);
+                manager->set_scene_objects(object_list);
             } else {                                // If size is less than 3, then this is not a valid smf file
                 cout << "Fatal! Smf file import error!" << endl;
                 exit(EXIT_FAILURE);

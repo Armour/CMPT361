@@ -20,8 +20,6 @@
 #define RAYCHESS_SPHERE_H_
 
 #include "object.h"
-#include "lib_gl.h"
-#include "lib_consts.h"
 
 namespace raychess {
 

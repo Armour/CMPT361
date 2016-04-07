@@ -17,19 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "scene.h"
-#include "octree.h"
-
-extern raychess::Object *scene;
-extern raychess::OctreeNode *octree;
-extern glm::vec3 background_color;
-extern glm::vec3 light_position;
-extern glm::vec3 light_intensity;
-extern glm::vec3 global_ambient;
-extern int chessboard_on;
-extern int octree_on;
-extern float decay_a;
-extern float decay_b;
-extern float decay_c;
+#include "sphere.h"
+#include "smf_parser.h"
 
 namespace raychess {
 
@@ -40,30 +29,30 @@ namespace raychess {
 //   This function set up the default scene
 //
 //   Parameters:
-//       void
+//       manager: the render manager for ray tracing
 //
 //   Returns:
 //       void
 //
 
-void SetUpDefaultScene(void) {
+void SetUpDefaultScene(RenderManager *manager) {
     // Index
     int index = 0;
 
     // Set background color
-    background_color = {0.50f, 0.05f, 0.80f};
+    manager->set_background_color({0.50f, 0.05f, 0.80f});
 
     // Set up global ambient color
-    global_ambient = {0.2f, 0.2f, 0.2f};
+    manager->set_global_ambient({0.2f, 0.2f, 0.2f});
 
     // Set up light
-    light_position = {-2.0f, 5.0f, 1.0f};
-    light_intensity = {1.0f, 1.0f, 1.0f};
+    manager->set_light_position({-2.0f, 5.0f, 1.0f});
+    manager->set_light_intensity({1.0f, 1.0f, 1.0f});
 
     // Set up decay parameters
-    decay_a = 0.5f;
-    decay_b = 0.3f;
-    decay_c = 0.0f;
+    manager->set_decay_a(0.5f);
+    manager->set_decay_b(0.3f);
+    manager->set_decay_c(0.0f);
 
     // Sphere 1
     glm::vec3 sphere1_center = {1.5f, -0.2f, -3.2f};
@@ -75,8 +64,10 @@ void SetUpDefaultScene(void) {
     float sphere1_reflectance = 0.4f;
     float sphere1_refractance = 0.4f;
     float sphere1_reflect_ratio = 1.52f;
-    scene = AddSphere(scene, sphere1_center, sphere1_radius, sphere1_ambient, sphere1_diffuse, sphere1_specular,
-                      sphere1_shininess, sphere1_reflectance, sphere1_refractance, sphere1_reflect_ratio, ++index);
+    Object *object_list = AddSphere(manager->get_scene_objects(), sphere1_center, sphere1_radius, sphere1_ambient,
+                                   sphere1_diffuse, sphere1_specular, sphere1_shininess, sphere1_reflectance,
+                                   sphere1_refractance, sphere1_reflect_ratio, ++index);
+    manager->set_scene_objects(object_list);
 
     // Sphere 2
     glm::vec3 sphere2_center = {-1.5f, 0.0f, -3.5f};
@@ -88,8 +79,10 @@ void SetUpDefaultScene(void) {
     float sphere2_reflectance = 0.3f;
     float sphere2_refractance = 0.3f;
     float sphere2_reflect_ratio = 1.52f;
-    scene = AddSphere(scene, sphere2_center, sphere2_radius, sphere2_ambient, sphere2_diffuse, sphere2_specular,
-                      sphere2_shininess, sphere2_reflectance, sphere2_refractance, sphere2_reflect_ratio, ++index);
+    object_list = AddSphere(manager->get_scene_objects(), sphere2_center, sphere2_radius, sphere2_ambient,
+                           sphere2_diffuse, sphere2_specular, sphere2_shininess, sphere2_reflectance,
+                           sphere2_refractance, sphere2_reflect_ratio, ++index);
+    manager->set_scene_objects(object_list);
 
     // Sphere 3
     glm::vec3 sphere3_center = {-0.35f, 1.75f, -2.25f};
@@ -101,11 +94,13 @@ void SetUpDefaultScene(void) {
     float sphere3_reflectance = 0.3f;
     float sphere3_refractance = 0.3f;
     float sphere3_reflect_ratio = 1.52f;
-    scene = AddSphere(scene, sphere3_center, sphere3_radius, sphere3_ambient, sphere3_diffuse, sphere3_specular,
-                      sphere3_shininess, sphere3_reflectance, sphere3_refractance, sphere3_reflect_ratio, ++index);
+    object_list = AddSphere(manager->get_scene_objects(), sphere3_center, sphere3_radius, sphere3_ambient,
+                            sphere3_diffuse, sphere3_specular, sphere3_shininess, sphere3_reflectance,
+                            sphere3_refractance, sphere3_reflect_ratio, ++index);
+    manager->set_scene_objects(object_list);
 
     // Chessboard with many triangles
-    if (chessboard_on) {
+    if (manager->chessboard_on_) {
         glm::vec3 v1, v2, v3, v4;
         bool infinite = false;
         float triangle_shininess = 30.0f;
@@ -121,23 +116,26 @@ void SetUpDefaultScene(void) {
                 v2 = {i * width + width, 0.0f, j * width + 0.0f};
                 v3 = {i * width + 0.0f, 0.0f, j * width + width};
                 v4 = {i * width + width, 0.0f, j * width + width};
-                scene = AddTriangle(scene, v1 + offset, v3 + offset, v2 + offset, color, color, color, triangle_shininess,
-                                    triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index, infinite);
-                scene = AddTriangle(scene, v2 + offset, v3 + offset, v4 + offset, color, color, color, triangle_shininess,
-                                    triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index, infinite);
+                object_list = AddTriangle(manager->get_scene_objects(), v1 + offset, v3 + offset, v2 + offset,
+                                          color, color, color, triangle_shininess, triangle_reflectance, triangle_refractance,
+                                          triangle_reflect_ratio, ++index, infinite);
+                manager->set_scene_objects(object_list);
+                object_list = AddTriangle(manager->get_scene_objects(), v2 + offset, v3 + offset, v4 + offset,
+                                          color, color, color, triangle_shininess, triangle_reflectance, triangle_refractance,
+                                          triangle_reflect_ratio, ++index, infinite);
+                manager->set_scene_objects(object_list);
             }
         }
     }
 
     // Create octree with all the objects in scene
-    if (octree_on) {
-        octree = new OctreeNode(glm::vec3(-20.0f, -20.0f, -20.0f), glm::vec3(20.0f, 20.0f, 20.0f));
-        Object *object = scene;
+    if (manager->octree_on_) {
+        Object *object = manager->get_scene_objects();
         while (object != nullptr) {
-            octree->AddObject(object);
+            manager->get_octree_root()->AddObject(object);
             object = object->get_next();
         }
-        octree->SplitSpace(8);
+        manager->get_octree_root()->SplitSpace(8);
     }
 }
 
@@ -148,39 +146,39 @@ void SetUpDefaultScene(void) {
 //   This function set up my own scene
 //
 //   Parameters:
-//       void
+//       manager: the render manager for ray tracing
 //
 //   Returns:
 //       void
 //
 
-void SetUpUserScene(void) {
+void SetUpUserScene(RenderManager *manager) {
     // Index
     int index = 0;
 
     // Set background color
-    background_color = {0.50f, 0.05f, 0.80f};
+    manager->set_background_color({0.50f, 0.05f, 0.80f});
 
     // Set up global ambient color
-    global_ambient = {0.2f, 0.2f, 0.2f};
+    manager->set_global_ambient({0.2f, 0.2f, 0.2f});
 
     // Set up light
-    light_position = {-2.0f, 5.0f, 1.0f};
-    light_intensity = {1.0f, 1.0f, 1.0f};
+    manager->set_light_position({-2.0f, 5.0f, 1.0f});
+    manager->set_light_intensity({1.0f, 1.0f, 1.0f});
 
     // Set up decay parameters
-    decay_a = 0.5f;
-    decay_b = 0.3f;
-    decay_c = 0.0f;
+    manager->set_decay_a(0.5f);
+    manager->set_decay_b(0.3f);
+    manager->set_decay_c(0.0f);
 
     // Import from mesh file
-    //smfparser::ImportMeshFile("chess_piece.smf", 3.5f, 0, glm::vec3(-3.0f, -1.5f, -5.20f), index, glm::vec3(0.6f, 0.0f, 0.0f));
-    //smfparser::ImportMeshFile("bishop.smf", 45.0f, 0, glm::vec3(1.5f, -1.5f, -4.00f), index, glm::vec3(0.0f, 0.0f, 0.6f));
-    smfparser::ImportMeshFile("chess_hires.smf", 3.5f, 0, glm::vec3(-3.0f, -0.6f, -5.20f), index, glm::vec3(0.6f, 0.0f, 0.2f));
-    //smfparser::ImportMeshFile("bishop_hires.smf", 45.0f, 0, glm::vec3(1.5f, -0.5f, -4.00f), index, glm::vec3(0.6f, 0.0f, 0.2f));
+    smfparser::ImportMeshFile(manager, "chess_piece.smf", 3.5f, 0, glm::vec3(-3.0f, -1.5f, -5.20f), index);
+    smfparser::ImportMeshFile(manager, "bishop.smf", 45.0f, 0, glm::vec3(1.5f, -1.5f, -4.00f), index);
+    //smfparser::ImportMeshFile("chess_hires.smf", 3.5f, 0, glm::vec3(-3.0f, -0.6f, -5.20f), index);
+    //smfparser::ImportMeshFile("bishop_hires.smf", 45.0f, 0, glm::vec3(1.5f, -0.5f, -4.00f), index);
 
     // Add infinite chessboard
-    if (chessboard_on) {
+    if (manager->chessboard_on_) {
         bool infinite = true;
         glm::vec3 v1, v2, v3;
         float triangle_shininess = 30.0f;
@@ -193,19 +191,20 @@ void SetUpUserScene(void) {
         v1 = {0.0f, 0.0f, 0.0f};
         v2 = {width, 0.0f, 0.0f};
         v3 = {0.0f, 0.0f, width};
-        scene = AddTriangle(scene, v1 + offset, v3 + offset, v2 + offset, color, color, color, triangle_shininess,
-                            triangle_reflectance, triangle_refractance, triangle_reflect_ratio, ++index, infinite);
+        Object *object_list = AddTriangle(manager->get_scene_objects(), v1 + offset, v3 + offset, v2 + offset,
+                                          color, color, color, triangle_shininess, triangle_reflectance, triangle_refractance,
+                                          triangle_reflect_ratio, ++index, infinite);
+        manager->set_scene_objects(object_list);
     }
 
     // Create octree with all the objects in scene
-    if (octree_on) {
-        octree = new OctreeNode(glm::vec3(-20.0f, -20.0f, -20.0f), glm::vec3(20.0f, 20.0f, 20.0f));
-        Object *object = scene;
+    if (manager->octree_on_) {
+        Object *object = manager->get_scene_objects();
         while (object != nullptr) {
-            octree->AddObject(object);
+            manager->get_octree_root()->AddObject(object);
             object = object->get_next();
         }
-        octree->SplitSpace(9);
+        manager->get_octree_root()->SplitSpace(9);
     }
 }
 

@@ -68,9 +68,6 @@ public:
     virtual bool InCubeRange(glm::vec3 min_pos, glm::vec3 max_pos) = 0;         // Check if a triangle is in a specific cube range
 };
 
-// Intersect ray with objects in scene
-Object *IntersectScene(glm::vec3 origin, glm::vec3 direction, Object *objects, glm::vec3 *hit, int object_ignore);
-
 }  // namespace raychess
 
 #endif  // RAYCHESS_OBJECT_H_

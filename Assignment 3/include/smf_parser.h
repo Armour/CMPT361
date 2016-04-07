@@ -29,6 +29,7 @@
 #include "lib_consts.h"
 #include "object.h"
 #include "triangle.h"
+#include "raycast.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ void TrimLeadingSpace(string &s);
 void TrimTailingSpace(string &s);
 
 // Import mesh data from file to memory
-void ImportMeshFile(string file_path, float scale, float rotate, glm::vec3 offset, int &index, glm::vec3 color);
+void ImportMeshFile(raychess::RenderManager *manager, string file_path, float scale, float rotate, glm::vec3 offset, int &index);
 
 }  // namespace smfparser
 

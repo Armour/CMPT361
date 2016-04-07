@@ -11,6 +11,7 @@ set(SOURCE_FILES
         include/init_shader.h
         include/lib_consts.h
         include/lib_gl.h
+        include/raycast.h
         include/scene.h
         include/object.h
         include/triangle.h
@@ -23,7 +24,6 @@ set(SOURCE_FILES
         src/raycast.cc
         src/scene.cc
         src/octree.cc
-        src/object.cc
         src/triangle.cc
         src/sphere.cc
         src/trace.cc
